@@ -6,7 +6,7 @@ The current priority is backend foundation first: database structure, authentica
 
 ## Project Status
 
-Current phase: API foundation added on top of the first backend foundation.
+Current phase: customer home page design started after the backend and API foundations.
 
 Done:
 
@@ -46,9 +46,14 @@ Done:
 - Added delivery order API list/show/status endpoints with assignment ownership checks.
 - Verified API role authorization for unauthenticated, customer, admin, and delivery sessions.
 - Verified missing AJAX CSRF tokens return compact `403` JSON responses.
+- Reworked the customer home page into a static, responsive grocery storefront design.
+- Added centralized CSS design tokens for the home page color palette, spacing, radius, and shadows.
+- Refined the home page stylesheet so the visual layout, cards, hero, banners, and responsive breakpoints match the current markup.
+- Kept the new home page design static only, with no API calls or dynamic database data.
 
 In progress / next:
 
+- Refine customer frontend styling across product, auth, account, and future cart pages.
 - Add automated feature tests once project PHPUnit dependencies are installed with Composer.
 - Add proper admin CRUD screens for products, users, orders, offers, and promotions.
 - Add customer saved address management.
@@ -64,7 +69,6 @@ Not started yet:
 - Admin product/order management screens.
 - Delivery order workflow.
 - Offers and promotions logic.
-- Frontend styling.
 - Category system.
 - Payment gateway.
 

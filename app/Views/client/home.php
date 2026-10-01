@@ -59,10 +59,14 @@ $benefits = [
             </nav>
 
             <div class="header-actions" aria-label="Quick actions">
-                <button type="button" aria-label="Search">⌕</button>
-                <a href="/login" aria-label="Account">○</a>
-                <button class="cart-button" type="button" aria-label="Cart">
-                    <span>Cart</span>
+                <button class="action-button action-search" type="button" aria-label="Search">
+                    <span class="sr-only">Search</span>
+                </button>
+                <a class="action-button action-user" href="/login" aria-label="Account">
+                    <span class="sr-only">Account</span>
+                </a>
+                <button class="action-button action-cart cart-button" type="button" aria-label="Cart">
+                    <span class="sr-only">Cart</span>
                     <strong>2</strong>
                 </button>
             </div>
@@ -83,7 +87,7 @@ $benefits = [
                 </div>
 
                 <div class="hero-visual" aria-label="Fresh vegetable basket">
-                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=90" alt="Basket of fresh vegetables">
+                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=980&q=90" alt="Basket of fresh vegetables">
                     <div class="fresh-seal">
                         <span>EAT FRESH</span>
                         <strong>STAY HEALTHY</strong>
@@ -125,6 +129,12 @@ $benefits = [
                             <p><?= esc($category['items']) ?></p>
                         </article>
                     <?php endforeach; ?>
+                </div>
+                <div class="slider-dots" aria-label="Featured product slides">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </section>
 
@@ -200,6 +210,13 @@ $benefits = [
                     </span>
                 </a>
                 <p>Your trusted source for fresh, organic and healthy food. We care for you and the planet.</p>
+                <div class="socials" aria-label="Social links">
+                    <span>f</span>
+                    <span>ig</span>
+                    <span>x</span>
+                    <span>in</span>
+                    <span>yt</span>
+                </div>
             </div>
             <div>
                 <h3>Quick Links</h3>
@@ -228,6 +245,10 @@ $benefits = [
                     <span>VISA</span>
                     <span>PayPal</span>
                     <span>UPI</span>
+                </div>
+                <div class="security-badges" aria-label="Security badges">
+                    <span>SSL</span>
+                    <span>SECURE</span>
                 </div>
             </div>
             <p class="copyright">© 2026 Sabjiwalah. All Rights Reserved.</p>

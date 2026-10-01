@@ -1,14 +1,8 @@
 {
-    "name": "codeigniter4/framework",
-    "description": "The CodeIgniter framework v4",
+    "name": "sabjiwalah/sabjiwalah",
+    "description": "Sabjiwalah web application",
     "license": "MIT",
     "type": "project",
-    "homepage": "https://codeigniter.com",
-    "support": {
-        "forum": "https://forum.codeigniter.com/",
-        "source": "https://github.com/codeigniter4/CodeIgniter4",
-        "slack": "https://codeigniterchat.slack.com"
-    },
     "require": {
         "php": "^8.2",
         "ext-intl": "*",

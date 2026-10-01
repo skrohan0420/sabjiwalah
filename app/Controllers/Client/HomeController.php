@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Client;
 
-class Home extends BaseController
+use App\Controllers\BaseController;
+use App\Models\ProductModel;
+
+class HomeController extends BaseController
 {
     public function index(): string
     {
@@ -29,8 +32,14 @@ class Home extends BaseController
             $databaseStatus['message'] = $exception->getMessage();
         }
 
-        return view('welcome_message', [
+        $products = (new ProductModel())
+            ->where('is_active', 1)
+            ->orderBy('name', 'ASC')
+            ->findAll(8);
+
+        return view('client/home', [
             'databaseStatus' => $databaseStatus,
+            'products'       => $products,
         ]);
     }
 }

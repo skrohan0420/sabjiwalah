@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class UserAddressModel extends Model
+{
+    protected $table = 'user_addresses';
+    protected $primaryKey = 'id';
+    protected $returnType = 'array';
+    protected $useTimestamps = true;
+    protected $allowedFields = [
+        'user_id',
+        'label',
+        'recipient_name',
+        'phone',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'postal_code',
+        'is_default',
+    ];
+
+    protected $validationRules = [
+        'user_id'        => 'required|is_natural_no_zero',
+        'label'          => 'required|max_length[60]',
+        'recipient_name' => 'required|max_length[120]',
+        'phone'          => 'required|max_length[30]',
+        'address_line_1' => 'required|max_length[255]',
+        'address_line_2' => 'permit_empty|max_length[255]',
+        'city'           => 'required|max_length[120]',
+        'state'          => 'permit_empty|max_length[120]',
+        'postal_code'    => 'required|max_length[20]',
+        'is_default'     => 'permit_empty|in_list[0,1]',
+    ];
+}

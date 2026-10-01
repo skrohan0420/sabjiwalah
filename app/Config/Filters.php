@@ -2,6 +2,11 @@
 
 namespace Config;
 
+use App\Filters\AuthFilter;
+use App\Filters\ApiAuthFilter;
+use App\Filters\ApiCsrfFilter;
+use App\Filters\ApiRoleFilter;
+use App\Filters\RoleFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -34,6 +39,11 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'auth'          => AuthFilter::class,
+        'role'          => RoleFilter::class,
+        'apiAuth'       => ApiAuthFilter::class,
+        'apiCsrf'       => ApiCsrfFilter::class,
+        'apiRole'       => ApiRoleFilter::class,
     ];
 
     /**
@@ -73,12 +83,12 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
-            // 'invalidchars',
+            'csrf' => ['except' => ['api/v1/*']],
+            'invalidchars',
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders',
+            'secureheaders',
         ],
     ];
 
@@ -106,5 +116,7 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        'apiCsrf' => ['before' => ['api/v1/*']],
+    ];
 }

@@ -50,6 +50,7 @@ Done:
 - Added centralized CSS design tokens for the home page color palette, spacing, radius, and shadows.
 - Refined the home page stylesheet so the visual layout, cards, hero, banners, and responsive breakpoints match the current markup.
 - Improved the customer home page further toward the provided GreenBasket-style reference with a fuller top strip/header, styled action icons, heart-style hero crop, compact cards, slider dots, and footer trust badges.
+- Strengthened responsive behavior across tablet, mobile, and narrow phone widths so grids, hero imagery, deal banner, newsletter form, nav, and footer stack more cleanly.
 - Kept the new home page design static only, with no API calls or dynamic database data.
 
 In progress / next:

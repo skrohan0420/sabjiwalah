@@ -1231,3 +1231,354 @@ main,
     border-width: 8px;
   }
 }
+
+/* Responsive hardening keeps the static design usable across in-between widths. */
+.hero-copy,
+.hero-visual,
+.farm-copy,
+.deal-banner > div,
+.newsletter > div,
+.category-card,
+.product-card,
+.benefit-card,
+.site-footer > div {
+  min-width: 0;
+}
+
+.hero h1,
+.farm-copy h2,
+.deal-banner h2,
+.newsletter h2,
+.section-heading h2,
+.category-card h3,
+.product-card h3,
+.benefit-card h3 {
+  overflow-wrap: anywhere;
+}
+
+.main-nav {
+  scrollbar-width: none;
+}
+
+.main-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(165px, 100%), 1fr));
+}
+
+.product-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(172px, 100%), 1fr));
+}
+
+@media (max-width: 980px) {
+  .hero {
+    gap: 30px;
+    padding-top: 38px;
+  }
+
+  .hero-copy {
+    max-width: 680px;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 4.9rem);
+  }
+
+  .hero-visual {
+    min-height: clamp(330px, 50vw, 420px);
+  }
+
+  .hero-visual > img {
+    width: min(100%, 540px);
+  }
+
+  .hero-visual::before {
+    width: min(100%, 568px);
+  }
+
+  .farm-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .farm-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .deal-banner {
+    grid-template-columns: minmax(0, 0.85fr) minmax(280px, 1fr);
+  }
+
+  .deal-stamp {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+  }
+
+  .newsletter {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .newsletter form {
+    grid-column: 1 / -1;
+  }
+
+  .newsletter > img {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .main-nav {
+    width: 100%;
+    gap: 20px;
+    scroll-padding-inline: var(--page-pad);
+  }
+
+  .hero {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.55rem, 11.5vw, 4.3rem);
+  }
+
+  .hero-copy p {
+    max-width: 34rem;
+    font-size: 0.98rem;
+  }
+
+  .hero-badges {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .hero-badges span {
+    padding-left: 0;
+    padding-top: 42px;
+  }
+
+  .hero-badges span::before {
+    top: 0;
+  }
+
+  .hero-visual {
+    min-height: clamp(260px, 64vw, 360px);
+  }
+
+  .hero-visual > img {
+    width: min(100%, 460px);
+    border-width: 8px;
+  }
+
+  .hero-visual::before {
+    width: min(100%, 486px);
+  }
+
+  .fresh-seal {
+    width: clamp(86px, 24vw, 112px);
+    padding: 12px;
+  }
+
+  .farm-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .farm-stats strong {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+  }
+
+  .farm-stats small {
+    font-size: 0.7rem;
+  }
+
+  .deal-banner {
+    gap: 18px;
+    padding: 24px;
+  }
+
+  .deal-banner > img {
+    min-height: 170px;
+  }
+
+  .deal-stamp {
+    position: static;
+    width: 98px;
+    justify-self: start;
+  }
+
+  .newsletter form {
+    flex-direction: row;
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 640px) {
+  .top-strip {
+    font-size: 0.68rem;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    font-size: 0.88rem;
+  }
+
+  .brand strong {
+    font-size: 1.05rem;
+  }
+
+  .brand small {
+    font-size: 0.62rem;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .action-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-badges {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-badges span {
+    padding-top: 0;
+    padding-left: 46px;
+  }
+
+  .section-heading {
+    align-items: center;
+  }
+
+  .category-grid,
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .benefit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter {
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .newsletter form {
+    flex-direction: column;
+    gap: 8px;
+    border-radius: var(--radius);
+  }
+
+  .site-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  :root {
+    --page-pad: 14px;
+  }
+
+  .top-strip span::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  .site-header {
+    gap: 10px;
+  }
+
+  .main-nav {
+    gap: 16px;
+    font-size: 0.76rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.25rem, 13vw, 3.4rem);
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+
+  .hero-visual {
+    min-height: 230px;
+  }
+
+  .fresh-seal {
+    right: -4px;
+    bottom: 2%;
+    width: 82px;
+    font-size: 0.6rem;
+  }
+
+  .farmer-image {
+    min-height: 190px;
+  }
+
+  .farm-copy,
+  .farm-stats,
+  .deal-banner,
+  .newsletter {
+    padding: 18px;
+  }
+
+  .farm-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading a {
+    font-size: 0.75rem;
+  }
+
+  .category-card,
+  .product-card {
+    padding: 10px;
+  }
+
+  .product-card button {
+    top: 12px;
+    right: 12px;
+  }
+
+  .deal-banner h2 {
+    font-size: clamp(1.9rem, 12vw, 3rem);
+  }
+
+  .deal-banner > img {
+    min-height: 145px;
+  }
+}
+
+@media (max-width: 360px) {
+  .category-grid,
+  .product-grid,
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .main-nav {
+    grid-row: 3;
+  }
+}

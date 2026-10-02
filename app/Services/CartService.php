@@ -11,12 +11,12 @@ class CartService
         return session(self::SESSION_KEY) ?? [];
     }
 
-    public function add(int $productId, int $quantity): void
+    public function add(string $productUid, int $quantity): void
     {
         $items = $this->items();
-        $items[$productId] = [
-            'product_id' => $productId,
-            'quantity'   => max(1, ($items[$productId]['quantity'] ?? 0) + $quantity),
+        $items[$productUid] = [
+            'product_uid' => $productUid,
+            'quantity'    => max(1, ($items[$productUid]['quantity'] ?? 0) + $quantity),
         ];
 
         session()->set(self::SESSION_KEY, $items);

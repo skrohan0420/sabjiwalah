@@ -15,7 +15,7 @@
         <ul>
             <?php foreach ($products as $product) : ?>
                 <li>
-                    <a href="/products/<?= esc($product['slug'], 'url') ?>">
+                    <a href="/products/<?= esc($product['uid'], 'url') ?>">
                         <?= esc($product['name']) ?>
                     </a>
                     - <?= esc($product['unit']) ?>

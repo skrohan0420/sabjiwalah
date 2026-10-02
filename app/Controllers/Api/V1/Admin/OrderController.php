@@ -35,7 +35,7 @@ class OrderController extends BaseApiController
             ->paginate($perPage, 'default', $page);
 
         return $this->success([
-            'items' => $rows,
+            'items' => array_map(fn (array $order): array => $this->publicOrder($order), $rows),
             'pager' => [
                 'current_page' => $orders->pager->getCurrentPage(),
                 'per_page'     => $perPage,
@@ -45,19 +45,26 @@ class OrderController extends BaseApiController
         ]);
     }
 
-    public function show(int $id)
+    public function show(string $uid)
     {
-        $order = (new OrderModel())->find($id);
+        $order = (new OrderModel())->findByUid($uid);
 
         if (! $order) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
-        return $this->success(['order' => $order]);
+        return $this->success(['order' => $this->publicOrder($order)]);
     }
 
-    public function updateStatus(int $id)
+    public function updateStatus(string $uid)
     {
+        $orders = new OrderModel();
+        $order = $orders->findByUid($uid);
+
+        if (! $order) {
+            return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
+        }
+
         $data = $this->requestData();
         $rules = [
             'status' => 'required|in_list[pending,confirmed,preparing,ready_for_delivery,out_for_delivery,delivered,cancelled,delivery_failed]',
@@ -70,7 +77,7 @@ class OrderController extends BaseApiController
 
         try {
             (new OrderService())->changeStatus(
-                $id,
+                (int) $order['id'],
                 (string) $data['status'],
                 (int) session('user_id'),
                 $data['notes'] ?? null,
@@ -80,7 +87,7 @@ class OrderController extends BaseApiController
         }
 
         return $this->success([
-            'order' => (new OrderModel())->find($id),
+            'order' => $this->publicOrder($orders->find((int) $order['id'])),
         ], 'Order status updated');
     }
 }

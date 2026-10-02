@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class OrderStatusHistoryModel extends Model
 {
+    use HasUid;
+
     protected $table = 'order_status_history';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'osh';
     protected $returnType = 'array';
     protected $useTimestamps = false;
     protected $createdField = 'created_at';
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'order_id',
         'old_status',

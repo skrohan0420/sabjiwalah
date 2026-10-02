@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class OfferModel extends Model
 {
+    use HasUid;
+
     protected $table = 'offers';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'off';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'name',
         'code',

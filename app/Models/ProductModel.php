@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class ProductModel extends Model
 {
+    use HasUid;
+
     protected $table = 'products';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'prd';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'name',
         'slug',

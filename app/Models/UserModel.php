@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class UserModel extends Model
 {
+    use HasUid;
+
     protected $table = 'users';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'usr';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'name',
         'email',

@@ -13,7 +13,9 @@ class PricingService
         $lines = [];
 
         foreach ($cartItems as $item) {
-            $product = $products->find((int) $item['product_id']);
+            $product = isset($item['product_uid'])
+                ? $products->findByUid((string) $item['product_uid'])
+                : $products->find((int) $item['product_id']);
 
             if (! $product || ! $product['is_active']) {
                 continue;

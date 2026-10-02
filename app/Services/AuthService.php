@@ -42,6 +42,7 @@ class AuthService
         session()->regenerate(true);
         session()->set([
             'user_id'       => (int) $user['id'],
+            'user_uid'      => $user['uid'],
             'user_name'     => $user['name'],
             'user_email'    => $user['email'],
             'user_role'     => $user['role'],
@@ -55,6 +56,7 @@ class AuthService
     {
         session()->remove([
             'user_id',
+            'user_uid',
             'user_name',
             'user_email',
             'user_role',

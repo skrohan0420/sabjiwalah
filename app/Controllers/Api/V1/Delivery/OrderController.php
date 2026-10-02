@@ -27,23 +27,30 @@ class OrderController extends BaseApiController
             ->orderBy('created_at', 'DESC')
             ->findAll();
 
-        return $this->success(['items' => $orders]);
+        return $this->success([
+            'items' => array_map(fn (array $order): array => $this->publicOrder($order), $orders),
+        ]);
     }
 
-    public function show(int $id)
+    public function show(string $uid)
     {
-        if (! $this->isAssignedToCurrentDeliveryUser($id)) {
+        $order = (new OrderModel())->findByUid($uid);
+
+        if (! $order || ! $this->isAssignedToCurrentDeliveryUser((int) $order['id'])) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
         return $this->success([
-            'order' => (new OrderModel())->find($id),
+            'order' => $this->publicOrder($order),
         ]);
     }
 
-    public function updateStatus(int $id)
+    public function updateStatus(string $uid)
     {
-        if (! $this->isAssignedToCurrentDeliveryUser($id)) {
+        $orders = new OrderModel();
+        $order = $orders->findByUid($uid);
+
+        if (! $order || ! $this->isAssignedToCurrentDeliveryUser((int) $order['id'])) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
@@ -59,7 +66,7 @@ class OrderController extends BaseApiController
 
         try {
             (new OrderService())->changeStatus(
-                $id,
+                (int) $order['id'],
                 (string) $data['status'],
                 (int) session('user_id'),
                 $data['notes'] ?? null,
@@ -69,7 +76,7 @@ class OrderController extends BaseApiController
         }
 
         return $this->success([
-            'order' => (new OrderModel())->find($id),
+            'order' => $this->publicOrder($orders->find((int) $order['id'])),
         ], 'Order status updated');
     }
 

@@ -29,7 +29,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     $routes->get('csrf', 'CsrfController::show');
 
     $routes->get('products', 'ProductController::index');
-    $routes->get('products/(:num)', 'ProductController::show/$1');
+    $routes->get('products/(:segment)', 'ProductController::show/$1');
 
     $routes->post('auth/register', 'AuthController::register');
     $routes->post('auth/login', 'AuthController::login');
@@ -39,19 +39,19 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     $routes->group('admin', ['namespace' => 'App\Controllers\Api\V1\Admin', 'filter' => 'apiRole:admin'], static function (RouteCollection $routes): void {
         $routes->get('products', 'ProductController::index');
         $routes->post('products', 'ProductController::create');
-        $routes->get('products/(:num)', 'ProductController::show/$1');
-        $routes->put('products/(:num)', 'ProductController::update/$1');
-        $routes->patch('products/(:num)', 'ProductController::update/$1');
-        $routes->delete('products/(:num)', 'ProductController::delete/$1');
+        $routes->get('products/(:segment)', 'ProductController::show/$1');
+        $routes->put('products/(:segment)', 'ProductController::update/$1');
+        $routes->patch('products/(:segment)', 'ProductController::update/$1');
+        $routes->delete('products/(:segment)', 'ProductController::delete/$1');
 
         $routes->get('orders', 'OrderController::index');
-        $routes->get('orders/(:num)', 'OrderController::show/$1');
-        $routes->patch('orders/(:num)/status', 'OrderController::updateStatus/$1');
+        $routes->get('orders/(:segment)', 'OrderController::show/$1');
+        $routes->patch('orders/(:segment)/status', 'OrderController::updateStatus/$1');
     });
 
     $routes->group('delivery', ['namespace' => 'App\Controllers\Api\V1\Delivery', 'filter' => 'apiRole:delivery'], static function (RouteCollection $routes): void {
         $routes->get('orders', 'OrderController::index');
-        $routes->get('orders/(:num)', 'OrderController::show/$1');
-        $routes->patch('orders/(:num)/status', 'OrderController::updateStatus/$1');
+        $routes->get('orders/(:segment)', 'OrderController::show/$1');
+        $routes->patch('orders/(:segment)/status', 'OrderController::updateStatus/$1');
     });
 });

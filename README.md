@@ -46,6 +46,8 @@ Done:
 - Added delivery order API list/show/status endpoints with assignment ownership checks.
 - Verified API role authorization for unauthenticated, customer, admin, and delivery sessions.
 - Verified missing AJAX CSRF tokens return compact `403` JSON responses.
+- Added unique `uid` columns across the core tables and standardized public/client/API identifiers around `uid`.
+- Added automatic UID generation in models for future inserts.
 - Reworked the customer home page into a static, responsive grocery storefront design.
 - Added centralized CSS design tokens for the home page color palette, spacing, radius, and shadows.
 - Refined the home page stylesheet so the visual layout, cards, hero, banners, and responsive breakpoints match the current markup.
@@ -134,6 +136,8 @@ Important database rules:
 - Admin and delivery users must not be creatable through public signup.
 - Orders must store address, product name, unit, and price snapshots for historical accuracy.
 - Money values must use decimal database types.
+- Every core table uses a unique `uid` for public/client/API references.
+- Numeric `id` remains an internal database primary key and foreign-key implementation detail.
 - Use migrations for all schema changes.
 
 ## Planned Code Structure
@@ -280,7 +284,7 @@ Current public endpoints:
 ```text
 GET  /api/v1/csrf
 GET  /api/v1/products
-GET  /api/v1/products/{id}
+GET  /api/v1/products/{uid}
 POST /api/v1/auth/register
 POST /api/v1/auth/login
 ```
@@ -297,21 +301,21 @@ Current admin endpoints:
 ```text
 GET    /api/v1/admin/products
 POST   /api/v1/admin/products
-GET    /api/v1/admin/products/{id}
-PUT    /api/v1/admin/products/{id}
-PATCH  /api/v1/admin/products/{id}
-DELETE /api/v1/admin/products/{id}
+GET    /api/v1/admin/products/{uid}
+PUT    /api/v1/admin/products/{uid}
+PATCH  /api/v1/admin/products/{uid}
+DELETE /api/v1/admin/products/{uid}
 GET    /api/v1/admin/orders
-GET    /api/v1/admin/orders/{id}
-PATCH  /api/v1/admin/orders/{id}/status
+GET    /api/v1/admin/orders/{uid}
+PATCH  /api/v1/admin/orders/{uid}/status
 ```
 
 Current delivery endpoints:
 
 ```text
 GET   /api/v1/delivery/orders
-GET   /api/v1/delivery/orders/{id}
-PATCH /api/v1/delivery/orders/{id}/status
+GET   /api/v1/delivery/orders/{uid}
+PATCH /api/v1/delivery/orders/{uid}/status
 ```
 
 API authentication strategy:

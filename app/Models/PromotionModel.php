@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class PromotionModel extends Model
 {
+    use HasUid;
+
     protected $table = 'promotions';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'pro';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'title',
         'image',

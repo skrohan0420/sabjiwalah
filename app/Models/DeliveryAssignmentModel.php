@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class DeliveryAssignmentModel extends Model
 {
+    use HasUid;
+
     protected $table = 'delivery_assignments';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'das';
     protected $returnType = 'array';
     protected $useTimestamps = false;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'order_id',
         'delivery_user_id',

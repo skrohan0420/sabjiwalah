@@ -36,6 +36,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'            => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'           => ['type' => 'VARCHAR', 'constraint' => 40],
             'name'          => ['type' => 'VARCHAR', 'constraint' => 120],
             'email'         => ['type' => 'VARCHAR', 'constraint' => 190],
             'phone'         => ['type' => 'VARCHAR', 'constraint' => 30, 'null' => true],
@@ -46,6 +47,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at'    => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('email', false, true);
         $this->forge->addKey('role');
         $this->forge->addKey('status');
@@ -56,6 +58,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'             => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'            => ['type' => 'VARCHAR', 'constraint' => 40],
             'user_id'        => ['type' => 'INT', 'unsigned' => true],
             'label'          => ['type' => 'VARCHAR', 'constraint' => 60],
             'recipient_name' => ['type' => 'VARCHAR', 'constraint' => 120],
@@ -70,6 +73,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at'     => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('user_id');
         $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('user_addresses');
@@ -79,6 +83,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'             => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'            => ['type' => 'VARCHAR', 'constraint' => 40],
             'name'           => ['type' => 'VARCHAR', 'constraint' => 150],
             'slug'           => ['type' => 'VARCHAR', 'constraint' => 190],
             'description'    => ['type' => 'TEXT', 'null' => true],
@@ -92,6 +97,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at'     => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('slug', false, true);
         $this->forge->addKey('is_active');
         $this->forge->createTable('products');
@@ -101,6 +107,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'              => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'             => ['type' => 'VARCHAR', 'constraint' => 40],
             'order_number'    => ['type' => 'VARCHAR', 'constraint' => 40],
             'user_id'         => ['type' => 'INT', 'unsigned' => true],
             'subtotal'        => ['type' => 'DECIMAL', 'constraint' => '10,2', 'default' => 0],
@@ -121,6 +128,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at'      => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('order_number', false, true);
         $this->forge->addKey('user_id');
         $this->forge->addKey('order_status');
@@ -132,6 +140,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'           => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'          => ['type' => 'VARCHAR', 'constraint' => 40],
             'order_id'     => ['type' => 'INT', 'unsigned' => true],
             'product_id'   => ['type' => 'INT', 'unsigned' => true, 'null' => true],
             'product_name' => ['type' => 'VARCHAR', 'constraint' => 150],
@@ -142,6 +151,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'created_at'   => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('order_id');
         $this->forge->addKey('product_id');
         $this->forge->addForeignKey('order_id', 'orders', 'id', 'CASCADE', 'CASCADE');
@@ -153,6 +163,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'        => ['type' => 'VARCHAR', 'constraint' => 40],
             'order_id'   => ['type' => 'INT', 'unsigned' => true],
             'old_status' => ['type' => 'VARCHAR', 'constraint' => 40, 'null' => true],
             'new_status' => ['type' => 'VARCHAR', 'constraint' => 40],
@@ -161,6 +172,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'created_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('order_id');
         $this->forge->addKey('changed_by');
         $this->forge->addForeignKey('order_id', 'orders', 'id', 'CASCADE', 'CASCADE');
@@ -172,6 +184,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'               => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'              => ['type' => 'VARCHAR', 'constraint' => 40],
             'order_id'         => ['type' => 'INT', 'unsigned' => true],
             'delivery_user_id' => ['type' => 'INT', 'unsigned' => true],
             'assigned_by'      => ['type' => 'INT', 'unsigned' => true],
@@ -179,6 +192,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'completed_at'     => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('order_id');
         $this->forge->addKey('delivery_user_id');
         $this->forge->addKey('assigned_by');
@@ -192,6 +206,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'                   => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'                  => ['type' => 'VARCHAR', 'constraint' => 40],
             'name'                 => ['type' => 'VARCHAR', 'constraint' => 150],
             'code'                 => ['type' => 'VARCHAR', 'constraint' => 80, 'null' => true],
             'type'                 => ['type' => 'VARCHAR', 'constraint' => 20],
@@ -206,6 +221,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at'           => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('code', false, true);
         $this->forge->addKey('is_active');
         $this->forge->createTable('offers');
@@ -215,6 +231,7 @@ class CreateInitialSabjiwalahSchema extends Migration
     {
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'uid'        => ['type' => 'VARCHAR', 'constraint' => 40],
             'title'      => ['type' => 'VARCHAR', 'constraint' => 150],
             'image'      => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'link'       => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
@@ -226,6 +243,7 @@ class CreateInitialSabjiwalahSchema extends Migration
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+        $this->forge->addKey('uid', false, true);
         $this->forge->addKey('position');
         $this->forge->addKey('is_active');
         $this->forge->createTable('promotions');

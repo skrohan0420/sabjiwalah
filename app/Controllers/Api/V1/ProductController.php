@@ -49,11 +49,12 @@ class ProductController extends BaseApiController
         ]);
     }
 
-    public function show(int $id)
+    public function show(string $uid)
     {
         $product = (new ProductModel())
             ->where('is_active', 1)
-            ->find($id);
+            ->where('uid', $uid)
+            ->first();
 
         if (! $product) {
             return $this->error('Product not found', ResponseInterface::HTTP_NOT_FOUND);

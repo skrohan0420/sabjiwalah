@@ -68,7 +68,7 @@ abstract class BaseApiController extends BaseController
         }
 
         return [
-            'id'     => (int) $user['id'],
+            'uid'    => $user['uid'],
             'name'   => $user['name'],
             'email'  => $user['email'],
             'phone'  => $user['phone'],
@@ -80,7 +80,7 @@ abstract class BaseApiController extends BaseController
     protected function publicProduct(array $product): array
     {
         return [
-            'id'             => (int) $product['id'],
+            'uid'            => $product['uid'],
             'name'           => $product['name'],
             'slug'           => $product['slug'],
             'description'    => $product['description'],
@@ -90,6 +90,30 @@ abstract class BaseApiController extends BaseController
             'unit'           => $product['unit'],
             'stock_quantity' => (int) $product['stock_quantity'],
             'is_active'      => (bool) $product['is_active'],
+        ];
+    }
+
+    protected function publicOrder(array $order): array
+    {
+        return [
+            'uid'             => $order['uid'],
+            'order_number'    => $order['order_number'],
+            'subtotal'        => (float) $order['subtotal'],
+            'discount_amount' => (float) $order['discount_amount'],
+            'delivery_charge' => (float) $order['delivery_charge'],
+            'total_amount'    => (float) $order['total_amount'],
+            'payment_method'  => $order['payment_method'],
+            'payment_status'  => $order['payment_status'],
+            'order_status'    => $order['order_status'],
+            'customer_name'   => $order['customer_name'],
+            'customer_phone'  => $order['customer_phone'],
+            'address_line'    => $order['address_line'],
+            'city'            => $order['city'],
+            'state'           => $order['state'],
+            'postal_code'     => $order['postal_code'],
+            'notes'           => $order['notes'],
+            'created_at'      => $order['created_at'],
+            'updated_at'      => $order['updated_at'],
         ];
     }
 }

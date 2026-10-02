@@ -54,9 +54,9 @@ class ProductController extends BaseApiController
         ]);
     }
 
-    public function show(int $id)
+    public function show(string $uid)
     {
-        $product = (new ProductModel())->find($id);
+        $product = (new ProductModel())->findByUid($uid);
 
         if (! $product) {
             return $this->error('Product not found', ResponseInterface::HTTP_NOT_FOUND);
@@ -88,14 +88,16 @@ class ProductController extends BaseApiController
         ], 'Product created', ResponseInterface::HTTP_CREATED);
     }
 
-    public function update(int $id)
+    public function update(string $uid)
     {
         $products = new ProductModel();
+        $product = $products->findByUid($uid);
 
-        if (! $products->find($id)) {
+        if (! $product) {
             return $this->error('Product not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
+        $id = (int) $product['id'];
         $data = $this->requestData();
         $rules = $this->rules($id);
 
@@ -112,15 +114,16 @@ class ProductController extends BaseApiController
         ], 'Product updated');
     }
 
-    public function delete(int $id)
+    public function delete(string $uid)
     {
         $products = new ProductModel();
+        $product = $products->findByUid($uid);
 
-        if (! $products->find($id)) {
+        if (! $product) {
             return $this->error('Product not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
-        $products->delete($id);
+        $products->delete((int) $product['id']);
 
         return $this->success(null, 'Product deleted');
     }

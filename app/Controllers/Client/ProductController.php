@@ -18,11 +18,14 @@ class ProductController extends BaseController
         ]);
     }
 
-    public function show(string $slug): string
+    public function show(string $uidOrSlug): string
     {
         $product = (new ProductModel())
-            ->where('slug', $slug)
             ->where('is_active', 1)
+            ->groupStart()
+                ->where('uid', $uidOrSlug)
+                ->orWhere('slug', $uidOrSlug)
+            ->groupEnd()
             ->first();
 
         if (! $product) {

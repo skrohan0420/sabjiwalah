@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class OrderItemModel extends Model
 {
+    use HasUid;
+
     protected $table = 'order_items';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'itm';
     protected $returnType = 'array';
     protected $useTimestamps = false;
     protected $createdField = 'created_at';
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'order_id',
         'product_id',

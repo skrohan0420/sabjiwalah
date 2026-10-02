@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class OrderModel extends Model
 {
+    use HasUid;
+
     protected $table = 'orders';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'ord';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'order_number',
         'user_id',

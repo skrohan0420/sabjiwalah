@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUid;
 use CodeIgniter\Model;
 
 class UserAddressModel extends Model
 {
+    use HasUid;
+
     protected $table = 'user_addresses';
     protected $primaryKey = 'id';
+    protected string $uidPrefix = 'adr';
     protected $returnType = 'array';
     protected $useTimestamps = true;
+    protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
         'user_id',
         'label',

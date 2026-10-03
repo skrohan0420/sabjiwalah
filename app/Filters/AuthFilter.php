@@ -11,7 +11,13 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (! session('is_logged_in')) {
-            return redirect()->to('/login')->with('error', 'Please log in to continue.');
+            $path = '/' . ltrim($request->getUri()->getPath(), '/');
+            $query = $request->getUri()->getQuery();
+            $redirect = $query === '' ? $path : $path . '?' . $query;
+
+            return redirect()
+                ->to('/login?redirect=' . rawurlencode($redirect))
+                ->with('error', 'Please log in to continue.');
         }
 
         return null;

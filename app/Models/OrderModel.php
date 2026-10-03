@@ -16,6 +16,7 @@ class OrderModel extends Model
     protected $useTimestamps = true;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'order_number',
         'user_id',
         'subtotal',

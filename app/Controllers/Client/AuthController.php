@@ -9,14 +9,16 @@ class AuthController extends BaseController
 {
     public function login(): string
     {
-        return view('client/auth/login');
+        return view('client/auth/login', [
+            'redirect' => $this->safeRedirect((string) $this->request->getGet('redirect')),
+        ]);
     }
 
     public function attemptLogin()
     {
         $rules = [
-            'email'    => 'required|valid_email',
-            'password' => 'required',
+            'phone' => 'required|max_length[30]',
+            'otp'   => 'required|numeric|exact_length[6]',
         ];
 
         if (! $this->validate($rules)) {
@@ -25,41 +27,26 @@ class AuthController extends BaseController
 
         $auth = new AuthService();
 
-        if (! $auth->attempt((string) $this->request->getPost('email'), (string) $this->request->getPost('password'))) {
-            return redirect()->back()->withInput()->with('error', 'Invalid login or inactive account.');
+        if (! $auth->verifyPhoneOtp(
+            (string) $this->request->getPost('phone'),
+            (string) $this->request->getPost('otp')
+        )) {
+            return redirect()->back()->withInput()->with('error', 'Invalid or expired OTP.');
         }
 
-        return $this->redirectByRole();
+        return $this->redirectByRole($this->safeRedirect((string) $this->request->getPost('redirect')));
     }
 
-    public function register(): string
+    public function register()
     {
-        return view('client/auth/register');
+        $redirect = $this->safeRedirect((string) $this->request->getGet('redirect'));
+
+        return redirect()->to('/login' . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
     }
 
     public function storeRegistration()
     {
-        $rules = [
-            'name'                  => 'required|max_length[120]',
-            'email'                 => 'required|valid_email|max_length[190]|is_unique[users.email]',
-            'phone'                 => 'permit_empty|max_length[30]',
-            'password'              => 'required|min_length[8]',
-            'password_confirmation' => 'required|matches[password]',
-        ];
-
-        if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        $auth = new AuthService();
-
-        if (! $auth->registerCustomer($this->request->getPost())) {
-            return redirect()->back()->withInput()->with('error', 'Unable to create account.');
-        }
-
-        $auth->attempt((string) $this->request->getPost('email'), (string) $this->request->getPost('password'));
-
-        return redirect()->to('/account')->with('message', 'Account created successfully.');
+        return $this->attemptLogin();
     }
 
     public function logout()
@@ -76,12 +63,27 @@ class AuthController extends BaseController
         ]);
     }
 
-    private function redirectByRole()
+    private function redirectByRole(?string $redirect = null)
     {
+        if (session('user_role') === 'customer' && $redirect !== null && $redirect !== '') {
+            return redirect()->to($redirect);
+        }
+
         return match (session('user_role')) {
             'admin' => redirect()->to('/admin'),
             'delivery' => redirect()->to('/delivery'),
             default => redirect()->to('/account'),
         };
+    }
+
+    private function safeRedirect(string $redirect): ?string
+    {
+        $redirect = trim($redirect);
+
+        if ($redirect === '' || ! str_starts_with($redirect, '/') || str_starts_with($redirect, '//')) {
+            return null;
+        }
+
+        return $redirect;
     }
 }

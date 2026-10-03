@@ -16,6 +16,7 @@ class DeliveryAssignmentModel extends Model
     protected $useTimestamps = false;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'order_id',
         'delivery_user_id',
         'assigned_by',

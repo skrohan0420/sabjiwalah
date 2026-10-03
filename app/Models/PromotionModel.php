@@ -16,6 +16,7 @@ class PromotionModel extends Model
     protected $useTimestamps = true;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'title',
         'image',
         'link',

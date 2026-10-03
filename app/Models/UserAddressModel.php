@@ -16,6 +16,7 @@ class UserAddressModel extends Model
     protected $useTimestamps = true;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'user_id',
         'label',
         'recipient_name',

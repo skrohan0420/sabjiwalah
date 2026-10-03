@@ -16,6 +16,7 @@ class ProductModel extends Model
     protected $useTimestamps = true;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'name',
         'slug',
         'description',

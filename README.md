@@ -25,8 +25,8 @@ Done:
 - Organized controllers into customer, admin, and delivery areas.
 - Added simple server-rendered placeholder pages for customer, admin, and delivery sections.
 - Added public product listing and product detail pages backed by the products table.
-- Added session-based signup, login, logout, and customer account pages.
-- Public signup always creates `customer` users.
+- Added session-based OTP login, logout, and customer account pages.
+- New public phone numbers always create `customer` users.
 - Added server-side auth and role filters.
 - Protected `/admin` for `admin` users only.
 - Protected `/delivery` for `delivery` users only.
@@ -48,6 +48,20 @@ Done:
 - Verified missing AJAX CSRF tokens return compact `403` JSON responses.
 - Added unique `uid` columns across the core tables and standardized public/client/API identifiers around `uid`.
 - Added automatic UID generation in models for future inserts.
+- Added a session-backed client cart foundation using product UIDs.
+- Added AJAX cart API endpoints for view, add, update, remove, and clear actions.
+- Added a basic `/cart` page and AJAX add-to-cart behavior on product pages.
+- Added an AJAX-first checkout foundation with server-side totals, cash-on-delivery order placement, order item snapshots, stock decrement, order status history, and cart clearing.
+- Protected checkout for customer accounts only and preserved login redirects back to `/checkout`.
+- Added development checkout phone OTP endpoints and UI. The OTP is shown on the checkout page for local testing, and order placement requires the matching verified phone.
+- Checkout currently collects name, phone, delivery address, city, state, postal code, and notes. Email is not required for checkout.
+- Removed `index.php` from generated application URLs and added redirects from old `/index.php/...` URLs to clean URLs.
+- Replaced customer-facing password auth with phone OTP auth. OTPs are shown in the UI/API for local testing.
+- Made customer email and password optional, with phone as the unique OTP login identifier.
+- Normalized customer phone numbers for OTP auth so local, leading-zero, and `+91` formats resolve to one canonical 10-digit login phone.
+- Added one basic responsive auth page for phone OTP login/signup combined.
+- Added a customer account section for managing personal details with AJAX profile updates.
+- Added customer account API endpoints for reading and updating profile details.
 - Reworked the customer home page into a static, responsive grocery storefront design.
 - Added centralized CSS design tokens for the home page color palette, spacing, radius, and shadows.
 - Refined the home page stylesheet so the visual layout, cards, hero, banners, and responsive breakpoints match the current markup.
@@ -61,7 +75,8 @@ In progress / next:
 - Add automated feature tests once project PHPUnit dependencies are installed with Composer.
 - Add proper admin CRUD screens for products, users, orders, offers, and promotions.
 - Add customer saved address management.
-- Add cart page and checkout flow using server-side pricing.
+- Add saved address selection to checkout.
+- Add customer order history and order detail pages.
 - Add order creation and status update workflows.
 - Add delivery assignment workflows.
 - Add a small frontend JavaScript API client/helper for `fetch('/api/v1/...')`.
@@ -69,7 +84,7 @@ In progress / next:
 
 Not started yet:
 
-- Cart and checkout flow.
+- Customer order history.
 - Admin product/order management screens.
 - Delivery order workflow.
 - Offers and promotions logic.
@@ -106,7 +121,7 @@ The first milestone is complete when:
 - `/` works.
 - `/admin` is protected and only accessible to admins.
 - `/delivery` is protected and only accessible to delivery users.
-- Customer signup cannot create admin or delivery accounts.
+- Customer self-auth cannot create admin or delivery accounts.
 - Models and database relationships are prepared.
 - Basic service architecture exists.
 - CSRF/security configuration is enabled.
@@ -130,10 +145,12 @@ Initial tables:
 
 Important database rules:
 
-- Passwords must be stored as secure hashes only.
+- Passwords, when present for legacy/internal accounts, must be stored as secure hashes only.
+- Customer auth is phone OTP based; email, name, and password are not required for customer login/signup.
+- OTP login phones are stored in canonical 10-digit form to avoid duplicate accounts from formats like `+91...`, `0...`, and plain local numbers.
 - User roles are `customer`, `admin`, and `delivery`.
-- Public signup must always create `customer` users.
-- Admin and delivery users must not be creatable through public signup.
+- Public OTP self-auth must always create `customer` users for new phone numbers.
+- Admin and delivery users must not be creatable through public self-auth.
 - Orders must store address, product name, unit, and price snapshots for historical accuracy.
 - Money values must use decimal database types.
 - Every core table uses a unique `uid` for public/client/API references.
@@ -228,6 +245,7 @@ copy env .env
 Current local database settings in `.env`:
 
 ```ini
+app.indexPage = ''
 database.default.hostname = localhost
 database.default.database = sabjiwalah
 database.default.username = root
@@ -285,6 +303,8 @@ Current public endpoints:
 GET  /api/v1/csrf
 GET  /api/v1/products
 GET  /api/v1/products/{uid}
+POST /api/v1/auth/otp/start
+POST /api/v1/auth/otp/verify
 POST /api/v1/auth/register
 POST /api/v1/auth/login
 ```
@@ -294,6 +314,12 @@ Current authenticated customer/session endpoints:
 ```text
 GET  /api/v1/auth/me
 POST /api/v1/auth/logout
+GET  /api/v1/account/profile
+PATCH /api/v1/account/profile
+GET  /api/v1/checkout/summary
+POST /api/v1/checkout/otp/start
+POST /api/v1/checkout/otp/verify
+POST /api/v1/checkout/place
 ```
 
 Current admin endpoints:
@@ -321,6 +347,9 @@ PATCH /api/v1/delivery/orders/{uid}/status
 API authentication strategy:
 
 - Uses the existing secure session-based authentication.
+- Customer-facing auth uses phone OTP instead of passwords.
+- Current development OTP responses include `dev_otp` so the flow can be tested without an SMS provider.
+- New public customer accounts are created from phone after OTP verification. Email and name are optional.
 - Does not use JWT yet.
 - AJAX requests from the same-origin frontend should include browser cookies/session automatically.
 - API auth responses never expose password hashes or session secrets.
@@ -330,7 +359,15 @@ API authorization strategy:
 - `/api/v1/admin/*` uses `apiRole:admin`.
 - `/api/v1/delivery/*` uses `apiRole:delivery`.
 - Protected non-role API routes use `apiAuth`.
+- Customer checkout API routes use `apiRole:customer`.
+- Customer account profile API routes use `apiRole:customer`.
 - Delivery order endpoints verify the order is assigned to the current delivery user before returning or updating it.
+
+Checkout OTP note:
+
+- The current checkout OTP is development-only and displays the generated code in the UI so the auth flow can be tested without SMS.
+- Replace this with a real SMS/OTP provider before production.
+- Checkout does not require an email address; the order-time contact fields are name, phone, and delivery address.
 
 CSRF for AJAX:
 
@@ -344,13 +381,13 @@ CSRF for AJAX:
 
 4. If a state-changing request fails with `Invalid or missing CSRF token`, fetch `/api/v1/csrf` again and retry after normal client-side error handling.
 
-Example JSON login:
+Example JSON OTP login:
 
 ```bash
-curl -X POST http://127.0.0.1:8080/api/v1/auth/login \
+curl -X POST http://127.0.0.1:8080/api/v1/auth/otp/start \
   -H "Content-Type: application/json" \
   -H "X-CSRF-TOKEN: {token_value}" \
-  -d "{\"email\":\"admin@sabjiwalah.local\",\"password\":\"Password@123\"}"
+  -d "{\"phone\":\"9000000003\"}"
 ```
 
 ## Useful Commands
@@ -385,12 +422,12 @@ Seed local development data:
 php spark db:seed DevelopmentSeeder
 ```
 
-Development accounts:
+Development account phones:
 
 ```text
-admin@sabjiwalah.local / Password@123
-delivery@sabjiwalah.local / Password@123
-customer@sabjiwalah.local / Password@123
+Admin User / 9000000001
+Delivery User / 9000000002
+Customer User / 9000000003
 ```
 
 Run tests:
@@ -419,7 +456,7 @@ Security rules:
 - Keep CSRF protection enabled.
 - Use CI4 Models/Query Builder for database writes and reads where possible.
 - Escape output in views.
-- Hash passwords securely.
+- Hash passwords securely when password hashes are used.
 - Regenerate sessions after login.
 - Enforce authorization on the server, not only through hidden links.
 - Do not trust prices or roles submitted from the client.

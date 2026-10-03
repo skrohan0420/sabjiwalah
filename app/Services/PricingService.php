@@ -28,6 +28,7 @@ class PricingService
 
             $lines[] = [
                 'product'    => $product,
+                'product_uid' => $product['uid'],
                 'quantity'   => $quantity,
                 'unit_price' => $unitPrice,
                 'total'      => $total,

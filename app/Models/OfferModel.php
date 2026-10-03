@@ -16,6 +16,7 @@ class OfferModel extends Model
     protected $useTimestamps = true;
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'name',
         'code',
         'type',

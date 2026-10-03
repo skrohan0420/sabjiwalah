@@ -7,15 +7,28 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class AuthController extends BaseApiController
 {
-    public function register()
+    public function startOtp()
     {
         $data = $this->requestData();
         $rules = [
-            'name'                  => 'required|max_length[120]',
-            'email'                 => 'required|valid_email|max_length[190]|is_unique[users.email]',
-            'phone'                 => 'permit_empty|max_length[30]',
-            'password'              => 'required|min_length[8]',
-            'password_confirmation' => 'required|matches[password]',
+            'phone' => 'required|max_length[30]',
+        ];
+
+        if (! $this->validateData($data, $rules)) {
+            return $this->validationError($this->validator->getErrors());
+        }
+
+        $otp = (new AuthService())->startPhoneOtp((string) $data['phone']);
+
+        return $this->success($otp, 'OTP generated for auth testing.');
+    }
+
+    public function verifyOtp()
+    {
+        $data = $this->requestData();
+        $rules = [
+            'phone' => 'required|max_length[30]',
+            'otp'   => 'required|numeric|exact_length[6]',
         ];
 
         if (! $this->validateData($data, $rules)) {
@@ -23,13 +36,36 @@ class AuthController extends BaseApiController
         }
 
         $auth = new AuthService();
-        $userId = $auth->registerCustomer($data);
 
-        if (! $userId) {
-            return $this->error('Unable to create account', ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+        if (! $auth->verifyPhoneOtp(
+            (string) $data['phone'],
+            (string) $data['otp']
+        )) {
+            return $this->error('Invalid or expired OTP.', ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
-        $auth->attempt((string) $data['email'], (string) $data['password']);
+        return $this->success([
+            'user' => $this->publicUser($auth->user()),
+        ], 'Login successful');
+    }
+
+    public function register()
+    {
+        $data = $this->requestData();
+        $rules = [
+            'phone' => 'required|max_length[30]',
+            'otp'   => 'required|numeric|exact_length[6]',
+        ];
+
+        if (! $this->validateData($data, $rules)) {
+            return $this->validationError($this->validator->getErrors());
+        }
+
+        $auth = new AuthService();
+
+        if (! $auth->verifyPhoneOtp((string) $data['phone'], (string) $data['otp'])) {
+            return $this->error('Invalid OTP, expired OTP, or unable to create account', ResponseInterface::HTTP_UNAUTHORIZED);
+        }
 
         return $this->success([
             'user' => $this->publicUser($auth->user()),
@@ -40,8 +76,8 @@ class AuthController extends BaseApiController
     {
         $data = $this->requestData();
         $rules = [
-            'email'    => 'required|valid_email',
-            'password' => 'required',
+            'phone' => 'required|max_length[30]',
+            'otp'   => 'required|numeric|exact_length[6]',
         ];
 
         if (! $this->validateData($data, $rules)) {
@@ -50,8 +86,11 @@ class AuthController extends BaseApiController
 
         $auth = new AuthService();
 
-        if (! $auth->attempt((string) $data['email'], (string) $data['password'])) {
-            return $this->error('Invalid login or inactive account', ResponseInterface::HTTP_UNAUTHORIZED);
+        if (! $auth->verifyPhoneOtp(
+            (string) $data['phone'],
+            (string) $data['otp']
+        )) {
+            return $this->error('Invalid or expired OTP.', ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
         return $this->success([

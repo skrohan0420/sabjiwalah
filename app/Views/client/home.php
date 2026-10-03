@@ -1,26 +1,36 @@
 <?php
-$categories = [
-    ['name' => 'Vegetables', 'items' => '120+ items', 'image' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Fruits', 'items' => '80+ items', 'image' => 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Herbs & Greens', 'items' => '60+ items', 'image' => 'https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Dairy & Eggs', 'items' => '40+ items', 'image' => 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Nuts & Seeds', 'items' => '50+ items', 'image' => 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?auto=format&fit=crop&w=360&q=80'],
+$categoryTabs = [
+    ['name' => 'All', 'icon' => 'bag', 'active' => true],
+    ['name' => 'Vegetables', 'icon' => 'leaf', 'badge' => 'Fresh'],
+    ['name' => 'Fruits', 'icon' => 'apple'],
+    ['name' => 'Dairy', 'icon' => 'milk'],
+    ['name' => 'Herbs', 'icon' => 'sprout'],
+    ['name' => 'Offers', 'icon' => 'gift'],
 ];
 
-$products = [
-    ['name' => 'Organic Tomatoes', 'price' => 'Rs 2.49 / kg', 'image' => 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Fresh Carrots', 'price' => 'Rs 1.49 / kg', 'image' => 'https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Green Spinach', 'price' => 'Rs 1.29 / bunch', 'image' => 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Red Apples', 'price' => 'Rs 2.99 / kg', 'image' => 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=360&q=80'],
-    ['name' => 'Farm Eggs (6pcs)', 'price' => 'Rs 1.99 / pack', 'image' => 'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?auto=format&fit=crop&w=360&q=80'],
+$promoTiles = [
+    ['title' => 'Fresh Vegetables', 'offer' => 'Up to 35% OFF', 'image' => 'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=360&q=80'],
+    ['title' => 'Daily Fruits', 'offer' => 'Sweet picks', 'image' => 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=360&q=80'],
+    ['title' => 'Milk & Eggs', 'offer' => 'Morning ready', 'image' => 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=360&q=80'],
+    ['title' => 'Kitchen Staples', 'offer' => 'Smart savings', 'image' => 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=360&q=80'],
 ];
 
-$benefits = [
-    ['icon' => 'basket', 'title' => 'Farm Fresh', 'copy' => 'Handpicked with care'],
-    ['icon' => 'sprout', 'title' => 'Chemical Free', 'copy' => 'Safe for you & family'],
-    ['icon' => 'leaf', 'title' => 'Sustainably Grown', 'copy' => 'Good for nature'],
-    ['icon' => 'shield', 'title' => 'Premium Quality', 'copy' => 'Best quality assured'],
+$fallbackImages = [
+    'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=420&q=80',
+    'https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=420&q=80',
+    'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=420&q=80',
+    'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=420&q=80',
+    'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?auto=format&fit=crop&w=420&q=80',
 ];
+
+$productSections = [
+    ['title' => 'Fresh picks for you', 'products' => $products, 'show_all' => true],
+    ['title' => 'Chai-time companions', 'products' => array_reverse($products), 'show_all' => false],
+];
+
+$isLoggedIn = (bool) session('is_logged_in');
+$accountUrl = $isLoggedIn ? '/account' : '/login';
+$accountLabel = $isLoggedIn ? 'Account' : 'Login';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,231 +38,269 @@ $benefits = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sabjiwalah fresh grocery and vegetable delivery">
-    <title>Sabjiwalah - Fresh from Nature</title>
+    <title>Sabjiwalah - Fresh Grocery Delivery</title>
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="stylesheet" href="/assets/css/home.css">
 </head>
 <body>
-    <div class="page-shell">
-        <div class="top-strip" aria-label="Store benefits">
-            <span>FREE DELIVERY on orders over Rs 499</span>
-            <span>Eat Fresh, Live Healthy</span>
-            <span>Support 24/7</span>
-        </div>
-
-        <header class="site-header">
-            <a class="brand" href="/" aria-label="Sabjiwalah home">
-                <span class="brand-mark">SB</span>
-                <span>
-                    <strong>Sabjiwalah</strong>
-                    <small>Fresh from Nature</small>
-                </span>
-            </a>
-
-            <nav class="main-nav" aria-label="Primary navigation">
-                <a class="is-active" href="/">Home</a>
-                <a href="/products">Shop</a>
-                <a href="#categories">Categories</a>
-                <a href="#deals">Deals</a>
-                <a href="#about">About Us</a>
-                <a href="#contact">Contact</a>
-            </nav>
-
-            <div class="header-actions" aria-label="Quick actions">
-                <button class="action-button action-search" type="button" aria-label="Search">
-                    <span class="sr-only">Search</span>
-                </button>
-                <a class="action-button action-user" href="/login" aria-label="Account">
-                    <span class="sr-only">Account</span>
-                </a>
-                <button class="action-button action-cart cart-button" type="button" aria-label="Cart">
-                    <span class="sr-only">Cart</span>
-                    <strong>2</strong>
-                </button>
+    <div class="app-shell">
+        <header class="home-header">
+            <div class="status-row" aria-label="Service status">
+                <span>Sabjiwalah in</span>
+                <div class="header-icons">
+                    <a class="wallet-pill" href="/cart" aria-label="Cart total">
+                        <span>Rs</span>
+                        <strong data-cart-count-badge>0</strong>
+                    </a>
+                    <a class="profile-button" href="<?= esc($accountUrl, 'attr') ?>" aria-label="<?= esc($accountLabel, 'attr') ?>">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+                            <path d="M4.75 20a7.25 7.25 0 0 1 14.5 0" />
+                        </svg>
+                    </a>
+                </div>
             </div>
+
+            <div class="delivery-copy">
+                <h1>13 minutes</h1>
+                <a href="/account">
+                    <strong>HOME</strong>
+                    <span>Surajpur, Greater Noida</span>
+                </a>
+            </div>
+
+            <form class="search-box" action="/products" method="get" role="search">
+                <label class="sr-only" for="home-search">Search products</label>
+                <span class="search-icon" aria-hidden="true"></span>
+                <input id="home-search" name="q" type="search" placeholder="Search for atta, dal, coke and more">
+                <button type="submit" aria-label="Search by voice or text"></button>
+            </form>
+
+            <nav class="category-tabs" aria-label="Shop categories">
+                <?php foreach ($categoryTabs as $category) : ?>
+                    <a class="<?= ! empty($category['active']) ? 'is-active' : '' ?>" href="/products">
+                        <span class="tab-icon tab-<?= esc($category['icon'], 'attr') ?>" aria-hidden="true">
+                            <?php if ($category['icon'] === 'bag') : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M7.2 8.6h9.6l1 11H6.2l1-11Z"></path>
+                                    <path d="M9 8.6V7a3 3 0 0 1 6 0v1.6"></path>
+                                    <path d="M8.8 12.2h6.4"></path>
+                                </svg>
+                            <?php elseif ($category['icon'] === 'leaf' || $category['icon'] === 'sprout') : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M5.1 18.9C5.4 10 11.4 5.7 19.6 4.4c-.5 8.2-5 13.7-13.1 14.3"></path>
+                                    <path d="M6.1 18.3c3.1-3.6 6.1-6.2 10.1-8"></path>
+                                </svg>
+                            <?php elseif ($category['icon'] === 'apple') : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M12 8.5c1.5-1.4 4.6-1.2 5.9.8 1.9 2.9.1 9.2-2.9 10.3-1 .4-2-.2-3-.2s-2 .6-3 .2c-3-1.1-4.8-7.4-2.9-10.3 1.3-2 4.4-2.2 5.9-.8Z"></path>
+                                    <path d="M12 8.4c.1-2.2 1.3-3.7 3.2-4.5"></path>
+                                    <path d="M11.8 8.2C10.8 6.7 9.6 6 8.2 6"></path>
+                                </svg>
+                            <?php elseif ($category['icon'] === 'milk') : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M9 3.8h6v3.5l1.4 1.8v10.1c0 .7-.6 1.2-1.2 1.2H8.8c-.6 0-1.2-.5-1.2-1.2V9.1L9 7.3V3.8Z"></path>
+                                    <path d="M9 7.3h6"></path>
+                                    <path d="M8.4 12.5h7.2"></path>
+                                </svg>
+                            <?php else : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M5.2 10.2h13.6v10H5.2v-10Z"></path>
+                                    <path d="M4.4 7.2h15.2v3H4.4v-3Z"></path>
+                                    <path d="M12 7.2v13"></path>
+                                    <path d="M12 7.1c-2.2-3.7-6.1-2.1-4.8.7"></path>
+                                    <path d="M12 7.1c2.2-3.7 6.1-2.1 4.8.7"></path>
+                                </svg>
+                            <?php endif; ?>
+                        </span>
+                        <?php if (! empty($category['badge'])) : ?>
+                            <em><?= esc($category['badge']) ?></em>
+                        <?php endif; ?>
+                        <strong><?= esc($category['name']) ?></strong>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
         </header>
 
         <main>
-            <section class="hero">
-                <div class="hero-copy">
-                    <h1>Fresh Food.<br>Healthy Life.<br><span>Happy You.</span></h1>
-                    <p>100% organic fruits, vegetables & more delivered fresh to your door.</p>
-                    <a class="primary-button" href="/products">Shop Now <span>→</span></a>
-
-                    <div class="hero-badges" aria-label="Service highlights">
-                        <span><strong>100% Organic</strong><small>Pure & Natural</small></span>
-                        <span><strong>Fast Delivery</strong><small>On Time, Every Time</small></span>
-                        <span><strong>Secure Payment</strong><small>Safe & Protected</small></span>
-                    </div>
-                </div>
-
-                <div class="hero-visual" aria-label="Fresh vegetable basket">
-                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=980&q=90" alt="Basket of fresh vegetables">
-                    <div class="fresh-seal">
-                        <span>EAT FRESH</span>
-                        <strong>STAY HEALTHY</strong>
-                    </div>
-                    <i class="leaf leaf-one"></i>
-                    <i class="leaf leaf-two"></i>
-                    <i class="leaf leaf-three"></i>
-                </div>
+            <section class="deal-hero" aria-labelledby="deal-heading">
+                <p>Weekend fresh drop</p>
+                <h2 id="deal-heading">Steal Rs 9 Deal</h2>
+                <span>Get any one item at special price</span>
             </section>
 
-            <section class="farm-card" id="about">
-                <div class="farmer-image">
-                    <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=520&q=80" alt="Farmer holding fresh produce">
-                </div>
-                <div class="farm-copy">
-                    <small>WELCOME TO SABJIWALAH</small>
-                    <h2>From Our Farm<br>To Your Table</h2>
-                    <p>We bring you the freshest, handpicked produce from trusted farms. Quality you can trust, every single time.</p>
-                    <a href="#categories">Learn More <span>→</span></a>
-                </div>
-                <div class="farm-stats">
-                    <span><strong>25+</strong><small>Local Farms</small></span>
-                    <span><strong>500+</strong><small>Fresh Products</small></span>
-                    <span><strong>10K+</strong><small>Happy Customers</small></span>
-                </div>
-            </section>
+            <div class="cart-message home-cart-message" data-cart-message role="status"></div>
 
-            <section class="section-block" id="categories">
-                <div class="section-heading">
-                    <h2>Shop by Category</h2>
-                    <a href="/products">View all →</a>
-                </div>
+            <?php foreach ($productSections as $sectionIndex => $section) : ?>
+                <section class="commerce-section" aria-labelledby="product-section-<?= esc((string) $sectionIndex, 'attr') ?>">
+                    <h2 id="product-section-<?= esc((string) $sectionIndex, 'attr') ?>"><?= esc($section['title']) ?></h2>
 
-                <div class="category-grid">
-                    <?php foreach ($categories as $category) : ?>
-                        <article class="category-card">
-                            <img src="<?= esc($category['image']) ?>" alt="<?= esc($category['name']) ?>">
-                            <h3><?= esc($category['name']) ?></h3>
-                            <p><?= esc($category['items']) ?></p>
+                    <?php if ($section['products'] === []) : ?>
+                        <article class="empty-card product-empty-card">
+                            <h3>Fresh stock coming soon</h3>
+                            <p>Products added by the store will appear here.</p>
                         </article>
+                    <?php else : ?>
+                        <div class="commerce-grid">
+                            <?php foreach ($section['products'] as $index => $product) : ?>
+                                <?php
+                                $effectivePrice = (float) ($product['sale_price'] ?? $product['price']);
+                                $originalPrice = (float) $product['price'];
+                                $image = $product['image'] ?: $fallbackImages[($index + $sectionIndex) % count($fallbackImages)];
+                                $discount = $originalPrice > $effectivePrice && $originalPrice > 0
+                                    ? (int) round((($originalPrice - $effectivePrice) / $originalPrice) * 100)
+                                    : 0;
+                                $ratingCount = number_format(6400 + (($index + 1) * 1207) + ($sectionIndex * 237));
+                                $stockLeft = isset($product['stock_quantity']) ? (int) $product['stock_quantity'] : null;
+                                ?>
+                                <article class="catalog-card">
+                                    <div class="product-media">
+                                        <?php if ($index === 2 && $sectionIndex === 0) : ?>
+                                            <span class="product-ribbon">Fasting Special</span>
+                                        <?php endif; ?>
+                                        <button class="save-button" type="button" aria-label="Save <?= esc($product['name'], 'attr') ?>"></button>
+                                        <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>">
+                                            <img src="<?= esc($image) ?>" alt="<?= esc($product['name']) ?>">
+                                        </a>
+                                        <div class="media-footer">
+                                            <span class="media-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                                            <span class="veg-mark" aria-label="Vegetarian product"></span>
+                                        </div>
+                                        <div class="pack-action-row">
+                                            <span><?= esc($product['unit']) ?></span>
+                                            <button
+                                                type="button"
+                                                data-add-to-cart
+                                                data-product-uid="<?= esc($product['uid'], 'attr') ?>"
+                                                data-quantity="1"
+                                            >
+                                                ADD
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="catalog-copy">
+                                        <div class="catalog-price">
+                                            <strong>Rs <?= esc(number_format($effectivePrice, 0)) ?></strong>
+                                            <?php if ($originalPrice > $effectivePrice) : ?>
+                                                <s>Rs <?= esc(number_format($originalPrice, 0)) ?></s>
+                                            <?php endif; ?>
+                                        </div>
+                                        <p class="catalog-offer">
+                                            <?= $discount > 0 ? esc($discount . '% OFF on MRP') : 'Price Drop' ?>
+                                        </p>
+                                        <h3>
+                                            <a href="/products/<?= esc($product['uid'], 'url') ?>">
+                                                <?= esc($product['name']) ?>
+                                            </a>
+                                        </h3>
+                                        <div class="rating-row" aria-label="Product rating">
+                                            <span class="rating-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                                            <span><?= esc($ratingCount) ?></span>
+                                        </div>
+                                        <p class="delivery-row">
+                                            <span aria-hidden="true"></span>
+                                            11 mins
+                                            <?php if ($stockLeft !== null && $stockLeft <= 5) : ?>
+                                                <em><?= esc((string) $stockLeft) ?> left</em>
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <?php if (! empty($section['show_all'])) : ?>
+                            <a class="see-all-products" href="/products">
+                                <span>
+                                    <?php foreach (array_slice($section['products'], 0, 3) as $thumbIndex => $thumbProduct) : ?>
+                                        <?php $thumbImage = $thumbProduct['image'] ?: $fallbackImages[$thumbIndex % count($fallbackImages)]; ?>
+                                        <img src="<?= esc($thumbImage) ?>" alt="">
+                                    <?php endforeach; ?>
+                                </span>
+                                See all products
+                            </a>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </section>
+            <?php endforeach; ?>
+
+            <section class="price-drops" aria-labelledby="drops-heading">
+                <h2 id="drops-heading">Mega Price Drops</h2>
+                <div class="promo-grid">
+                    <?php foreach ($promoTiles as $tile) : ?>
+                        <a class="promo-card" href="/products">
+                            <span><?= esc($tile['offer']) ?></span>
+                            <h3><?= esc($tile['title']) ?></h3>
+                            <img src="<?= esc($tile['image']) ?>" alt="">
+                        </a>
                     <?php endforeach; ?>
                 </div>
-                <div class="slider-dots" aria-label="Featured product slides">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </section>
 
-            <section class="deal-banner" id="deals">
-                <div>
-                    <small>LIMITED TIME OFFER</small>
-                    <h2>UP TO 30% OFF</h2>
-                    <p>On Fresh Vegetables</p>
-                    <a class="deal-button" href="/products">Grab the Deal <span>→</span></a>
-                </div>
-                <img src="https://images.unsplash.com/photo-1557844352-761f2565b576?auto=format&fit=crop&w=900&q=80" alt="Fresh vegetables offer">
-                <strong class="deal-stamp">Best Quality<br>Best Price</strong>
-            </section>
-
-            <section class="section-block">
-                <div class="section-heading">
-                    <h2>Why Choose Us?</h2>
-                </div>
-                <div class="benefit-grid">
-                    <?php foreach ($benefits as $benefit) : ?>
-                        <article class="benefit-card">
-                            <span><?= esc($benefit['icon']) ?></span>
-                            <div>
-                                <h3><?= esc($benefit['title']) ?></h3>
-                                <p><?= esc($benefit['copy']) ?></p>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-
-            <section class="section-block">
-                <div class="section-heading">
-                    <h2>Top Picks For You</h2>
-                    <a href="/products">View all →</a>
-                </div>
-
-                <div class="product-grid">
-                    <?php foreach ($products as $product) : ?>
-                        <article class="product-card">
-                            <button type="button" aria-label="Save <?= esc($product['name']) ?>">♡</button>
-                            <img src="<?= esc($product['image']) ?>" alt="<?= esc($product['name']) ?>">
-                            <h3><?= esc($product['name']) ?></h3>
-                            <p><?= esc($product['price']) ?></p>
-                            <a href="/products">Add to Cart</a>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-
-            <section class="newsletter" id="contact">
-                <div class="mail-icon">✉</div>
-                <div>
-                    <h2>Stay Healthy, Stay Updated!</h2>
-                    <p>Subscribe to get best offers, health tips & fresh updates in your inbox.</p>
-                </div>
-                <form action="#" method="post">
-                    <label class="sr-only" for="newsletter-email">Email address</label>
-                    <input id="newsletter-email" type="email" placeholder="Enter your email">
-                    <button type="submit">Subscribe</button>
-                </form>
-                <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=340&q=80" alt="Basket of vegetables">
+            <section class="quick-links" aria-label="Quick shop shortcuts">
+                <a href="/products"><span>%</span> Deals</a>
+                <a href="/products"><span></span> Fresh</a>
+                <a href="/products"><span></span> Greens</a>
+                <a href="/products"><span></span> Staples</a>
             </section>
         </main>
 
-        <footer class="site-footer">
-            <div>
-                <a class="brand footer-brand" href="/">
-                    <span class="brand-mark">SB</span>
-                    <span>
-                        <strong>Sabjiwalah</strong>
-                        <small>Fresh from Nature</small>
-                    </span>
-                </a>
-                <p>Your trusted source for fresh, organic and healthy food. We care for you and the planet.</p>
-                <div class="socials" aria-label="Social links">
-                    <span>f</span>
-                    <span>ig</span>
-                    <span>x</span>
-                    <span>in</span>
-                    <span>yt</span>
-                </div>
-            </div>
-            <div>
-                <h3>Quick Links</h3>
-                <a href="/products">Shop</a>
-                <a href="#categories">Categories</a>
-                <a href="#deals">Deals</a>
-                <a href="#about">About Us</a>
-            </div>
-            <div>
-                <h3>Customer Service</h3>
-                <a href="/account">My Account</a>
-                <a href="#">Track Order</a>
-                <a href="#">Shipping & Delivery</a>
-                <a href="#">Returns & Refunds</a>
-            </div>
-            <div>
-                <h3>Information</h3>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms & Conditions</a>
-                <a href="#">Refund Policy</a>
-                <a href="#">Careers</a>
-            </div>
-            <div>
-                <h3>Payment Methods</h3>
-                <div class="payments">
-                    <span>VISA</span>
-                    <span>PayPal</span>
-                    <span>UPI</span>
-                </div>
-                <div class="security-badges" aria-label="Security badges">
-                    <span>SSL</span>
-                    <span>SECURE</span>
-                </div>
-            </div>
-            <p class="copyright">© 2026 Sabjiwalah. All Rights Reserved.</p>
-        </footer>
+        <nav class="bottom-nav" aria-label="Bottom navigation">
+            <a class="is-active" href="/">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M3.5 11.2 12 4l8.5 7.2"></path>
+                        <path d="M5.8 10.4v8.1c0 .8.6 1.4 1.4 1.4h9.6c.8 0 1.4-.6 1.4-1.4v-8.1"></path>
+                        <path d="M9.6 19.9v-5.4h4.8v5.4"></path>
+                    </svg>
+                </span>
+                Home
+            </a>
+            <a href="/products">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4.3 9.5h15.4l-1.2-4.1H5.5L4.3 9.5Z"></path>
+                        <path d="M5.4 9.5v9.2c0 .8.6 1.4 1.4 1.4h10.4c.8 0 1.4-.6 1.4-1.4V9.5"></path>
+                        <path d="M9.2 20.1v-6h5.6v6"></path>
+                        <path d="M3.7 9.5c.3 1.5 1.4 2.4 2.7 2.4s2.4-.9 2.7-2.4c.3 1.5 1.4 2.4 2.9 2.4s2.6-.9 2.9-2.4c.3 1.5 1.4 2.4 2.7 2.4s2.4-.9 2.7-2.4"></path>
+                    </svg>
+                </span>
+                Shop
+            </a>
+            <a href="/products">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M8.4 3.8 12 7.4 8.4 11 4.8 7.4 8.4 3.8Z"></path>
+                        <path d="M15.6 3.8 19.2 7.4 15.6 11 12 7.4 15.6 3.8Z"></path>
+                        <path d="M8.4 13 12 16.6l-3.6 3.6-3.6-3.6L8.4 13Z"></path>
+                        <path d="M15.6 13l3.6 3.6-3.6 3.6-3.6-3.6 3.6-3.6Z"></path>
+                    </svg>
+                </span>
+                Categories
+            </a>
+            <a href="/cart">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M3.8 5.2h2.4l2 9.4c.2.8.8 1.3 1.6 1.3h7.4c.8 0 1.4-.5 1.6-1.3l1.1-5.9H7"></path>
+                        <path d="M9.8 19.6h.1"></path>
+                        <path d="M17 19.6h.1"></path>
+                        <path d="M10.2 11.2h7.3"></path>
+                    </svg>
+                </span>
+                Cart
+            </a>
+            <a href="<?= esc($accountUrl, 'attr') ?>">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M12 12.1a4.1 4.1 0 1 0 0-8.2 4.1 4.1 0 0 0 0 8.2Z"></path>
+                        <path d="M4.8 20.1c.8-4.1 3.3-6.2 7.2-6.2s6.4 2.1 7.2 6.2"></path>
+                    </svg>
+                </span>
+                <?= esc($accountLabel) ?>
+            </a>
+        </nav>
     </div>
+    <script src="/assets/js/cart.js"></script>
 </body>
 </html>

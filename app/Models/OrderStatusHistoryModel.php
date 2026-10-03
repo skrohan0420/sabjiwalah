@@ -17,6 +17,7 @@ class OrderStatusHistoryModel extends Model
     protected $createdField = 'created_at';
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'order_id',
         'old_status',
         'new_status',

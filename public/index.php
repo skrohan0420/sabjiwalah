@@ -23,6 +23,15 @@ if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
     exit(1);
 }
 
+if (isset($_SERVER['REQUEST_URI']) && str_contains($_SERVER['REQUEST_URI'], '/index.php')) {
+    $cleanUri = preg_replace('#/index\.php/?#i', '/', $_SERVER['REQUEST_URI'], 1) ?: '/';
+    $cleanUri = preg_replace('#/{2,}#', '/', $cleanUri) ?: '/';
+
+    header('Location: ' . $cleanUri, true, 301);
+
+    exit;
+}
+
 /*
  *---------------------------------------------------------------
  * SET THE CURRENT DIRECTORY

@@ -17,6 +17,7 @@ class OrderItemModel extends Model
     protected $createdField = 'created_at';
     protected $beforeInsert = ['ensureUid'];
     protected $allowedFields = [
+        'uid',
         'order_id',
         'product_id',
         'product_name',

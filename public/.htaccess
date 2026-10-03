@@ -16,6 +16,10 @@ Options -Indexes
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
 	# RewriteBase /
 
+	# Redirect old front-controller URLs to clean URLs.
+	RewriteCond %{THE_REQUEST} \s/+index\.php/?([^\s?]*) [NC]
+	RewriteRule ^index\.php/?(.*)$ /$1 [R=301,L]
+
 	# Redirect Trailing Slashes...
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_URI} (.+)/$

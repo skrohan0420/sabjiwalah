@@ -156,9 +156,17 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                 <article class="catalog-card">
                                     <div class="product-media">
                                         <?php if ($index === 2 && $sectionIndex === 0) : ?>
-                                            <span class="product-ribbon">Fasting Special</span>
+                                            <span class="product-ribbon" aria-label="Fasting Special">
+                                                <span aria-hidden="true">Fasting</span>
+                                            </span>
                                         <?php endif; ?>
-                                        <button class="save-button" type="button" aria-label="Save <?= esc($product['name'], 'attr') ?>"></button>
+                                        <button
+                                            class="save-button"
+                                            type="button"
+                                            data-save-product="<?= esc($product['uid'], 'attr') ?>"
+                                            aria-label="Save <?= esc($product['name'], 'attr') ?>"
+                                            aria-pressed="false"
+                                        ></button>
                                         <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>">
                                             <img src="<?= esc($image) ?>" alt="<?= esc($product['name']) ?>">
                                         </a>
@@ -167,15 +175,29 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                             <span class="veg-mark" aria-label="Vegetarian product"></span>
                                         </div>
                                         <div class="pack-action-row">
-                                            <span><?= esc($product['unit']) ?></span>
-                                            <button
-                                                type="button"
-                                                data-add-to-cart
+                                            <span class="pack-size"><?= esc($product['unit']) ?></span>
+                                            <div
+                                                class="cart-card-control"
+                                                data-cart-control
                                                 data-product-uid="<?= esc($product['uid'], 'attr') ?>"
-                                                data-quantity="1"
+                                                data-product-image="<?= esc($image, 'attr') ?>"
+                                                data-current-quantity="0"
                                             >
-                                                ADD
-                                            </button>
+                                                <button
+                                                    class="cart-add-button"
+                                                    type="button"
+                                                    data-add-to-cart
+                                                    data-product-uid="<?= esc($product['uid'], 'attr') ?>"
+                                                    data-quantity="1"
+                                                >
+                                                    ADD
+                                                </button>
+                                                <div class="cart-stepper" aria-label="Cart quantity">
+                                                    <button type="button" data-cart-decrement aria-label="Decrease quantity">&minus;</button>
+                                                    <span data-cart-quantity-value>1</span>
+                                                    <button type="button" data-cart-increment aria-label="Increase quantity">+</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -246,6 +268,15 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
             </section>
         </main>
 
+        <a class="floating-cart-bar" href="/cart" data-floating-cart hidden>
+            <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
+            <span>
+                <strong>View cart</strong>
+                <em data-floating-cart-count>0 items</em>
+            </span>
+            <i aria-hidden="true"></i>
+        </a>
+
         <nav class="bottom-nav" aria-label="Bottom navigation">
             <a class="is-active" href="/">
                 <span class="nav-icon" aria-hidden="true">
@@ -278,17 +309,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                     </svg>
                 </span>
                 Categories
-            </a>
-            <a href="/cart">
-                <span class="nav-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M3.8 5.2h2.4l2 9.4c.2.8.8 1.3 1.6 1.3h7.4c.8 0 1.4-.5 1.6-1.3l1.1-5.9H7"></path>
-                        <path d="M9.8 19.6h.1"></path>
-                        <path d="M17 19.6h.1"></path>
-                        <path d="M10.2 11.2h7.3"></path>
-                    </svg>
-                </span>
-                Cart
             </a>
             <a href="<?= esc($accountUrl, 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">

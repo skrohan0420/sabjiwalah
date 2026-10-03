@@ -37,6 +37,9 @@
                         type="button"
                         data-add-to-cart
                         data-product-uid="<?= esc($product['uid'], 'attr') ?>"
+                        data-product-name="<?= esc($product['name'], 'attr') ?>"
+                        data-product-unit="<?= esc($product['unit'], 'attr') ?>"
+                        data-product-price="<?= esc((string) ($product['sale_price'] ?? $product['price']), 'attr') ?>"
                         data-quantity-target="#product-quantity"
                     >
                         Add to Cart
@@ -52,6 +55,6 @@
             </aside>
         </section>
     </main>
-    <script src="/assets/js/cart.js"></script>
+    <script src="/assets/js/cart.js?v=20261003-optimistic-cart"></script>
 </body>
 </html>

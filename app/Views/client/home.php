@@ -40,13 +40,18 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
     <meta name="description" content="Sabjiwalah fresh grocery and vegetable delivery">
     <title>Sabjiwalah - Fresh Grocery Delivery</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
+    <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
+    <link rel="stylesheet" href="/assets/css/home.css?v=20261003-brand-cache">
 </head>
 <body>
     <div class="app-shell">
         <header class="home-header">
             <div class="status-row" aria-label="Service status">
-                <span>Sabjiwalah in</span>
+                <span class="brand-mark" aria-label="Sabjiwalah">
+                    <img class="brand-cart-logo" src="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" alt="" width="184" height="132" decoding="async" fetchpriority="high">
+                    <img class="brand-wordmark" src="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" alt="" width="620" height="160" decoding="async" fetchpriority="high">
+                </span>
                 <div class="header-icons">
                     <a class="wallet-pill" href="/cart" aria-label="Cart total">
                         <span>Rs</span>
@@ -76,7 +81,9 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                     </span>
                 </button>
             </div>
+        </header>
 
+        <div class="sticky-shop-controls">
             <form class="search-box" action="/products" method="get" role="search">
                 <label class="sr-only" for="home-search">Search products</label>
                 <span class="search-icon" aria-hidden="true"></span>
@@ -90,34 +97,44 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                         <span class="tab-icon tab-<?= esc($category['icon'], 'attr') ?>" aria-hidden="true">
                             <?php if ($category['icon'] === 'bag') : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
-                                    <path d="M7.2 8.6h9.6l1 11H6.2l1-11Z"></path>
-                                    <path d="M9 8.6V7a3 3 0 0 1 6 0v1.6"></path>
-                                    <path d="M8.8 12.2h6.4"></path>
+                                    <path d="M6.8 9.2h10.4l1.1 9.8H5.7l1.1-9.8Z"></path>
+                                    <path d="M9 9.2V7.6a3 3 0 0 1 6 0v1.6"></path>
+                                    <path d="M8.6 12.5h6.8"></path>
+                                    <path d="M8.1 15.5h7.8"></path>
                                 </svg>
-                            <?php elseif ($category['icon'] === 'leaf' || $category['icon'] === 'sprout') : ?>
+                            <?php elseif ($category['icon'] === 'leaf') : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
-                                    <path d="M5.1 18.9C5.4 10 11.4 5.7 19.6 4.4c-.5 8.2-5 13.7-13.1 14.3"></path>
-                                    <path d="M6.1 18.3c3.1-3.6 6.1-6.2 10.1-8"></path>
+                                    <path d="M6.2 17.8c2.5-1.2 4.5-3 6-5.4"></path>
+                                    <path d="M9.4 15.4c-2.3-.8-3.9-2.5-4.8-5.1 3.8-.4 6.8.6 8.9 3"></path>
+                                    <path d="M12.2 12.4c.8-4.2 3.6-6.8 8.2-7.8-.3 5.3-3.1 8.8-8.3 10.3"></path>
                                 </svg>
                             <?php elseif ($category['icon'] === 'apple') : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
-                                    <path d="M12 8.5c1.5-1.4 4.6-1.2 5.9.8 1.9 2.9.1 9.2-2.9 10.3-1 .4-2-.2-3-.2s-2 .6-3 .2c-3-1.1-4.8-7.4-2.9-10.3 1.3-2 4.4-2.2 5.9-.8Z"></path>
-                                    <path d="M12 8.4c.1-2.2 1.3-3.7 3.2-4.5"></path>
-                                    <path d="M11.8 8.2C10.8 6.7 9.6 6 8.2 6"></path>
+                                    <path d="M12 8.7c1.4-1.3 4.2-1.1 5.5.7 1.9 2.8.2 8.8-2.7 9.8-1 .3-1.8-.2-2.8-.2s-1.8.5-2.8.2c-2.9-1-4.6-7-2.7-9.8 1.3-1.8 4.1-2 5.5-.7Z"></path>
+                                    <path d="M12 8.4c0-2.2 1.2-3.7 3.5-4.6"></path>
+                                    <path d="M10.6 6.5c-.9-.8-2-1.1-3.2-.8"></path>
                                 </svg>
                             <?php elseif ($category['icon'] === 'milk') : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
-                                    <path d="M9 3.8h6v3.5l1.4 1.8v10.1c0 .7-.6 1.2-1.2 1.2H8.8c-.6 0-1.2-.5-1.2-1.2V9.1L9 7.3V3.8Z"></path>
-                                    <path d="M9 7.3h6"></path>
-                                    <path d="M8.4 12.5h7.2"></path>
+                                    <path d="M9.3 3.7h5.4v3.5l1.6 1.9v10.1c0 .7-.5 1.2-1.2 1.2H8.9c-.7 0-1.2-.5-1.2-1.2V9.1l1.6-1.9V3.7Z"></path>
+                                    <path d="M9.3 7.2h5.4"></path>
+                                    <path d="M8.4 12.2h7.2"></path>
+                                    <path d="M8.4 16.2h7.2"></path>
+                                </svg>
+                            <?php elseif ($category['icon'] === 'sprout') : ?>
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M12 20V9.7"></path>
+                                    <path d="M12 10.6c-3.1-.3-5.2-2-6.2-5 3.2-.2 5.5 1.2 6.8 4"></path>
+                                    <path d="M12 13.7c2.4-.2 4.3-1.5 5.8-3.9 1.3 3.6-.4 6.2-5 7.8"></path>
+                                    <path d="M8.4 20h7.2"></path>
                                 </svg>
                             <?php else : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
-                                    <path d="M5.2 10.2h13.6v10H5.2v-10Z"></path>
-                                    <path d="M4.4 7.2h15.2v3H4.4v-3Z"></path>
-                                    <path d="M12 7.2v13"></path>
-                                    <path d="M12 7.1c-2.2-3.7-6.1-2.1-4.8.7"></path>
-                                    <path d="M12 7.1c2.2-3.7 6.1-2.1 4.8.7"></path>
+                                    <path d="M5.3 10h13.4v9.8H5.3V10Z"></path>
+                                    <path d="M4.3 7h15.4v3H4.3V7Z"></path>
+                                    <path d="M12 7v12.8"></path>
+                                    <path d="M12 7c-2-3.4-5.6-2.3-5 .4"></path>
+                                    <path d="M12 7c2-3.4 5.6-2.3 5 .4"></path>
                                 </svg>
                             <?php endif; ?>
                         </span>
@@ -128,7 +145,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                     </a>
                 <?php endforeach; ?>
             </nav>
-        </header>
+        </div>
 
         <main>
             <section class="deal-hero" aria-labelledby="deal-heading">
@@ -217,6 +234,9 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                                 class="cart-card-control"
                                                 data-cart-control
                                                 data-product-uid="<?= esc($product['uid'], 'attr') ?>"
+                                                data-product-name="<?= esc($product['name'], 'attr') ?>"
+                                                data-product-unit="<?= esc($product['unit'], 'attr') ?>"
+                                                data-product-price="<?= esc((string) $effectivePrice, 'attr') ?>"
                                                 data-product-image="<?= esc($image, 'attr') ?>"
                                                 data-current-quantity="0"
                                             >
@@ -377,6 +397,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
             </a>
         </nav>
     </div>
-    <script src="/assets/js/cart.js"></script>
+    <script src="/assets/js/cart.js?v=20261003-optimistic-cart"></script>
 </body>
 </html>

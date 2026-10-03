@@ -43,6 +43,6 @@
         </section>
     </main>
 
-    <script src="/assets/js/cart.js"></script>
+    <script src="/assets/js/cart.js?v=20261003-optimistic-cart"></script>
 </body>
 </html>

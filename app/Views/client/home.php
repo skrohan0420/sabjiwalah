@@ -62,11 +62,19 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
             </div>
 
             <div class="delivery-copy">
-                <h1>13 minutes</h1>
-                <a href="/account">
-                    <strong>HOME</strong>
-                    <span>Surajpur, Greater Noida</span>
-                </a>
+                <button type="button" data-location-open aria-haspopup="dialog" aria-controls="location-sheet">
+                    <strong class="delivery-pin" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                            <path d="M12 21s6.4-5.5 6.4-11.1A6.4 6.4 0 0 0 5.6 9.9C5.6 15.5 12 21 12 21Z"></path>
+                            <circle cx="12" cy="9.9" r="2.3"></circle>
+                        </svg>
+                    </strong>
+                    <span class="sr-only">Delivery location</span>
+                    <span class="delivery-location-lines">
+                        <span data-current-location-label>Surajpur, Greater Noida</span>
+                        <small data-current-location-detail>Uttar Pradesh, India</small>
+                    </span>
+                </button>
             </div>
 
             <form class="search-box" action="/products" method="get" role="search">
@@ -147,17 +155,23 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                 $effectivePrice = (float) ($product['sale_price'] ?? $product['price']);
                                 $originalPrice = (float) $product['price'];
                                 $image = $product['image'] ?: $fallbackImages[($index + $sectionIndex) % count($fallbackImages)];
+                                $carouselImages = [$image];
+                                for ($offset = 1; count($carouselImages) < 4 && $offset <= count($fallbackImages); $offset++) {
+                                    $candidateImage = $fallbackImages[($index + $sectionIndex + $offset) % count($fallbackImages)];
+                                    if (! in_array($candidateImage, $carouselImages, true)) {
+                                        $carouselImages[] = $candidateImage;
+                                    }
+                                }
                                 $discount = $originalPrice > $effectivePrice && $originalPrice > 0
                                     ? (int) round((($originalPrice - $effectivePrice) / $originalPrice) * 100)
                                     : 0;
                                 $ratingCount = number_format(6400 + (($index + 1) * 1207) + ($sectionIndex * 237));
-                                $stockLeft = isset($product['stock_quantity']) ? (int) $product['stock_quantity'] : null;
                                 ?>
                                 <article class="catalog-card">
                                     <div class="product-media">
                                         <?php if ($index === 2 && $sectionIndex === 0) : ?>
                                             <span class="product-ribbon" aria-label="Fasting Special">
-                                                <span aria-hidden="true">Fasting</span>
+                                                <span aria-hidden="true">Fasting Special</span>
                                             </span>
                                         <?php endif; ?>
                                         <button
@@ -167,11 +181,34 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                             aria-label="Save <?= esc($product['name'], 'attr') ?>"
                                             aria-pressed="false"
                                         ></button>
-                                        <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>">
-                                            <img src="<?= esc($image) ?>" alt="<?= esc($product['name']) ?>">
+                                        <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>" data-product-carousel>
+                                            <span class="product-carousel-viewport">
+                                                <span class="product-carousel-track" data-carousel-track>
+                                                    <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
+                                                        <img
+                                                            src="<?= esc($carouselImage) ?>"
+                                                            alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
+                                                            draggable="false"
+                                                            <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
+                                                        >
+                                                    <?php endforeach; ?>
+                                                </span>
+                                            </span>
                                         </a>
                                         <div class="media-footer">
-                                            <span class="media-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                                            <span class="media-dots" role="tablist" aria-label="<?= esc($product['name'], 'attr') ?> images">
+                                                <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
+                                                    <button
+                                                        class="<?= $slideIndex === 0 ? 'is-active' : '' ?>"
+                                                        type="button"
+                                                        data-carousel-dot
+                                                        data-carousel-index="<?= esc((string) $slideIndex, 'attr') ?>"
+                                                        aria-label="Show image <?= esc((string) ($slideIndex + 1), 'attr') ?>"
+                                                        aria-selected="<?= $slideIndex === 0 ? 'true' : 'false' ?>"
+                                                        role="tab"
+                                                    ></button>
+                                                <?php endforeach; ?>
+                                            </span>
                                             <span class="veg-mark" aria-label="Vegetarian product"></span>
                                         </div>
                                         <div class="pack-action-row">
@@ -220,13 +257,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
                                             <span class="rating-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
                                             <span><?= esc($ratingCount) ?></span>
                                         </div>
-                                        <p class="delivery-row">
-                                            <span aria-hidden="true"></span>
-                                            11 mins
-                                            <?php if ($stockLeft !== null && $stockLeft <= 5) : ?>
-                                                <em><?= esc((string) $stockLeft) ?> left</em>
-                                            <?php endif; ?>
-                                        </p>
                                     </div>
                                 </article>
                             <?php endforeach; ?>
@@ -276,6 +306,32 @@ $accountLabel = $isLoggedIn ? 'Account' : 'Login';
             </span>
             <i aria-hidden="true"></i>
         </a>
+
+        <div class="location-sheet" id="location-sheet" data-location-sheet hidden>
+            <button class="location-close" type="button" data-location-close aria-label="Close location selector"></button>
+            <section class="location-panel" role="dialog" aria-modal="true" aria-labelledby="location-title">
+                <h2 id="location-title">Select delivery location</h2>
+                <form class="location-search" data-location-search-form>
+                    <span aria-hidden="true"></span>
+                    <label class="sr-only" for="location-search-input">Search delivery location</label>
+                    <input
+                        id="location-search-input"
+                        name="location"
+                        type="search"
+                        autocomplete="street-address"
+                        placeholder="Search for area, street name..."
+                        data-location-search
+                    >
+                </form>
+                <div class="location-results" data-location-results hidden></div>
+                <button class="location-current" type="button" data-use-current-location>
+                    <span aria-hidden="true"></span>
+                    <strong>Use current location</strong>
+                    <em data-location-current-address>Surajpur, Greater Noida, Uttar Pradesh, India</em>
+                    <i aria-hidden="true"></i>
+                </button>
+            </section>
+        </div>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
             <a class="is-active" href="/">

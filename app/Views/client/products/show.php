@@ -49,12 +49,11 @@
 
             <aside class="cart-summary">
                 <h2>Cart</h2>
-                <p class="cart-message" data-cart-message role="status"></p>
                 <p>Items: <strong data-cart-count-badge>0</strong></p>
                 <p><a href="/checkout">Review checkout</a></p>
             </aside>
         </section>
     </main>
-    <script src="/assets/js/cart.js?v=20261003-optimistic-cart"></script>
+    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
 </body>
 </html>

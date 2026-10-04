@@ -8,7 +8,7 @@
 </head>
 <body class="account-guest-body">
     <main class="account-page account-page--guest">
-        <a class="account-back" href="/" aria-label="Back to home">
+        <a class="account-back" href="/" aria-label="Go back" data-history-back>
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>
@@ -119,6 +119,7 @@
         </footer>
     </main>
 
+    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
     <script>
         document.addEventListener('click', async (event) => {
             const button = event.target.closest('[data-share-app]');

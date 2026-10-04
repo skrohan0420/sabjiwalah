@@ -5,11 +5,12 @@
   });
 
   let csrf = null;
-  let messageTimer = null;
   let currentCart = { count: 0, items: [], subtotal: 0 };
   let cartMutationVersion = 0;
   const cartUpdateDebounceMs = 400;
   const pendingItemUpdates = new Map();
+  const productImageFallback = '/assets/images/product-placeholder.svg';
+  const cartCacheStorageKey = 'sabjiwalah.cart';
   const savedProductsStorageKey = 'sabjiwalah.savedProducts';
   const deliveryLocationStorageKey = 'sabjiwalah.deliveryLocation';
 
@@ -57,42 +58,6 @@
     }
 
     return payload;
-  }
-
-  function setMessage(message, isError = false) {
-    if (messageTimer) {
-      window.clearTimeout(messageTimer);
-      messageTimer = null;
-    }
-
-    document.querySelectorAll('[data-cart-message]').forEach((node) => {
-      node.textContent = shortMessage(message || '');
-      node.classList.toggle('is-visible', Boolean(message));
-      node.classList.toggle('is-error', Boolean(message && isError));
-      node.style.color = '';
-    });
-
-    if (message) {
-      messageTimer = window.setTimeout(() => setMessage(''), 1800);
-    }
-  }
-
-  function shortMessage(message) {
-    const normalized = message.toLowerCase();
-
-    if (normalized.includes('added')) {
-      return 'Added';
-    }
-
-    if (normalized.includes('removed')) {
-      return 'Removed';
-    }
-
-    if (normalized.includes('updated')) {
-      return 'Updated';
-    }
-
-    return message;
   }
 
   function updateCount(count) {
@@ -194,20 +159,54 @@
     });
   }
 
-  function renderOptimisticCart(nextCart, message) {
+  function renderOptimisticCart(nextCart) {
     const previousCart = cloneCart(currentCart);
     renderCart(nextCart);
-    setMessage(message);
     return previousCart;
   }
 
-  async function commitCartRequest(request, previousCart, version, fallbackMessage) {
+  function readCachedCart() {
+    try {
+      const cached = JSON.parse(window.localStorage.getItem(cartCacheStorageKey) || 'null');
+
+      if (!cached || !Array.isArray(cached.items)) {
+        return null;
+      }
+
+      return normalizeCart(cached);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function cacheCart(cart) {
+    try {
+      window.localStorage.setItem(cartCacheStorageKey, JSON.stringify(normalizeCart(cart)));
+    } catch (error) {
+      // Cart cache is only a visual warm start for page transitions.
+    }
+  }
+
+  function hydrateCartFromCache() {
+    const cachedCart = readCachedCart();
+
+    if (!cachedCart) {
+      return;
+    }
+
+    document.body.classList.add('is-cart-hydrating');
+    renderCart(cachedCart);
+    window.requestAnimationFrame(() => {
+      document.body.classList.remove('is-cart-hydrating');
+    });
+  }
+
+  async function commitCartRequest(request, previousCart, version) {
     try {
       const payload = await request;
 
       if (version === cartMutationVersion) {
         renderCart(payload.data.cart);
-        setMessage(payload.message || fallbackMessage);
       }
 
       return payload.data.cart;
@@ -218,7 +217,6 @@
         refreshCart().catch(() => {});
       }
 
-      setMessage(error.message, true);
       throw error;
     }
   }
@@ -274,6 +272,34 @@
 
     document.querySelectorAll('[data-save-product]').forEach((button) => {
       syncSaveButtons(button.dataset.saveProduct, savedProducts.has(button.dataset.saveProduct));
+    });
+  }
+
+  function fallbackProductImage(image) {
+    const fallback = image.dataset.fallbackImage || productImageFallback;
+
+    if (image.dataset.fallbackApplied === 'true' || image.src.endsWith(fallback)) {
+      return;
+    }
+
+    image.dataset.fallbackApplied = 'true';
+    image.removeAttribute('srcset');
+    image.src = fallback;
+    image.alt = image.alt || 'Product image';
+
+    const media = image.closest('.product-media');
+    const control = media?.querySelector('[data-cart-control]');
+
+    if (control) {
+      control.dataset.productImage = fallback;
+    }
+  }
+
+  function initImageFallbacks() {
+    document.querySelectorAll('img').forEach((image) => {
+      if (image.complete && image.naturalWidth === 0) {
+        fallbackProductImage(image);
+      }
     });
   }
 
@@ -793,6 +819,9 @@
       return;
     }
 
+    const isCategoryPage = document.body.classList.contains('category-body');
+    const hideThreshold = isCategoryPage ? 8 : 4;
+    const showThreshold = isCategoryPage ? 32 : 4;
     let lastScrollY = window.scrollY;
     let ticking = false;
 
@@ -807,9 +836,9 @@
 
       if (sheetOpen || currentScrollY < 20) {
         setBottomNavHidden(false);
-      } else if (deltaY > 4) {
+      } else if (deltaY > hideThreshold) {
         setBottomNavHidden(true);
-      } else if (deltaY < -4) {
+      } else if (deltaY < -showThreshold) {
         setBottomNavHidden(false);
       }
 
@@ -963,6 +992,7 @@
 
         const image = document.createElement('img');
         image.src = imageUrl;
+        image.dataset.fallbackImage = productImageFallback;
         image.alt = '';
         image.loading = 'lazy';
         thumbs.appendChild(image);
@@ -1012,7 +1042,7 @@
         data-product-price="${unitPrice}"
         data-current-quantity="${quantity}"
       >
-        <img src="${escapeHtml(image)}" alt="">
+        <img src="${escapeHtml(image)}" alt="" data-fallback-image="${productImageFallback}">
         <div>
           <h3>${escapeHtml(product.name || 'Product')}</h3>
           <p>${escapeHtml(product.unit || '')}</p>
@@ -1079,6 +1109,7 @@
   function renderCart(cart) {
     cart = normalizeCart(cart);
     currentCart = cloneCart(cart);
+    cacheCart(cart);
 
     updateCount(cart.count);
     updateCheckoutReview(cart);
@@ -1136,16 +1167,13 @@
     cancelPendingItemUpdate(productUid);
 
     const version = ++cartMutationVersion;
-    const previousCart = renderOptimisticCart(
-      cartWithQuantity(productUid, quantity, source, 'add'),
-      'Added',
-    );
+    const previousCart = renderOptimisticCart(cartWithQuantity(productUid, quantity, source, 'add'));
     const request = api('/api/v1/cart/items', {
       method: 'POST',
       body: JSON.stringify({ product_uid: productUid, quantity }),
     });
 
-    return commitCartRequest(request, previousCart, version, 'Added to cart');
+    return commitCartRequest(request, previousCart, version);
   }
 
   async function updateItem(productUid, quantity, source = null) {
@@ -1158,10 +1186,7 @@
     }
 
     const version = ++cartMutationVersion;
-    renderOptimisticCart(
-      cartWithQuantity(productUid, quantity, source, 'set'),
-      quantity > 0 ? 'Updated' : 'Removed',
-    );
+    renderOptimisticCart(cartWithQuantity(productUid, quantity, source, 'set'));
 
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -1172,7 +1197,7 @@
           body: JSON.stringify({ quantity }),
         });
 
-        commitCartRequest(request, previousCart, version, quantity > 0 ? 'Cart updated' : 'Product removed from cart')
+        commitCartRequest(request, previousCart, version)
           .then(resolve)
           .catch(reject);
       }, cartUpdateDebounceMs);
@@ -1189,24 +1214,24 @@
     cancelPendingItemUpdate(productUid);
 
     const version = ++cartMutationVersion;
-    const previousCart = renderOptimisticCart(cartWithoutItem(productUid), 'Removed');
+    const previousCart = renderOptimisticCart(cartWithoutItem(productUid));
     const request = api(`/api/v1/cart/items/${encodeURIComponent(productUid)}`, {
       method: 'DELETE',
     });
 
-    return commitCartRequest(request, previousCart, version, 'Removed from cart');
+    return commitCartRequest(request, previousCart, version);
   }
 
   async function clearCart() {
     cancelAllPendingItemUpdates({ count: 0, items: [], subtotal: 0 });
 
     const version = ++cartMutationVersion;
-    const previousCart = renderOptimisticCart({ count: 0, items: [], subtotal: 0 }, 'Cart cleared');
+    const previousCart = renderOptimisticCart({ count: 0, items: [], subtotal: 0 });
     const request = api('/api/v1/cart', {
       method: 'DELETE',
     });
 
-    return commitCartRequest(request, previousCart, version, 'Cart cleared');
+    return commitCartRequest(request, previousCart, version);
   }
 
   function setText(selector, value) {
@@ -1271,7 +1296,7 @@
         await clearCart();
       }
     } catch (error) {
-      setMessage(error.message, true);
+      console.error(error);
     }
   });
 
@@ -1286,17 +1311,26 @@
       const item = quantityInput.closest('[data-product-uid]');
       await updateItem(item.dataset.productUid, Number(quantityInput.value) || 0, item);
     } catch (error) {
-      setMessage(error.message, true);
+      console.error(error);
     }
   });
 
+  document.addEventListener('error', (event) => {
+    if (event.target instanceof HTMLImageElement) {
+      fallbackProductImage(event.target);
+    }
+  }, true);
+
+  hydrateCartFromCache();
+
   if (document.querySelector('[data-cart-page]')) {
-    refreshCart().catch((error) => setMessage(error.message, true));
+    refreshCart().catch((error) => console.error(error));
   } else {
     refreshCart().catch(() => {});
   }
 
   initSaveButtons();
+  initImageFallbacks();
   initProductCarousels();
   initLocationSheet();
   initScrollChrome();

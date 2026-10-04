@@ -32,7 +32,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
         <?= $isLoggedIn ? 'data-checkout-page' : '' ?>
     >
         <header class="checkout-topbar">
-            <a class="checkout-icon-link" href="<?= esc($backUrl, 'attr') ?>" aria-label="Go back"></a>
+            <a class="checkout-icon-link" href="<?= esc($backUrl, 'attr') ?>" aria-label="Go back" data-history-back></a>
             <h1><?= esc($pageTitle) ?></h1>
             <a class="checkout-text-link" href="/products">Shop</a>
         </header>
@@ -71,7 +71,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                                 data-product-price="<?= esc((string) $unitPrice, 'attr') ?>"
                                 data-current-quantity="<?= esc((string) $item['quantity'], 'attr') ?>"
                             >
-                                <img src="<?= esc($product['image'] ?: '/assets/images/sabjiwalah-cart-icon.png', 'attr') ?>" alt="">
+                                <img src="<?= esc($product['image'] ?: '/assets/images/product-placeholder.svg', 'attr') ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
                                 <div>
                                     <h3><?= esc($product['name']) ?></h3>
                                     <p><?= esc($product['unit']) ?></p>
@@ -226,7 +226,8 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
         <?php endif; ?>
     </main>
 
-    <script src="/assets/js/cart.js?v=20261004-checkout-review"></script>
+    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
+    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
     <?php if ($isLoggedIn) : ?>
         <script src="/assets/js/checkout.js"></script>
     <?php endif; ?>

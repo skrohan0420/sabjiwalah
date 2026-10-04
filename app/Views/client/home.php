@@ -42,7 +42,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
     <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261004-search-variety">
+    <link rel="stylesheet" href="/assets/css/home.css?v=20261004-cart-hydration">
 </head>
 <body>
     <div class="app-shell">
@@ -162,8 +162,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                 <span>Get any one item at special price</span>
             </section>
 
-            <div class="cart-message home-cart-message" data-cart-message role="status"></div>
-
             <?php foreach ($productSections as $sectionIndex => $section) : ?>
                 <section class="commerce-section" aria-labelledby="product-section-<?= esc((string) $sectionIndex, 'attr') ?>">
                     <h2 id="product-section-<?= esc((string) $sectionIndex, 'attr') ?>"><?= esc($section['title']) ?></h2>
@@ -213,6 +211,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                                         <img
                                                             src="<?= esc($carouselImage) ?>"
                                                             alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
+                                                            data-fallback-image="/assets/images/product-placeholder.svg"
                                                             draggable="false"
                                                             <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                                                         >
@@ -295,7 +294,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                 <span>
                                     <?php foreach (array_slice($section['products'], 0, 3) as $thumbIndex => $thumbProduct) : ?>
                                         <?php $thumbImage = $thumbProduct['image'] ?: $fallbackImages[$thumbIndex % count($fallbackImages)]; ?>
-                                        <img src="<?= esc($thumbImage) ?>" alt="">
+                                        <img src="<?= esc($thumbImage) ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
                                     <?php endforeach; ?>
                                 </span>
                                 See all products
@@ -312,7 +311,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                         <a class="promo-card" href="/products">
                             <span><?= esc($tile['offer']) ?></span>
                             <h3><?= esc($tile['title']) ?></h3>
-                            <img src="<?= esc($tile['image']) ?>" alt="">
+                            <img src="<?= esc($tile['image']) ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -365,9 +364,10 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             <a class="is-active" href="/">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M3.5 11.2 12 4l8.5 7.2"></path>
-                        <path d="M5.8 10.4v8.1c0 .8.6 1.4 1.4 1.4h9.6c.8 0 1.4-.6 1.4-1.4v-8.1"></path>
-                        <path d="M9.6 19.9v-5.4h4.8v5.4"></path>
+                        <path d="M3.8 10.9 12 4.2l8.2 6.7"></path>
+                        <path d="M5.7 9.9v8.5c0 1 .7 1.7 1.7 1.7h9.2c1 0 1.7-.7 1.7-1.7V9.9"></path>
+                        <path d="M9.7 20.1v-5.8h4.6v5.8"></path>
+                        <path d="M10.1 4.9h3.8"></path>
                     </svg>
                 </span>
                 Home
@@ -375,10 +375,11 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             <a href="/products">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M4.3 9.5h15.4l-1.2-4.1H5.5L4.3 9.5Z"></path>
-                        <path d="M5.4 9.5v9.2c0 .8.6 1.4 1.4 1.4h10.4c.8 0 1.4-.6 1.4-1.4V9.5"></path>
-                        <path d="M9.2 20.1v-6h5.6v6"></path>
-                        <path d="M3.7 9.5c.3 1.5 1.4 2.4 2.7 2.4s2.4-.9 2.7-2.4c.3 1.5 1.4 2.4 2.9 2.4s2.6-.9 2.9-2.4c.3 1.5 1.4 2.4 2.7 2.4s2.4-.9 2.7-2.4"></path>
+                        <path d="M5.4 9.7h13.2"></path>
+                        <path d="M6.1 9.7 7 5.4h10l.9 4.3"></path>
+                        <path d="M6.2 11.7v6.7c0 1 .7 1.7 1.7 1.7h8.2c1 0 1.7-.7 1.7-1.7v-6.7"></path>
+                        <path d="M9 20.1v-5.2h6v5.2"></path>
+                        <path d="M4.2 9.7c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2c.2 1.3 1.3 2.2 2.8 2.2s2.6-.9 2.8-2.2c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2"></path>
                     </svg>
                 </span>
                 Shop
@@ -386,10 +387,10 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             <a href="/products">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M8.4 3.8 12 7.4 8.4 11 4.8 7.4 8.4 3.8Z"></path>
-                        <path d="M15.6 3.8 19.2 7.4 15.6 11 12 7.4 15.6 3.8Z"></path>
-                        <path d="M8.4 13 12 16.6l-3.6 3.6-3.6-3.6L8.4 13Z"></path>
-                        <path d="M15.6 13l3.6 3.6-3.6 3.6-3.6-3.6 3.6-3.6Z"></path>
+                        <rect x="4.8" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
+                        <rect x="14" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
+                        <rect x="4.8" y="14" width="5.2" height="5.2" rx="1.3"></rect>
+                        <rect x="14" y="14" width="5.2" height="5.2" rx="1.3"></rect>
                     </svg>
                 </span>
                 Categories
@@ -397,14 +398,15 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             <a href="<?= esc($accountUrl, 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M12 12.1a4.1 4.1 0 1 0 0-8.2 4.1 4.1 0 0 0 0 8.2Z"></path>
-                        <path d="M4.8 20.1c.8-4.1 3.3-6.2 7.2-6.2s6.4 2.1 7.2 6.2"></path>
+                        <path d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z"></path>
+                        <path d="M4.9 20.2c.7-4.2 3.1-6.3 7.1-6.3s6.4 2.1 7.1 6.3"></path>
+                        <path d="M8.8 18.5h6.4"></path>
                     </svg>
                 </span>
-                <?= esc($accountLabel) ?>
+                Account
             </a>
         </nav>
     </div>
-    <script src="/assets/js/cart.js?v=20261004-search-random"></script>
+    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
 </body>
 </html>

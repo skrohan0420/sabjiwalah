@@ -8,7 +8,7 @@
 </head>
 <body>
     <main class="auth-page">
-        <a class="auth-back" href="/account" aria-label="Back to account">
+        <a class="auth-back" href="/account" aria-label="Go back" data-history-back>
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>
@@ -147,6 +147,7 @@
         <p class="auth-terms">By continuing, you agree to our <a href="/">Terms of service</a> &amp; <a href="/">Privacy policy</a>.</p>
     </main>
 
+    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
     <script src="/assets/js/auth.js"></script>
 </body>
 </html>

@@ -335,9 +335,9 @@ body.is-bottom-nav-hidden .app-shell {
 .search-box {
   position: relative;
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) 32px;
+  grid-template-columns: 34px minmax(0, 1fr) 36px;
   align-items: center;
-  min-height: 39px;
+  min-height: 44px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 13px;
@@ -350,18 +350,75 @@ body.is-bottom-nav-hidden .app-shell {
 }
 
 .search-box input {
+  position: relative;
+  z-index: 2;
+  grid-column: 2;
+  grid-row: 1;
   width: 100%;
   min-width: 0;
   border: 0;
   outline: 0;
   color: #242824;
-  font-size: 0.8rem;
-  font-weight: 650;
+  font-size: 0.84rem;
+  font-weight: 520;
+  background: transparent;
 }
 
 .search-box input::placeholder {
-  color: #2d332d;
-  opacity: 0.92;
+  color: #5f6a61;
+  opacity: 0;
+}
+
+.search-box.has-search-value .search-placeholder-anim,
+.search-box.has-search-focus .search-placeholder-anim,
+.search-box input:focus ~ .search-placeholder-anim,
+.search-box input:not(:placeholder-shown) ~ .search-placeholder-anim {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.search-placeholder-anim {
+  grid-column: 2;
+  grid-row: 1;
+  z-index: 1;
+  align-self: center;
+  min-width: 0;
+  overflow: hidden;
+  color: #637067;
+  font-size: 0.84rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.86;
+}
+
+.search-placeholder-anim.is-slide-up {
+  animation: searchPlaceholderSlideUp 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.search-placeholder-anim.is-fade-in {
+  animation: searchPlaceholderFade 520ms ease both;
+}
+
+.search-placeholder-anim.is-slide-down {
+  animation: searchPlaceholderSlideDown 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.search-placeholder-anim.is-zoom-in {
+  animation: searchPlaceholderZoom 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.search-placeholder-anim.is-wipe-in {
+  animation: searchPlaceholderWipe 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.search-placeholder-anim.is-type-in {
+  width: max-content;
+  max-width: 100%;
+  animation:
+    searchPlaceholderType 900ms steps(28, end) both,
+    searchPlaceholderCaret 900ms steps(2, end) both;
 }
 
 .search-icon {
@@ -387,11 +444,99 @@ body.is-bottom-nav-hidden .app-shell {
 
 .search-box button {
   position: relative;
+  z-index: 2;
+  grid-column: 3;
+  grid-row: 1;
   width: 100%;
-  height: 24px;
+  height: 28px;
   border: 0;
   border-left: 1px solid #edf0ea;
   background: transparent;
+}
+
+@keyframes searchPlaceholderSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+
+  100% {
+    opacity: 0.86;
+    transform: translateY(0);
+  }
+}
+
+@keyframes searchPlaceholderFade {
+  0% {
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 0.86;
+    filter: blur(0);
+  }
+}
+
+@keyframes searchPlaceholderSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  100% {
+    opacity: 0.86;
+    transform: translateY(0);
+  }
+}
+
+@keyframes searchPlaceholderZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(1px);
+  }
+
+  100% {
+    opacity: 0.86;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes searchPlaceholderWipe {
+  0% {
+    opacity: 0.72;
+    clip-path: inset(0 100% 0 0 round 3px);
+    transform: translateX(-4px);
+  }
+
+  100% {
+    opacity: 0.86;
+    clip-path: inset(0 0 0 0 round 3px);
+    transform: translateX(0);
+  }
+}
+
+@keyframes searchPlaceholderType {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes searchPlaceholderCaret {
+  0%,
+  100% {
+    border-right: 1px solid transparent;
+  }
+
+  50% {
+    border-right: 1px solid rgba(99, 112, 103, 0.8);
+  }
 }
 
 .search-box button::before {
@@ -1656,6 +1801,9 @@ body.is-location-sheet-open {
 }
 
 .floating-cart-bar {
+  --floating-cart-y: 10px;
+  --floating-cart-scale: 0.985;
+  --floating-cart-nav-shift: 0px;
   position: fixed;
   left: 50%;
   bottom: calc(var(--bottom-nav-height) + max(12px, env(safe-area-inset-bottom)));
@@ -1677,19 +1825,24 @@ body.is-location-sheet-open {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 10px) scale(0.985);
+  transform: translate(-50%, calc(var(--floating-cart-y) + var(--floating-cart-nav-shift))) scale(var(--floating-cart-scale));
   transition:
-    opacity 160ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 220ms ease;
   will-change: transform, opacity;
 }
 
 .floating-cart-bar.is-visible {
+  --floating-cart-y: 0px;
+  --floating-cart-scale: 1;
   opacity: 1;
   pointer-events: auto;
-  transform: translate(-50%, 0) scale(1);
-  animation: cartBarReveal 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body.is-bottom-nav-hidden .floating-cart-bar {
+  --floating-cart-nav-shift: var(--bottom-nav-height);
+  pointer-events: none;
 }
 
 .floating-cart-thumbs {
@@ -1779,20 +1932,6 @@ body.is-location-sheet-open {
   background: #fff;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9 18 6-6-6-6' fill='none' stroke='white' stroke-width='2.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9 18 6-6-6-6' fill='none' stroke='white' stroke-width='2.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-
-@keyframes cartBarReveal {
-  0% {
-    opacity: 0;
-    filter: blur(2px);
-    transform: translate(-50%, 10px) scale(0.985);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate(-50%, 0) scale(1);
-  }
 }
 
 .bottom-nav {

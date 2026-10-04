@@ -17,7 +17,7 @@
             <nav>
                 <a href="/">Home</a>
                 <a href="/products">Products</a>
-                <a href="/cart">Cart</a>
+                <a href="/checkout">Checkout</a>
                 <a href="/logout">Logout</a>
             </nav>
         </header>

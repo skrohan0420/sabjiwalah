@@ -829,6 +829,76 @@
     window.addEventListener('scroll', requestUpdate, { passive: true });
   }
 
+  function initSearchPlaceholderRotation() {
+    const input = document.querySelector('[data-search-placeholder]');
+    const visual = document.querySelector('[data-search-placeholder-anim]');
+
+    if (!input || !visual) {
+      return;
+    }
+
+    const placeholders = (input.dataset.searchPlaceholders || '')
+      .split('|')
+      .map((placeholder) => placeholder.trim())
+      .filter(Boolean);
+
+    if (placeholders.length < 2) {
+      return;
+    }
+
+    const searchBox = input.closest('.search-box');
+    const animations = ['is-slide-up', 'is-type-in', 'is-fade-in', 'is-slide-down', 'is-zoom-in', 'is-wipe-in'];
+    let previousIndex = -1;
+    let previousAnimationIndex = -1;
+
+    function syncVisibility() {
+      const shouldHide = input.value.trim() !== '' || document.activeElement === input;
+      searchBox?.classList.toggle('has-search-value', input.value.trim() !== '');
+      searchBox?.classList.toggle('has-search-focus', document.activeElement === input);
+      visual.hidden = shouldHide;
+    }
+
+    function showNextPlaceholder() {
+      if (document.activeElement === input || input.value.trim() !== '') {
+        syncVisibility();
+        return;
+      }
+
+      let index = Math.floor(Math.random() * placeholders.length);
+      let animationIndex = Math.floor(Math.random() * animations.length);
+
+      if (placeholders.length > 1) {
+        while (index === previousIndex) {
+          index = Math.floor(Math.random() * placeholders.length);
+        }
+      }
+
+      if (animations.length > 1) {
+        while (animationIndex === previousAnimationIndex) {
+          animationIndex = Math.floor(Math.random() * animations.length);
+        }
+      }
+
+      previousIndex = index;
+      previousAnimationIndex = animationIndex;
+
+      visual.classList.remove(...animations);
+      visual.textContent = placeholders[index];
+      input.placeholder = placeholders[index];
+      void visual.offsetWidth;
+      visual.classList.add(animations[animationIndex]);
+    }
+
+    syncVisibility();
+    showNextPlaceholder();
+
+    input.addEventListener('focus', syncVisibility);
+    input.addEventListener('blur', syncVisibility);
+    input.addEventListener('input', syncVisibility);
+
+    window.setInterval(showNextPlaceholder, 5200);
+  }
+
   function updateProductControls(cart) {
     const quantities = new Map(
       cart.items.map((item) => [item.product.uid, Number(item.quantity) || 0]),
@@ -876,7 +946,7 @@
 
     bar.hidden = false;
     bar.classList.toggle('is-visible', count > 0);
-    bar.setAttribute('aria-label', count > 0 ? `View cart, ${count} ${count === 1 ? 'item' : 'items'}` : 'View cart');
+    bar.setAttribute('aria-label', count > 0 ? `Checkout, ${count} ${count === 1 ? 'item' : 'items'}` : 'Checkout');
 
     if (countLabel) {
       countLabel.textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
@@ -900,11 +970,118 @@
     }
   }
 
+  function compactMoney(amount) {
+    return `Rs ${Number(amount || 0).toLocaleString('en-IN', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+    })}`;
+  }
+
+  function checkoutTotals(cart) {
+    const page = document.querySelector('[data-checkout-review-page]');
+    const deliveryCharge = Number(page?.dataset.deliveryCharge ?? 40) || 0;
+    const freeDeliveryMinimum = Number(page?.dataset.freeDeliveryMinimum ?? 499) || 0;
+    const subtotal = Number(cart.subtotal) || 0;
+    const delivery = subtotal > 0 && subtotal < freeDeliveryMinimum ? deliveryCharge : 0;
+
+    return {
+      subtotal,
+      delivery,
+      total: subtotal + delivery,
+    };
+  }
+
+  function checkoutItemMarkup(item) {
+    const product = item.product || {};
+    const price = Number(product.price ?? item.unit_price ?? 0) || 0;
+    const unitPrice = Number(item.unit_price) || 0;
+    const quantity = Number(item.quantity) || 0;
+    const total = Number(item.total) || unitPrice * quantity;
+    const image = product.image || '/assets/images/sabjiwalah-cart-icon.png';
+    const hasSavings = price > unitPrice;
+
+    return `
+      <article
+        class="checkout-review-item"
+        data-cart-control
+        data-checkout-review-item
+        data-product-uid="${escapeHtml(product.uid || '')}"
+        data-product-name="${escapeHtml(product.name || 'Product')}"
+        data-product-unit="${escapeHtml(product.unit || '')}"
+        data-product-image="${escapeHtml(image)}"
+        data-product-price="${unitPrice}"
+        data-current-quantity="${quantity}"
+      >
+        <img src="${escapeHtml(image)}" alt="">
+        <div>
+          <h3>${escapeHtml(product.name || 'Product')}</h3>
+          <p>${escapeHtml(product.unit || '')}</p>
+        </div>
+        <div class="checkout-quantity-pill" aria-label="${quantity} in cart">
+          <button type="button" data-cart-decrement aria-label="Decrease quantity">-</button>
+          <strong data-cart-quantity-value>${quantity}</strong>
+          <button type="button" data-cart-increment aria-label="Increase quantity">+</button>
+        </div>
+        <p class="checkout-line-price">
+          ${hasSavings ? `<del>${compactMoney(price * quantity)}</del>` : ''}
+          <strong>${compactMoney(total)}</strong>
+        </p>
+      </article>
+    `;
+  }
+
+  function updateCheckoutReview(cart) {
+    const page = document.querySelector('[data-checkout-review-page]');
+
+    if (!page) {
+      return;
+    }
+
+    const items = page.querySelector('[data-checkout-review-items]');
+    const count = Number(cart.count) || 0;
+    const totals = checkoutTotals(cart);
+    const previousQuantities = new Map(
+      Array.from(page.querySelectorAll('[data-checkout-review-item]')).map((item) => [
+        item.dataset.productUid,
+        Number(item.dataset.currentQuantity) || 0,
+      ]),
+    );
+
+    setText('[data-checkout-review-count]', String(count));
+    setText('[data-checkout-review-count-label]', count === 1 ? 'item' : 'items');
+    setText('[data-checkout-subtotal]', compactMoney(totals.subtotal));
+    setText('[data-checkout-delivery]', compactMoney(totals.delivery));
+    setText('[data-checkout-total]', compactMoney(totals.total));
+
+    if (!items) {
+      return;
+    }
+
+    items.innerHTML = cart.items.length
+      ? cart.items.map(checkoutItemMarkup).join('')
+      : '<p class="checkout-empty">Your cart is empty. Add fresh picks before checkout.</p>';
+
+    cart.items.forEach((item) => {
+      const productUid = item.product?.uid || '';
+      const previousQuantity = previousQuantities.get(productUid);
+      const quantity = Number(item.quantity) || 0;
+      const value = items.querySelector(`[data-checkout-review-item][data-product-uid="${CSS.escape(productUid)}"] [data-cart-quantity-value]`);
+
+      if (previousQuantity !== undefined && quantity > 0 && quantity !== previousQuantity && value) {
+        value.classList.remove('is-quantity-changing');
+        value.dataset.quantityDirection = quantity > previousQuantity ? 'up' : 'down';
+        void value.offsetWidth;
+        value.classList.add('is-quantity-changing');
+      }
+    });
+  }
+
   function renderCart(cart) {
     cart = normalizeCart(cart);
     currentCart = cloneCart(cart);
 
     updateCount(cart.count);
+    updateCheckoutReview(cart);
     updateProductControls(cart);
     updateFloatingCart(cart);
 
@@ -1032,6 +1209,12 @@
     return commitCartRequest(request, previousCart, version, 'Cart cleared');
   }
 
+  function setText(selector, value) {
+    document.querySelectorAll(selector).forEach((node) => {
+      node.textContent = value;
+    });
+  }
+
   document.addEventListener('click', async (event) => {
     const saveButton = event.target.closest('[data-save-product]');
     const addButton = event.target.closest('[data-add-to-cart]');
@@ -1117,6 +1300,7 @@
   initProductCarousels();
   initLocationSheet();
   initScrollChrome();
+  initSearchPlaceholderRotation();
 
   window.SabjiwalahCart = {
     refresh: refreshCart,

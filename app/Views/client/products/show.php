@@ -15,7 +15,7 @@
             </div>
             <nav>
                 <a href="/products">Products</a>
-                <a href="/cart">Cart (<span data-cart-count-badge>0</span>)</a>
+                <a href="/checkout">Checkout (<span data-cart-count-badge>0</span>)</a>
             </nav>
         </header>
 
@@ -51,7 +51,7 @@
                 <h2>Cart</h2>
                 <p class="cart-message" data-cart-message role="status"></p>
                 <p>Items: <strong data-cart-count-badge>0</strong></p>
-                <p><a href="/cart">View cart</a></p>
+                <p><a href="/checkout">Review checkout</a></p>
             </aside>
         </section>
     </main>

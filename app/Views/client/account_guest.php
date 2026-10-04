@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Account - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/account.css?v=20261004-compact-account">
+    <link rel="stylesheet" href="/assets/css/account.css?v=20261004-minimal-avatar">
 </head>
 <body class="account-guest-body">
     <main class="account-page account-page--guest">
@@ -16,9 +16,10 @@
 
         <section class="guest-hero" aria-labelledby="guest-account-title">
             <div class="guest-avatar" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 12.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z"></path>
-                    <path d="M4.8 20.2c.7-4 3.2-6 7.2-6s6.5 2 7.2 6"></path>
+                <svg viewBox="0 0 64 64">
+                    <circle class="avatar-ring" cx="32" cy="32" r="25"></circle>
+                    <circle class="avatar-head" cx="32" cy="24.5" r="7.2"></circle>
+                    <path class="avatar-body" d="M19 48c2.7-8.6 7.6-12.9 13-12.9S42.3 39.4 45 48"></path>
                 </svg>
             </div>
             <h1 id="guest-account-title">Your account</h1>

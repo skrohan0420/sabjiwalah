@@ -1,7 +1,7 @@
 <?php
 $categoryTabs = [
     ['name' => 'All', 'icon' => 'bag', 'active' => true],
-    ['name' => 'Vegetables', 'icon' => 'leaf', 'badge' => 'Fresh'],
+    ['name' => 'Vegetables', 'icon' => 'leaf'],
     ['name' => 'Fruits', 'icon' => 'apple'],
     ['name' => 'Dairy', 'icon' => 'milk'],
     ['name' => 'Herbs', 'icon' => 'sprout'],
@@ -42,7 +42,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
     <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261003-brand-cache">
+    <link rel="stylesheet" href="/assets/css/home.css?v=20261004-search-variety">
 </head>
 <body>
     <div class="app-shell">
@@ -53,7 +53,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                     <img class="brand-wordmark" src="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" alt="" width="620" height="160" decoding="async" fetchpriority="high">
                 </span>
                 <div class="header-icons">
-                    <a class="wallet-pill" href="/cart" aria-label="Cart total">
+                    <a class="wallet-pill" href="/checkout" aria-label="Checkout total">
                         <span>Rs</span>
                         <strong data-cart-count-badge>0</strong>
                     </a>
@@ -87,7 +87,15 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             <form class="search-box" action="/products" method="get" role="search">
                 <label class="sr-only" for="home-search">Search products</label>
                 <span class="search-icon" aria-hidden="true"></span>
-                <input id="home-search" name="q" type="search" placeholder="Search for atta, dal, coke and more">
+                <input
+                    id="home-search"
+                    name="q"
+                    type="search"
+                    placeholder="Search for atta, dal, coke and more"
+                    data-search-placeholder
+                    data-search-placeholders="Search fresh vegetables|Search fruits for today|Search atta, dal and rice|Search milk and breakfast|Search tomato, onion, potato|Search paneer and curd|Search tea-time snacks|Search cooking oil and ghee|Search pooja essentials|Search weekly grocery deals|Search leafy greens|Search cold drinks"
+                >
+                <span class="search-placeholder-anim" data-search-placeholder-anim aria-hidden="true">Search for atta, dal, coke and more</span>
                 <button type="submit" aria-label="Search by voice or text"></button>
             </form>
 
@@ -318,10 +326,10 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </section>
         </main>
 
-        <a class="floating-cart-bar" href="/cart" data-floating-cart hidden>
+        <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
             <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
             <span>
-                <strong>View cart</strong>
+                <strong>Checkout</strong>
                 <em data-floating-cart-count>0 items</em>
             </span>
             <i aria-hidden="true"></i>
@@ -397,6 +405,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </a>
         </nav>
     </div>
-    <script src="/assets/js/cart.js?v=20261003-optimistic-cart"></script>
+    <script src="/assets/js/cart.js?v=20261004-search-random"></script>
 </body>
 </html>

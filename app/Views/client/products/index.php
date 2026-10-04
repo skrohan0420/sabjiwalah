@@ -15,7 +15,7 @@
         </div>
         <nav>
             <a href="/">Home</a>
-            <a href="/cart">Cart (<span data-cart-count-badge>0</span>)</a>
+            <a href="/checkout">Checkout (<span data-cart-count-badge>0</span>)</a>
         </nav>
     </header>
 

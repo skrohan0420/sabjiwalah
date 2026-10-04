@@ -8,6 +8,8 @@
   let messageTimer = null;
   let currentCart = { count: 0, items: [], subtotal: 0 };
   let cartMutationVersion = 0;
+  const cartUpdateDebounceMs = 400;
+  const pendingItemUpdates = new Map();
   const savedProductsStorageKey = 'sabjiwalah.savedProducts';
   const deliveryLocationStorageKey = 'sabjiwalah.deliveryLocation';
 
@@ -219,6 +221,24 @@
       setMessage(error.message, true);
       throw error;
     }
+  }
+
+  function cancelPendingItemUpdate(productUid, result = currentCart) {
+    const pendingUpdate = pendingItemUpdates.get(productUid);
+
+    if (!pendingUpdate) {
+      return;
+    }
+
+    clearTimeout(pendingUpdate.timer);
+    pendingItemUpdates.delete(productUid);
+    pendingUpdate.resolve(cloneCart(result));
+  }
+
+  function cancelAllPendingItemUpdates(result = currentCart) {
+    Array.from(pendingItemUpdates.keys()).forEach((productUid) => {
+      cancelPendingItemUpdate(productUid, result);
+    });
   }
 
   function getSavedProducts() {
@@ -936,6 +956,8 @@
   }
 
   async function addToCart(productUid, quantity, source = null) {
+    cancelPendingItemUpdate(productUid);
+
     const version = ++cartMutationVersion;
     const previousCart = renderOptimisticCart(
       cartWithQuantity(productUid, quantity, source, 'add'),
@@ -950,20 +972,45 @@
   }
 
   async function updateItem(productUid, quantity, source = null) {
+    const pendingUpdate = pendingItemUpdates.get(productUid);
+    const previousCart = pendingUpdate?.previousCart || cloneCart(currentCart);
+
+    if (pendingUpdate) {
+      clearTimeout(pendingUpdate.timer);
+      pendingUpdate.resolve(cloneCart(currentCart));
+    }
+
     const version = ++cartMutationVersion;
-    const previousCart = renderOptimisticCart(
+    renderOptimisticCart(
       cartWithQuantity(productUid, quantity, source, 'set'),
       quantity > 0 ? 'Updated' : 'Removed',
     );
-    const request = api(`/api/v1/cart/items/${encodeURIComponent(productUid)}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity }),
-    });
 
-    return commitCartRequest(request, previousCart, version, quantity > 0 ? 'Cart updated' : 'Product removed from cart');
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pendingItemUpdates.delete(productUid);
+
+        const request = api(`/api/v1/cart/items/${encodeURIComponent(productUid)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ quantity }),
+        });
+
+        commitCartRequest(request, previousCart, version, quantity > 0 ? 'Cart updated' : 'Product removed from cart')
+          .then(resolve)
+          .catch(reject);
+      }, cartUpdateDebounceMs);
+
+      pendingItemUpdates.set(productUid, {
+        previousCart,
+        timer,
+        resolve,
+      });
+    });
   }
 
   async function removeItem(productUid) {
+    cancelPendingItemUpdate(productUid);
+
     const version = ++cartMutationVersion;
     const previousCart = renderOptimisticCart(cartWithoutItem(productUid), 'Removed');
     const request = api(`/api/v1/cart/items/${encodeURIComponent(productUid)}`, {
@@ -974,6 +1021,8 @@
   }
 
   async function clearCart() {
+    cancelAllPendingItemUpdates({ count: 0, items: [], subtotal: 0 });
+
     const version = ++cartMutationVersion;
     const previousCart = renderOptimisticCart({ count: 0, items: [], subtotal: 0 }, 'Cart cleared');
     const request = api('/api/v1/cart', {

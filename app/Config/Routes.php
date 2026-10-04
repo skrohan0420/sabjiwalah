@@ -7,6 +7,7 @@ $routes->get('/', 'Client\HomeController::index');
 $routes->get('products', 'Client\ProductController::index');
 $routes->get('products/(:segment)', 'Client\ProductController::show/$1');
 $routes->get('cart', 'Client\CartController::index');
+$routes->get('account', 'Client\AuthController::account');
 
 $routes->get('login', 'Client\AuthController::login');
 $routes->post('login', 'Client\AuthController::attemptLogin');
@@ -15,7 +16,6 @@ $routes->post('signup', 'Client\AuthController::storeRegistration');
 $routes->get('logout', 'Client\AuthController::logout', ['filter' => 'auth']);
 
 $routes->group('', ['filter' => 'role:customer'], static function (RouteCollection $routes): void {
-    $routes->get('account', 'Client\AuthController::account');
     $routes->get('checkout', 'Client\CheckoutController::index');
 });
 

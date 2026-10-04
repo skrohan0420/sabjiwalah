@@ -153,3 +153,259 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+.account-guest-body {
+  color: #24262b;
+  background: #f6f7fb;
+}
+
+.account-page--guest {
+  width: min(100% - 28px, 430px);
+  min-height: 100vh;
+  padding: 18px 0 40px;
+}
+
+.account-page--guest a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.account-back {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 8px 20px rgba(20, 26, 38, 0.04);
+}
+
+.account-back svg,
+.guest-avatar svg,
+.quick-actions svg,
+.account-row-icon svg,
+.account-chevron {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.account-back svg,
+.account-row-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.guest-hero {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 16px 0 14px;
+  text-align: center;
+}
+
+.guest-avatar {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  color: #303236;
+  background: #ffffff;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 12px 26px rgba(20, 26, 38, 0.035);
+}
+
+.guest-avatar svg {
+  width: 46px;
+  height: 46px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.guest-hero h1,
+.guest-hero p,
+.guest-footer strong,
+.guest-footer span {
+  margin: 0;
+}
+
+.guest-hero h1 {
+  font-size: 1.7rem;
+  line-height: 1.08;
+  letter-spacing: 0;
+  font-weight: 900;
+}
+
+.guest-hero p {
+  color: #777c86;
+  font-size: 0.94rem;
+}
+
+.guest-continue {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  margin-top: 14px;
+  border: 1.5px solid #278528;
+  border-radius: 8px;
+  color: #278528;
+  background: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.quick-actions a {
+  min-height: 78px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 1px solid #eef0f5;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(23, 28, 40, 0.035);
+  font-size: 0.92rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.quick-actions svg {
+  width: 28px;
+  height: 28px;
+  color: #2f3135;
+}
+
+.account-list {
+  overflow: hidden;
+  margin-top: 12px;
+  border: 1px solid #eef0f5;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(23, 28, 40, 0.03);
+}
+
+.account-list h2 {
+  margin: 0;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid #edf0f5;
+  color: #2c2e33;
+  font-size: 1.03rem;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.account-list--single {
+  margin-top: 14px;
+}
+
+.account-row {
+  width: 100%;
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 1px solid #edf0f5;
+  color: #292b30;
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-row:last-child {
+  border-bottom: 0;
+}
+
+.account-row strong {
+  color: #303b67;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.account-row-icon {
+  display: grid;
+  place-items: center;
+  color: #2d3036;
+}
+
+.account-chevron {
+  width: 18px;
+  height: 18px;
+  color: #b6bac3;
+}
+
+.guest-footer {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  margin-top: 42px;
+  color: #b3b7bf;
+  text-align: center;
+}
+
+.guest-footer strong {
+  color: #b7bbc3;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.guest-footer span {
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+@media (max-width: 480px) {
+  .account-page--guest {
+    width: min(100% - 24px, 430px);
+    padding-top: 16px;
+  }
+
+  .account-back {
+    width: 38px;
+    height: 38px;
+  }
+
+  .guest-avatar {
+    width: 78px;
+    height: 78px;
+  }
+
+  .guest-continue {
+    min-height: 46px;
+  }
+
+  .quick-actions {
+    gap: 10px;
+  }
+
+  .quick-actions a {
+    min-height: 76px;
+    font-size: 0.9rem;
+  }
+
+  .account-row {
+    min-height: 50px;
+    font-size: 0.94rem;
+  }
+}

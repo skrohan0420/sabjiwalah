@@ -47,6 +47,7 @@ class AuthService
             'dev_otp'     => $code,
             'expires_at'  => date(DATE_ATOM, $expiresAt),
             'user_exists' => $user !== null,
+            'user_name'   => $user ? (string) ($user['name'] ?? '') : null,
         ];
     }
 

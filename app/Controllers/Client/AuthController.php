@@ -58,6 +58,10 @@ class AuthController extends BaseController
 
     public function account(): string
     {
+        if (! session('is_logged_in')) {
+            return view('client/account_guest');
+        }
+
         return view('client/account', [
             'user' => (new AuthService())->user(),
         ]);

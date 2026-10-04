@@ -29,8 +29,8 @@ $productSections = [
 ];
 
 $isLoggedIn = (bool) session('is_logged_in');
-$accountUrl = $isLoggedIn ? '/account' : '/login';
-$accountLabel = $isLoggedIn ? 'Account' : 'Login';
+$accountUrl = '/account';
+$accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 ?>
 <!DOCTYPE html>
 <html lang="en">

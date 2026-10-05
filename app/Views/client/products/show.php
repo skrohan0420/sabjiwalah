@@ -54,6 +54,6 @@
             </aside>
         </section>
     </main>
-    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
+    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
 </body>
 </html>

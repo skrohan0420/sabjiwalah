@@ -31,7 +31,7 @@ $accountUrl = '/account';
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
     <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261004-filter-icons">
+    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
 </head>
 <body class="category-body">
     <div class="app-shell category-app-shell">
@@ -45,8 +45,8 @@ $accountUrl = '/account';
                         <span>Surajpur, Greater Noida</span>
                     </button>
                 </div>
-                <a class="category-icon-button category-search-link" href="/products" aria-label="Search products"></a>
-                <button class="category-icon-button category-share-button" type="button" aria-label="Share"></button>
+                <a class="category-icon-button category-search-link" href="/search" aria-label="Search products"></a>
+                <button class="category-icon-button category-share-button" type="button" aria-label="Share" data-share-page></button>
             </div>
 
             <nav class="category-filter-bar" aria-label="Sort and filter products">
@@ -239,17 +239,16 @@ $accountUrl = '/account';
                 </span>
                 Home
             </a>
-            <a href="/products">
+            <a href="/orders">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M5.4 9.7h13.2"></path>
-                        <path d="M6.1 9.7 7 5.4h10l.9 4.3"></path>
-                        <path d="M6.2 11.7v6.7c0 1 .7 1.7 1.7 1.7h8.2c1 0 1.7-.7 1.7-1.7v-6.7"></path>
-                        <path d="M9 20.1v-5.2h6v5.2"></path>
-                        <path d="M4.2 9.7c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2c.2 1.3 1.3 2.2 2.8 2.2s2.6-.9 2.8-2.2c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2"></path>
+                        <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
+                        <path d="M8.9 8.4h6.2"></path>
+                        <path d="M8.9 12h6.2"></path>
+                        <path d="M8.9 15.6h3.7"></path>
                     </svg>
                 </span>
-                Shop
+                My Orders
             </a>
             <a class="is-active" href="/products">
                 <span class="nav-icon" aria-hidden="true">
@@ -275,6 +274,6 @@ $accountUrl = '/account';
         </nav>
     </div>
     <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
+    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
 </body>
 </html>

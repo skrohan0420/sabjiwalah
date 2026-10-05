@@ -30,6 +30,11 @@ a {
   width: min(100% - 32px, var(--max));
   margin: 0 auto;
   padding: 32px 0;
+  background: transparent;
+}
+
+.account-page--with-nav {
+  padding-bottom: calc(var(--bottom-nav-height, 58px) + 28px);
 }
 
 .account-header {
@@ -165,6 +170,7 @@ a {
   width: min(100% - 28px, 400px);
   min-height: 100vh;
   padding: 16px 0 34px;
+  background: transparent;
 }
 
 .account-page--guest a {
@@ -394,7 +400,7 @@ a {
   display: grid;
   justify-items: center;
   gap: 5px;
-  margin-top: 100px;
+  margin-top: 45px;
   color: #b9c0ba;
   text-align: center;
 }

@@ -42,7 +42,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
     <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261004-cart-hydration">
+    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
 </head>
 <body>
     <div class="app-shell">
@@ -53,16 +53,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                     <img class="brand-wordmark" src="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" alt="" width="620" height="160" decoding="async" fetchpriority="high">
                 </span>
                 <div class="header-icons">
-                    <a class="wallet-pill" href="/checkout" aria-label="Checkout total">
-                        <span>Rs</span>
-                        <strong data-cart-count-badge>0</strong>
-                    </a>
-                    <a class="profile-button" href="<?= esc($accountUrl, 'attr') ?>" aria-label="<?= esc($accountLabel, 'attr') ?>">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-                            <path d="M4.75 20a7.25 7.25 0 0 1 14.5 0" />
-                        </svg>
-                    </a>
+                    <button class="home-share-button" type="button" aria-label="Share Sabjiwalah" data-share-page></button>
                 </div>
             </div>
 
@@ -84,13 +75,15 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         </header>
 
         <div class="sticky-shop-controls">
-            <form class="search-box" action="/products" method="get" role="search">
+            <form class="search-box" action="/search" method="get" role="search" data-search-redirect="/search">
                 <label class="sr-only" for="home-search">Search products</label>
                 <span class="search-icon" aria-hidden="true"></span>
                 <input
                     id="home-search"
                     name="q"
                     type="search"
+                    readonly
+                    aria-readonly="true"
                     placeholder="Search for atta, dal, coke and more"
                     data-search-placeholder
                     data-search-placeholders="Search fresh vegetables|Search fruits for today|Search atta, dal and rice|Search milk and breakfast|Search tomato, onion, potato|Search paneer and curd|Search tea-time snacks|Search cooking oil and ghee|Search pooja essentials|Search weekly grocery deals|Search leafy greens|Search cold drinks"
@@ -304,25 +297,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                 </section>
             <?php endforeach; ?>
 
-            <section class="price-drops" aria-labelledby="drops-heading">
-                <h2 id="drops-heading">Mega Price Drops</h2>
-                <div class="promo-grid">
-                    <?php foreach ($promoTiles as $tile) : ?>
-                        <a class="promo-card" href="/products">
-                            <span><?= esc($tile['offer']) ?></span>
-                            <h3><?= esc($tile['title']) ?></h3>
-                            <img src="<?= esc($tile['image']) ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-
-            <section class="quick-links" aria-label="Quick shop shortcuts">
-                <a href="/products"><span>%</span> Deals</a>
-                <a href="/products"><span></span> Fresh</a>
-                <a href="/products"><span></span> Greens</a>
-                <a href="/products"><span></span> Staples</a>
-            </section>
+            
         </main>
 
         <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
@@ -372,17 +347,16 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                 </span>
                 Home
             </a>
-            <a href="/products">
+            <a href="/orders">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M5.4 9.7h13.2"></path>
-                        <path d="M6.1 9.7 7 5.4h10l.9 4.3"></path>
-                        <path d="M6.2 11.7v6.7c0 1 .7 1.7 1.7 1.7h8.2c1 0 1.7-.7 1.7-1.7v-6.7"></path>
-                        <path d="M9 20.1v-5.2h6v5.2"></path>
-                        <path d="M4.2 9.7c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2c.2 1.3 1.3 2.2 2.8 2.2s2.6-.9 2.8-2.2c.2 1.3 1.2 2.2 2.5 2.2s2.3-.9 2.5-2.2"></path>
+                        <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
+                        <path d="M8.9 8.4h6.2"></path>
+                        <path d="M8.9 12h6.2"></path>
+                        <path d="M8.9 15.6h3.7"></path>
                     </svg>
                 </span>
-                Shop
+                My Orders
             </a>
             <a href="/products">
                 <span class="nav-icon" aria-hidden="true">
@@ -407,6 +381,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </a>
         </nav>
     </div>
-    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
+    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
 </body>
 </html>

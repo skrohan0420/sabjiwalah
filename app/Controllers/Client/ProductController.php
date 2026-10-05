@@ -18,6 +18,29 @@ class ProductController extends BaseController
         ]);
     }
 
+    public function search(): string
+    {
+        $query = trim((string) $this->request->getGet('q'));
+        $products = (new ProductModel())
+            ->where('is_active', 1);
+
+        if ($query !== '') {
+            $products
+                ->groupStart()
+                    ->like('name', $query)
+                    ->orLike('description', $query)
+                    ->orLike('unit', $query)
+                ->groupEnd();
+        }
+
+        return view('client/products/search', [
+            'products' => $products
+                ->orderBy('name', 'ASC')
+                ->findAll(),
+            'query' => $query,
+        ]);
+    }
+
     public function show(string $uidOrSlug): string
     {
         $product = (new ProductModel())

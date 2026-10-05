@@ -227,7 +227,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
     </main>
 
     <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/cart.js?v=20261004-image-fallback"></script>
+    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
     <?php if ($isLoggedIn) : ?>
         <script src="/assets/js/checkout.js"></script>
     <?php endif; ?>

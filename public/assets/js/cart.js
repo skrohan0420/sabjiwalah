@@ -928,6 +928,51 @@
     window.setInterval(showNextPlaceholder, 5200);
   }
 
+  function initSearchRedirects() {
+    document.querySelectorAll('[data-search-redirect]').forEach((launcher) => {
+      const targetUrl = launcher.dataset.searchRedirect || launcher.getAttribute('action') || '/search';
+      const input = launcher.querySelector('input');
+
+      function redirect(event) {
+        event.preventDefault();
+        window.location.href = targetUrl;
+      }
+
+      launcher.addEventListener('submit', redirect);
+      launcher.addEventListener('click', redirect);
+
+      if (input) {
+        input.addEventListener('focus', redirect);
+        input.addEventListener('keydown', redirect);
+      }
+    });
+  }
+
+  function initShareButtons() {
+    document.querySelectorAll('[data-share-page]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const shareData = {
+          title: document.title || 'Sabjiwalah',
+          text: 'Fresh groceries and vegetables delivered by Sabjiwalah.',
+          url: window.location.origin,
+        };
+
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+            return;
+          }
+
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(shareData.url);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    });
+  }
+
   function updateProductControls(cart) {
     const quantities = new Map(
       cart.items.map((item) => [item.product.uid, Number(item.quantity) || 0]),
@@ -1335,6 +1380,8 @@
   initLocationSheet();
   initScrollChrome();
   initSearchPlaceholderRotation();
+  initSearchRedirects();
+  initShareButtons();
 
   window.SabjiwalahCart = {
     refresh: refreshCart,

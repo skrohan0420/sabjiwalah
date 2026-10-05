@@ -4,6 +4,8 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 $routes->get('/', 'Client\HomeController::index');
+$routes->get('search', 'Client\ProductController::search');
+$routes->get('orders', 'Client\OrderController::index');
 $routes->get('products', 'Client\ProductController::index');
 $routes->get('products/(:segment)', 'Client\ProductController::show/$1');
 $routes->get('account', 'Client\AuthController::account');

@@ -69,6 +69,9 @@ class AuthController extends BaseController
 
     private function redirectByRole(?string $redirect = null)
     {
+        if (! \App\Services\CustomerSetup::complete((new AuthService())->user())) {
+            return redirect()->to(site_url('account'));
+        }
         if (session('user_role') === 'customer' && $redirect !== null && $redirect !== '') {
             return redirect()->to(app_asset_url($redirect));
         }

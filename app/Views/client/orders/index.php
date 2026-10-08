@@ -12,8 +12,9 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View your Sabjiwalah orders">
     <title>My Orders - Sabjiwalah</title>
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
-    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
+    <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <?= view('shared/theme') ?>
 </head>
 <body class="orders-body">
     <div class="app-shell orders-app-shell">
@@ -111,7 +112,7 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
             </a>
         </nav>
     </div>
-    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>
 </body>
 </html>

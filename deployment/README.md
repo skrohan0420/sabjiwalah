@@ -168,3 +168,28 @@ checkout changes. It adds two nullable coordinate columns to existing orders.
 Checks: `node --test tests/frontend/location.test.cjs` (mocked Google API interaction)
 and `php tests/deployment/delivery-pin.php` (validation and local schema, no orders).
 Actual Google labels, search and device GPS require the configured key for live testing.
+
+## Smooth page navigation and asset caching
+
+All shared page headers load the navigation styles and script. Supported browsers
+use short native page transitions, while reduced-motion preferences disable them.
+The bottom navigation keeps its position during transitions. Normal links, form
+submissions and browser history continue to work.
+
+Back/forward navigation retains scroll positions and scrollable category rails.
+The browser's live page cache is used when available; session storage provides a
+fallback for scroll restoration. Search results keep their existing URL query.
+Intent-based prefetching is limited to four same-origin public browsing URLs per
+page and is disabled for data saver or slow mobile connections. Account, checkout,
+logout, admin and API routes are excluded.
+
+Upload `public/assets/.htaccess` with the assets. Apache with `mod_headers` caches
+content-versioned static files for seven days and other static files for one hour.
+`app_static_url()` appends a content hash, so editing an asset changes its URL.
+HTML and API responses are excluded. Spark does not apply Apache `.htaccess`
+headers; local Spark development continues normally.
+
+Checks: `node --test tests/frontend/page-navigation.test.cjs tests/frontend/theme.test.cjs`
+and `php tests/deployment/static-assets.php`. On the deployed Apache host, inspect
+the response headers for a versioned CSS/JS URL: `Cache-Control` should contain
+`max-age=604800, immutable`.

@@ -39,7 +39,8 @@ function fixture(apiKey = 'test-only-key') {
     localStorage: { getItem: key => saved.get(key) || null, setItem: (key, value) => saved.set(key, value) },
     navigator: { geolocation: { watchPosition(callback) { gpsCallback = callback; return 7; }, clearWatch() { instances.gpsStopped = true; } } },
     requestAnimationFrame: fn => fn(),
-    document: { querySelector: get, createElement: () => new Element(), activeElement: new Element(), body: new Element(), head: { appendChild() { queueMicrotask(() => context.window.sabjiwalahGoogleMapsReady()); } } },
+    CustomEvent: class { constructor(type) { this.type = type; } },
+    document: { addEventListener() {}, dispatchEvent() {}, querySelector: get, createElement: () => new Element(), activeElement: new Element(), body: new Element(), head: { appendChild() { queueMicrotask(() => context.window.sabjiwalahGoogleMapsReady()); } } },
   };
   context.window = { isSecureContext: true, addEventListener() {}, google };
   vm.runInNewContext(source, context);

@@ -1,0 +1,15 @@
+/* Browser-native navigation keeps normal links, forms and history intact. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: page-fade-out 130ms ease-out both; }
+::view-transition-new(root) { animation: page-fade-in 180ms ease-out both; }
+@keyframes page-fade-out { to { opacity: 0; } }
+@keyframes page-fade-in { from { opacity: 0; } }
+.bottom-nav { view-transition-name: bottom-navigation; }
+::view-transition-group(bottom-navigation) { animation-duration: 180ms; }
+::view-transition-old(bottom-navigation), ::view-transition-new(bottom-navigation) { animation: none; }
+.product-photo, .product-carousel-viewport { aspect-ratio: 1; }
+.guest-avatar, .brand-cart-logo, .brand-wordmark { flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*) { animation: none; }
+}

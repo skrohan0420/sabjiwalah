@@ -22,8 +22,9 @@ $accountUrl = base_url('account');
     <meta name="description" content="Search fresh vegetables, fruits and daily groceries from Sabjiwalah">
     <title><?= esc($displayQuery) ?> - Sabjiwalah Search</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
-    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
+    <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <?= view('shared/theme') ?>
 </head>
 <body class="search-body">
     <div class="app-shell search-app-shell">
@@ -117,7 +118,7 @@ $accountUrl = base_url('account');
                                                     <img
                                                         src="<?= esc(app_asset_url($carouselImage)) ?>"
                                                         alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                                                        data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
+                                                        data-fallback-image="<?= esc(app_static_url('assets/images/product-placeholder.svg'), 'attr') ?>"
                                                         draggable="false"
                                                         <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                                                     >
@@ -253,7 +254,7 @@ $accountUrl = base_url('account');
             </a>
         </nav>
     </div>
-    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>
 </body>
 </html>

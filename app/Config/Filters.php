@@ -44,6 +44,7 @@ class Filters extends BaseFilters
         'apiAuth'       => ApiAuthFilter::class,
         'apiCsrf'       => ApiCsrfFilter::class,
         'apiRole'       => ApiRoleFilter::class,
+        'customerSetup' => \App\Filters\CustomerSetupFilter::class,
     ];
 
     /**
@@ -82,6 +83,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
+            'customerSetup',
             'csrf' => ['except' => ['api/v1/*']],
             'invalidchars',
         ],

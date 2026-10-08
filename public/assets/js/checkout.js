@@ -241,6 +241,13 @@
         });
       }
     } catch { /* Checkout stays available when browser storage is unavailable. */ }
+    try {
+      const profile = JSON.parse(localStorage.getItem('sabjiwalah.customerProfile') || 'null');
+      const name = form.elements.namedItem('customer_name');
+      if (name && (!name.value || /^Customer(?: \d+)?$/.test(name.value)) && typeof profile?.name === 'string') {
+        name.value = profile.name.trim().slice(0, 120);
+      }
+    } catch { /* Name entry stays available without browser storage. */ }
     loadSummary().catch((error) => setMessage(error.message, true));
   }
 })();

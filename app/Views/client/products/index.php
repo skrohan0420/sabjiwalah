@@ -30,10 +30,11 @@ $accountUrl = base_url('account');
     <meta name="description" content="Shop fresh vegetables, fruits and daily groceries from Sabjiwalah">
     <title>Products - Sabjiwalah</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
-    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
-    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="preload" href="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo-header.png'), 'attr') ?>" as="image" type="image/png">
+    <link rel="preload" href="<?= esc(app_static_url('assets/images/sabjiwalah-wordmark-header.png'), 'attr') ?>" as="image" type="image/png">
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
+    <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <?= view('shared/theme') ?>
 </head>
 <body class="category-body">
     <div class="app-shell category-app-shell">
@@ -90,7 +91,7 @@ $accountUrl = base_url('account');
                     <?php foreach ($categoryItems as $category) : ?>
                         <a class="<?= ! empty($category['active']) ? 'is-active' : '' ?>" href="<?= esc(base_url('products'), 'attr') ?>">
                             <span>
-                                <img src="<?= esc(app_asset_url($category['image'])) ?>" alt="" data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>">
+                                <img src="<?= esc(app_asset_url($category['image'])) ?>" alt="" data-fallback-image="<?= esc(app_static_url('assets/images/product-placeholder.svg'), 'attr') ?>">
                             </span>
                             <strong><?= esc($category['name']) ?></strong>
                         </a>
@@ -138,7 +139,7 @@ $accountUrl = base_url('account');
                                                         <img
                                                             src="<?= esc(app_asset_url($carouselImage)) ?>"
                                                             alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                                                            data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
+                                                            data-fallback-image="<?= esc(app_static_url('assets/images/product-placeholder.svg'), 'attr') ?>"
                                                             draggable="false"
                                                             <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                                                         >
@@ -275,7 +276,7 @@ $accountUrl = base_url('account');
             </a>
         </nav>
     </div>
-    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>
 </body>
 </html>

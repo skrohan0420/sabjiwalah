@@ -46,7 +46,7 @@ $ratingCount = number_format(6400 + (($index + 1) * 1207) + ($sectionIndex * 237
                         <img
                             src="<?= esc(app_asset_url($carouselImage)) ?>"
                             alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                            data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
+                            data-fallback-image="<?= esc(app_static_url('assets/images/product-placeholder.svg'), 'attr') ?>"
                             draggable="false"
                             <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                         >

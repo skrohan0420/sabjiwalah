@@ -41,19 +41,21 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <meta name="description" content="Sabjiwalah fresh grocery and vegetable delivery">
     <title>Sabjiwalah - Fresh Grocery Delivery</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
-    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261008-location-compact'), 'attr') ?>">
-    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/location.css?v=20261008-centered-pin'), 'attr') ?>">
+    <link rel="preload" href="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo-header.png'), 'attr') ?>" as="image" type="image/png">
+    <link rel="preload" href="<?= esc(app_static_url('assets/images/sabjiwalah-wordmark-header.png'), 'attr') ?>" as="image" type="image/png">
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
+    <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/location.css'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/onboarding.css'), 'attr') ?>">
+    <?= view('shared/theme') ?>
 </head>
 <body>
     <div class="app-shell">
         <header class="home-header">
             <div class="status-row" aria-label="Service status">
                 <span class="brand-mark" aria-label="Sabjiwalah">
-                    <img class="brand-cart-logo" src="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" alt="" width="184" height="132" decoding="async" fetchpriority="high">
-                    <img class="brand-wordmark" src="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" alt="" width="620" height="160" decoding="async" fetchpriority="high">
+                    <img class="brand-cart-logo" src="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo-header.png'), 'attr') ?>" alt="" width="184" height="132" decoding="async" fetchpriority="high">
+                    <img class="brand-wordmark" src="<?= esc(app_static_url('assets/images/sabjiwalah-wordmark-header.png'), 'attr') ?>" alt="" width="620" height="160" decoding="async" fetchpriority="high">
                 </span>
                 <div class="header-icons">
                     <button class="home-share-button" type="button" aria-label="Share Sabjiwalah" data-share-page></button>
@@ -152,10 +154,37 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         </div>
 
         <main>
-            <section class="deal-hero" aria-labelledby="deal-heading">
-                <p>Weekend fresh drop</p>
-                <h2 id="deal-heading">Steal Rs 9 Deal</h2>
-                <span>Get any one item at special price</span>
+            <section class="banner-carousel" aria-label="Fresh picks and offers" aria-roledescription="carousel" data-banner-carousel>
+                <div class="banner-track" data-banner-track>
+                    <a class="deal-hero banner-slide" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="Weekend fresh drop: Steal Rs 9 Deal. Browse products." aria-roledescription="slide" data-banner-slide>
+                        <p>Weekend fresh drop</p>
+                        <h2>Steal Rs 9 Deal</h2>
+                        <span>Get any one item at special price</span>
+                    </a>
+                    <a class="deal-hero banner-slide banner-slide--garden" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="Fresh from the garden. Shop fresh picks." aria-roledescription="slide" data-banner-slide>
+                        <p>Your daily dose of fresh</p>
+                        <h2>Fresh from<br>the garden</h2>
+                        <span>Good food starts with fresh picks <b aria-hidden="true">↗</b></span>
+                    </a>
+                    <a class="deal-hero banner-slide banner-slide--fruit" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="A little fruit, a lot of joy. Explore products." aria-roledescription="slide" data-banner-slide>
+                        <p>Colour your everyday</p>
+                        <h2>A little fruit.<br>A lot of joy.</h2>
+                        <span>Make room for something fresh <b aria-hidden="true">↗</b></span>
+                    </a>
+                    <a class="deal-hero banner-slide banner-slide--daily" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="Your everyday essentials. Browse products." aria-roledescription="slide" data-banner-slide>
+                        <p>The everyday edit</p>
+                        <h2>Stock up.<br>Slow down.</h2>
+                        <span>Your kitchen essentials, all in one place <b aria-hidden="true">↗</b></span>
+                    </a>
+                </div>
+                <div class="banner-controls" data-banner-controls hidden>
+                    <div class="banner-dots" aria-label="Choose banner">
+                        <?php for ($bannerIndex = 0; $bannerIndex < 4; $bannerIndex++) : ?>
+                            <button type="button" aria-label="Show banner <?= $bannerIndex + 1 ?> of 4" aria-current="<?= $bannerIndex === 0 ? 'true' : 'false' ?>" data-banner-dot="<?= $bannerIndex ?>"></button>
+                        <?php endfor; ?>
+                    </div>
+                    <button class="banner-pause" type="button" aria-label="Pause banner rotation" data-banner-pause>Ⅱ</button>
+                </div>
             </section>
 
             <?php foreach ($productSections as $sectionIndex => $section) : ?>
@@ -179,7 +208,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                 <span>
                                     <?php foreach (array_slice($section['products'], 0, 3) as $thumbIndex => $thumbProduct) : ?>
                                         <?php $thumbImage = $thumbProduct['image'] ?: $fallbackImages[$thumbIndex % count($fallbackImages)]; ?>
-                                        <img src="<?= esc(app_asset_url($thumbImage)) ?>" alt="" data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>">
+                                        <img src="<?= esc(app_asset_url($thumbImage)) ?>" alt="" data-fallback-image="<?= esc(app_static_url('assets/images/product-placeholder.svg'), 'attr') ?>">
                                     <?php endforeach; ?>
                                 </span>
                                 See all products
@@ -195,6 +224,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         <?= view('client/products/_floating_cart') ?>
 
         <?= view('client/products/_location_picker') ?>
+        <?= view('client/_onboarding') ?>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
             <a class="is-active" href="<?= esc(base_url(''), 'attr') ?>">
@@ -242,7 +272,9 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </a>
         </nav>
     </div>
-    <script src="<?= esc(base_url('assets/js/cart.js?v=20261008-location-map'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/location.js?v=20261008-centered-pin'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/banner-carousel.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/location.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/onboarding.js'), 'attr') ?>"></script>
 </body>
 </html>

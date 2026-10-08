@@ -1,6 +1,7 @@
-<IfModule mod_authz_core.c>
-    Require all granted
-    <FilesMatch "\.(?:php[0-9]?|phtml|phar)$">
-        Require all denied
+# Cache public files only. HTML, APIs and session responses are unaffected.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?:css|js|png|jpe?g|webp|avif|gif|svg|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header set Cache-Control "public, max-age=604800, immutable" "expr=%{QUERY_STRING} =~ /(?:^|&)v=[a-f0-9]{12}(?:&|$)/"
     </FilesMatch>
 </IfModule>

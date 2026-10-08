@@ -74,6 +74,7 @@ abstract class BaseApiController extends BaseController
             'phone'  => $user['phone'],
             'role'   => $user['role'],
             'status' => $user['status'],
+            'profile_complete' => \App\Services\CustomerSetup::complete($user),
         ];
     }
 

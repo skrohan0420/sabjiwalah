@@ -327,6 +327,8 @@
       return '/delivery';
     }
 
+    if (user.profile_complete === false) return '/account';
+
     return redirect || '/account';
   }
 

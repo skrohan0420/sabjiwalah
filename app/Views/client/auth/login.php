@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sabjiwalah</title>
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/auth.css?v=20261004-auth-alerts'), 'attr') ?>">
-    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/auth.css'), 'attr') ?>">
+    <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <?= view('shared/theme') ?>
 </head>
 <body>
     <main class="auth-page">
@@ -63,7 +64,7 @@
 
         <section class="auth-brand" aria-labelledby="auth-title">
             <span class="auth-logo" aria-hidden="true">
-                <img src="<?= esc(base_url('assets/images/sabjiwalah-cart-logo.png'), 'attr') ?>" alt="">
+                <img src="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo.png'), 'attr') ?>" alt="">
             </span>
             <h1 id="auth-title">Fresh groceries at your doorstep</h1>
         </section>
@@ -149,7 +150,7 @@
         <p class="auth-terms">By continuing, you agree to our <a href="<?= esc(base_url(''), 'attr') ?>">Terms of service</a> &amp; <a href="<?= esc(base_url(''), 'attr') ?>">Privacy policy</a>.</p>
     </main>
 
-    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/auth.js?v=20261008-phone-input'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/auth.js'), 'attr') ?>"></script>
 </body>
 </html>

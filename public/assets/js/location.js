@@ -149,9 +149,13 @@
     document.body.classList.remove('is-location-sheet-open');
     Array.from(sheet.parentElement.children).forEach(node => { node.inert = false; });
     previousFocus?.focus();
-    closeTimer = setTimeout(() => { sheet.hidden = true; }, 220);
+    closeTimer = setTimeout(() => {
+      sheet.hidden = true;
+      document.dispatchEvent(new CustomEvent('sabjiwalah:location-closed'));
+    }, 220);
   }
   document.querySelector('[data-location-open]').addEventListener('click', open);
+  document.addEventListener('sabjiwalah:location-open', open);
   sheet.querySelector('[data-location-close]').addEventListener('click', close);
   sheet.addEventListener('click', event => { if (event.target === sheet) close(); });
   sheet.addEventListener('keydown', event => {

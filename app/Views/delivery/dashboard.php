@@ -9,6 +9,6 @@
     <h1>Delivery Dashboard</h1>
     <p>Sabjiwalah delivery area is protected.</p>
     <p>Assigned orders: <?= esc($assignmentCount) ?></p>
-    <p><a href="/logout">Logout</a></p>
+    <p><a href="<?= esc(base_url('logout'), 'attr') ?>">Logout</a></p>
 </body>
 </html>

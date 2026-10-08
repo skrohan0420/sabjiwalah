@@ -41,7 +41,7 @@ class AuthController extends BaseController
     {
         $redirect = $this->safeRedirect((string) $this->request->getGet('redirect'));
 
-        return redirect()->to('/login' . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
+        return redirect()->to(site_url('login') . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
     }
 
     public function storeRegistration()
@@ -53,7 +53,7 @@ class AuthController extends BaseController
     {
         (new AuthService())->logout();
 
-        return redirect()->to('/')->with('message', 'Logged out successfully.');
+        return redirect()->to(site_url(''))->with('message', 'Logged out successfully.');
     }
 
     public function account(): string
@@ -70,13 +70,13 @@ class AuthController extends BaseController
     private function redirectByRole(?string $redirect = null)
     {
         if (session('user_role') === 'customer' && $redirect !== null && $redirect !== '') {
-            return redirect()->to($redirect);
+            return redirect()->to(app_asset_url($redirect));
         }
 
         return match (session('user_role')) {
-            'admin' => redirect()->to('/admin'),
-            'delivery' => redirect()->to('/delivery'),
-            default => redirect()->to('/account'),
+            'admin' => redirect()->to(site_url('admin')),
+            'delivery' => redirect()->to(site_url('delivery')),
+            default => redirect()->to(site_url('account')),
         };
     }
 

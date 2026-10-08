@@ -10,6 +10,16 @@ Current phase: customer home page design started after the backend and API found
 
 Done:
 
+- Matched the storefront container background to the product sections so bottom spacing no longer shows a yellow strip.
+
+- Added an Apache/htdocs project-root entry point, public asset routing, and private-file access restrictions.
+- Made customer navigation, assets, login redirects, and AJAX URLs work with environment-specific domains and subdirectory base URLs.
+- Added separate local and test-server `.env` templates and no-terminal deployment/database import instructions in `deployment/README.md`.
+- Configured the test-server template for `https://sabjiwalah.site.je/` and its supplied hosted MySQL connection details; the hidden password must be entered on the server.
+- Added a combined `.env` with local/server URL and database profiles selected only by `CI_ENVIRONMENT`: development for local, production for the hosted test server, and testing for automated tests.
+- Set the local profile to `http://localhost:8080/` for `php spark serve`; the hosted profile continues to use Apache at `https://sabjiwalah.site.je/`.
+- Added deployment URL checks and an Apache smoke-check script covering pages, assets, APIs, private paths, and legacy redirects.
+
 - Standardized the project name as `Sabjiwalah`.
 - Updated Composer metadata to `sabjiwalah/sabjiwalah`.
 - Replaced the default CodeIgniter README with this project tracker.
@@ -223,6 +233,13 @@ Status changes should eventually be centralized in `OrderService` and recorded i
 
 ## Local Setup
 
+For Apache/htdocs and test-server hosting without terminal access, follow
+[deployment/README.md](deployment/README.md). Both sets of URL and database
+settings are kept in `.env`; change only `CI_ENVIRONMENT` to select them.
+Use development for `http://localhost:8080/` with `php spark serve` and production for
+`https://sabjiwalah.site.je/`. Enter the hosted MySQL password once.
+For local Apache instead, set `app.localBaseURL = 'http://localhost/sabjiwalah/'`.
+
 Requirements:
 
 - PHP 8.2 or higher
@@ -246,13 +263,19 @@ Current local database settings in `.env`:
 
 ```ini
 app.indexPage = ''
-database.default.hostname = localhost
-database.default.database = sabjiwalah
-database.default.username = root
-database.default.password =
-database.default.DBDriver = MySQLi
-database.default.port = 3306
+CI_ENVIRONMENT = development
+app.localBaseURL = 'http://localhost:8080/'
+app.serverBaseURL = 'https://sabjiwalah.site.je/'
+database.local.hostname = localhost
+database.local.database = sabjiwalah
+database.local.username = root
+database.local.password = ''
+database.local.DBDriver = MySQLi
+database.local.port = 3306
 ```
+
+The same `.env` also contains `database.server.*` for the hosted database.
+See `deployment/env.example` for the complete combined template.
 
 Run the development server:
 
@@ -434,6 +457,13 @@ Run tests:
 
 ```bash
 composer test
+```
+
+Deployment-specific checks (Node.js required only on the machine running checks):
+
+```bash
+node tests/deployment/app-url.cjs
+node tests/deployment/apache-smoke.cjs http://localhost/sabjiwalah/
 ```
 
 Current test note: `composer test` currently resolves to an old global XAMPP/PEAR PHPUnit on this machine and fails before running the app tests. Install project dependencies with Composer so the project uses the PHPUnit version required by `composer.json`.

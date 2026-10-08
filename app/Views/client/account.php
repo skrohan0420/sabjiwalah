@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
-    <link rel="stylesheet" href="/assets/css/account.css?v=20261005-account-nav">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/account.css?v=20261005-account-nav'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body>
     <main class="account-page account-page--with-nav" data-account-page>
@@ -16,10 +17,10 @@
                 <p>Manage your personal details for orders and checkout.</p>
             </div>
             <nav>
-                <a href="/">Home</a>
-                <a href="/products">Products</a>
-                <a href="/checkout">Checkout</a>
-                <a href="/logout">Logout</a>
+                <a href="<?= esc(base_url(''), 'attr') ?>">Home</a>
+                <a href="<?= esc(base_url('products'), 'attr') ?>">Products</a>
+                <a href="<?= esc(base_url('checkout'), 'attr') ?>">Checkout</a>
+                <a href="<?= esc(base_url('logout'), 'attr') ?>">Logout</a>
             </nav>
         </header>
 
@@ -74,7 +75,7 @@
         </section>
     </main>
 
-    <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
+    <a class="floating-cart-bar" href="<?= esc(base_url('checkout'), 'attr') ?>" data-floating-cart hidden>
         <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
         <span>
             <strong>Checkout</strong>
@@ -84,7 +85,7 @@
     </a>
 
     <nav class="bottom-nav" aria-label="Bottom navigation">
-        <a href="/">
+        <a href="<?= esc(base_url(''), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M3.8 10.9 12 4.2l8.2 6.7"></path>
@@ -95,7 +96,7 @@
             </span>
             Home
         </a>
-        <a href="/orders">
+        <a href="<?= esc(base_url('orders'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
@@ -106,7 +107,7 @@
             </span>
             My Orders
         </a>
-        <a href="/products">
+        <a href="<?= esc(base_url('products'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <rect x="4.8" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
@@ -117,7 +118,7 @@
             </span>
             Categories
         </a>
-        <a class="is-active" href="/account">
+        <a class="is-active" href="<?= esc(base_url('account'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z"></path>
@@ -129,7 +130,7 @@
         </a>
     </nav>
 
-    <script src="/assets/js/account.js"></script>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/account.js'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
 </body>
 </html>

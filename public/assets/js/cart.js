@@ -9,13 +9,13 @@
   let cartMutationVersion = 0;
   const cartUpdateDebounceMs = 400;
   const pendingItemUpdates = new Map();
-  const productImageFallback = '/assets/images/product-placeholder.svg';
+  const productImageFallback = window.Sabjiwalah.url('/assets/images/product-placeholder.svg');
   const cartCacheStorageKey = 'sabjiwalah.cart';
   const savedProductsStorageKey = 'sabjiwalah.savedProducts';
   const deliveryLocationStorageKey = 'sabjiwalah.deliveryLocation';
 
   async function getCsrf() {
-    const response = await fetch('/api/v1/csrf', {
+    const response = await fetch(window.Sabjiwalah.url('/api/v1/csrf'), {
       headers: { Accept: 'application/json' },
       credentials: 'same-origin',
     });
@@ -45,7 +45,7 @@
       headers[token.header_name] = token.token_value;
     }
 
-    const response = await fetch(path, {
+    const response = await fetch(window.Sabjiwalah.url(path), {
       ...options,
       method,
       headers,
@@ -935,7 +935,7 @@
 
       function redirect(event) {
         event.preventDefault();
-        window.location.href = targetUrl;
+        window.location.href = window.Sabjiwalah.url(targetUrl);
       }
 
       launcher.addEventListener('submit', redirect);
@@ -1036,7 +1036,7 @@
         }
 
         const image = document.createElement('img');
-        image.src = imageUrl;
+        image.src = window.Sabjiwalah.url(imageUrl);
         image.dataset.fallbackImage = productImageFallback;
         image.alt = '';
         image.loading = 'lazy';
@@ -1072,7 +1072,7 @@
     const unitPrice = Number(item.unit_price) || 0;
     const quantity = Number(item.quantity) || 0;
     const total = Number(item.total) || unitPrice * quantity;
-    const image = product.image || '/assets/images/sabjiwalah-cart-icon.png';
+    const image = window.Sabjiwalah.url(product.image || '/assets/images/sabjiwalah-cart-icon.png');
     const hasSavings = price > unitPrice;
 
     return `

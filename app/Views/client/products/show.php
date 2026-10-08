@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($product['name']) ?> - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/cart.css">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/cart.css'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body>
     <main class="cart-page">
@@ -14,8 +15,8 @@
                 <h1><?= esc($product['name']) ?></h1>
             </div>
             <nav>
-                <a href="/products">Products</a>
-                <a href="/checkout">Checkout (<span data-cart-count-badge>0</span>)</a>
+                <a href="<?= esc(base_url('products'), 'attr') ?>">Products</a>
+                <a href="<?= esc(base_url('checkout'), 'attr') ?>">Checkout (<span data-cart-count-badge>0</span>)</a>
             </nav>
         </header>
 
@@ -50,10 +51,10 @@
             <aside class="cart-summary">
                 <h2>Cart</h2>
                 <p>Items: <strong data-cart-count-badge>0</strong></p>
-                <p><a href="/checkout">Review checkout</a></p>
+                <p><a href="<?= esc(base_url('checkout'), 'attr') ?>">Review checkout</a></p>
             </aside>
         </section>
     </main>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
 </body>
 </html>

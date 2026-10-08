@@ -7,7 +7,7 @@
   let otpVerified = false;
 
   async function getCsrf() {
-    const response = await fetch('/api/v1/csrf', {
+    const response = await fetch(window.Sabjiwalah.url('/api/v1/csrf'), {
       headers: { Accept: 'application/json' },
       credentials: 'same-origin',
     });
@@ -36,7 +36,7 @@
       headers[csrf.header_name] = csrf.token_value;
     }
 
-    const response = await fetch(path, {
+    const response = await fetch(window.Sabjiwalah.url(path), {
       ...options,
       method,
       headers,

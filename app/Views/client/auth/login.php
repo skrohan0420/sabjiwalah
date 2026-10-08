@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/auth.css?v=20261004-auth-alerts">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/auth.css?v=20261004-auth-alerts'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body>
     <main class="auth-page">
-        <a class="auth-back" href="/account" aria-label="Go back" data-history-back>
+        <a class="auth-back" href="<?= esc(base_url('account'), 'attr') ?>" aria-label="Go back" data-history-back>
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>
@@ -61,7 +62,7 @@
 
         <section class="auth-brand" aria-labelledby="auth-title">
             <span class="auth-logo" aria-hidden="true">
-                <img src="/assets/images/sabjiwalah-cart-logo.png" alt="">
+                <img src="<?= esc(base_url('assets/images/sabjiwalah-cart-logo.png'), 'attr') ?>" alt="">
             </span>
             <h1 id="auth-title">Fresh groceries at your doorstep</h1>
         </section>
@@ -83,7 +84,7 @@
                 </ul>
             <?php endif; ?>
 
-            <form method="post" action="/login" class="auth-form" data-auth-form data-auth-mode="login">
+            <form method="post" action="<?= esc(base_url('login'), 'attr') ?>" class="auth-form" data-auth-form data-auth-mode="login">
                 <?= csrf_field() ?>
                 <input type="hidden" name="redirect" value="<?= esc($redirect ?? '', 'attr') ?>" data-auth-redirect>
 
@@ -144,10 +145,10 @@
             </form>
         </section>
 
-        <p class="auth-terms">By continuing, you agree to our <a href="/">Terms of service</a> &amp; <a href="/">Privacy policy</a>.</p>
+        <p class="auth-terms">By continuing, you agree to our <a href="<?= esc(base_url(''), 'attr') ?>">Terms of service</a> &amp; <a href="<?= esc(base_url(''), 'attr') ?>">Privacy policy</a>.</p>
     </main>
 
-    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/auth.js"></script>
+    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/auth.js'), 'attr') ?>"></script>
 </body>
 </html>

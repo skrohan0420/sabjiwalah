@@ -16,14 +16,14 @@ class RoleFilter implements FilterInterface
             $redirect = $query === '' ? $path : $path . '?' . $query;
 
             return redirect()
-                ->to('/login?redirect=' . rawurlencode($redirect))
+                ->to(site_url('login') . '?redirect=' . rawurlencode($redirect))
                 ->with('error', 'Please log in to continue.');
         }
 
         $allowedRoles = $arguments ?? [];
 
         if ($allowedRoles !== [] && ! in_array(session('user_role'), $allowedRoles, true)) {
-            return redirect()->to('/')->with('error', 'You do not have access to that area.');
+            return redirect()->to(site_url())->with('error', 'You do not have access to that area.');
         }
 
         return null;

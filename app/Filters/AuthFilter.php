@@ -16,7 +16,7 @@ class AuthFilter implements FilterInterface
             $redirect = $query === '' ? $path : $path . '?' . $query;
 
             return redirect()
-                ->to('/login?redirect=' . rawurlencode($redirect))
+                ->to(site_url('login') . '?redirect=' . rawurlencode($redirect))
                 ->with('error', 'Please log in to continue.');
         }
 

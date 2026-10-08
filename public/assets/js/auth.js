@@ -102,7 +102,7 @@
   }
 
   async function getCsrf() {
-    const response = await fetch('/api/v1/csrf', {
+    const response = await fetch(window.Sabjiwalah.url('/api/v1/csrf'), {
       headers: { Accept: 'application/json' },
       credentials: 'same-origin',
     });
@@ -117,7 +117,7 @@
 
   async function api(path, body) {
     const csrf = await getCsrf();
-    const response = await fetch(path, {
+    const response = await fetch(window.Sabjiwalah.url(path), {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -259,7 +259,7 @@
       saveProfile(phone);
       const payload = await api('/api/v1/auth/otp/verify', { phone, otp });
       saveProfile(phone, payload.data.user?.name);
-      window.location.href = targetFor(payload.data.user, redirect);
+      window.location.href = window.Sabjiwalah.url(targetFor(payload.data.user, redirect));
     } catch (error) {
       isVerifyingOtp = false;
       otpDigitInputs(form).forEach((input) => {

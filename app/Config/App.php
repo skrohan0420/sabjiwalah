@@ -18,6 +18,25 @@ class App extends BaseConfig
      */
     public string $baseURL = 'http://localhost:8080/';
 
+    // Both profiles are loaded from the same .env. CI_ENVIRONMENT selects one.
+    public string $localBaseURL = 'http://localhost:8080/';
+    public string $serverBaseURL = 'https://sabjiwalah.site.je/';
+    public bool $localForceHTTPS = false;
+    public bool $serverForceHTTPS = true;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (ENVIRONMENT === 'production') {
+            $this->baseURL = $this->serverBaseURL;
+            $this->forceGlobalSecureRequests = $this->serverForceHTTPS;
+        } elseif (ENVIRONMENT === 'development') {
+            $this->baseURL = $this->localBaseURL;
+            $this->forceGlobalSecureRequests = $this->localForceHTTPS;
+        }
+    }
+
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
      * If you want to accept multiple Hostnames, set this.

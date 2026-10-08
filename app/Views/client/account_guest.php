@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Account - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
-    <link rel="stylesheet" href="/assets/css/account.css?v=20261005-account-nav">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/account.css?v=20261005-account-nav'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body class="account-guest-body">
     <main class="account-page account-page--guest account-page--with-nav">
-        <a class="account-back" href="/" aria-label="Go back" data-history-back>
+        <a class="account-back" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back>
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>
@@ -25,11 +26,11 @@
             </div>
             <h1 id="guest-account-title">Your account</h1>
             <p>Log in to view your complete profile</p>
-            <a class="guest-continue" href="/login?redirect=%2Faccount">Continue</a>
+            <a class="guest-continue" href="<?= esc(base_url('login?redirect=%2Faccount'), 'attr') ?>">Continue</a>
         </section>
 
         <section class="quick-actions" aria-label="Account shortcuts">
-            <a href="/orders">
+            <a href="<?= esc(base_url('orders'), 'attr') ?>">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 8h14l-1.4 11H6.4L5 8Z"></path>
                     <path d="M8 8a4 4 0 0 1 8 0"></path>
@@ -37,7 +38,7 @@
                 </svg>
                 <span>Your orders</span>
             </a>
-            <a href="/login?redirect=%2Faccount">
+            <a href="<?= esc(base_url('login?redirect=%2Faccount'), 'attr') ?>">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 5h14v10H9l-4 4V5Z"></path>
                     <path d="M9 9h6"></path>
@@ -69,7 +70,7 @@
 
         <section class="account-list" aria-labelledby="guest-info-title">
             <h2 id="guest-info-title">Your information</h2>
-            <a class="account-row" href="/login?redirect=%2Faccount">
+            <a class="account-row" href="<?= esc(base_url('login?redirect=%2Faccount'), 'attr') ?>">
                 <span class="account-row-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24">
                         <path d="M4 6.5 10 4l6 2.5 4-1.5v13.5L14 21l-6-2.5-4 1.5V6.5Z"></path>
@@ -99,7 +100,7 @@
                     <path d="m9 5 7 7-7 7"></path>
                 </svg>
             </button>
-            <a class="account-row" href="/">
+            <a class="account-row" href="<?= esc(base_url(''), 'attr') ?>">
                 <span class="account-row-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24">
                         <path d="M4 6.5 10 4l6 2.5 4-1.5v13.5L14 21l-6-2.5-4 1.5V6.5Z"></path>
@@ -120,7 +121,7 @@
         </footer>
     </main>
 
-    <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
+    <a class="floating-cart-bar" href="<?= esc(base_url('checkout'), 'attr') ?>" data-floating-cart hidden>
         <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
         <span>
             <strong>Checkout</strong>
@@ -130,7 +131,7 @@
     </a>
 
     <nav class="bottom-nav" aria-label="Bottom navigation">
-        <a href="/">
+        <a href="<?= esc(base_url(''), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M3.8 10.9 12 4.2l8.2 6.7"></path>
@@ -141,7 +142,7 @@
             </span>
             Home
         </a>
-        <a href="/orders">
+        <a href="<?= esc(base_url('orders'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
@@ -152,7 +153,7 @@
             </span>
             My Orders
         </a>
-        <a href="/products">
+        <a href="<?= esc(base_url('products'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <rect x="4.8" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
@@ -163,7 +164,7 @@
             </span>
             Categories
         </a>
-        <a class="is-active" href="/account">
+        <a class="is-active" href="<?= esc(base_url('account'), 'attr') ?>">
             <span class="nav-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                     <path d="M12 12.4a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Z"></path>
@@ -175,8 +176,8 @@
         </a>
     </nav>
 
-    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
     <script>
         document.addEventListener('click', async (event) => {
             const button = event.target.closest('[data-share-app]');

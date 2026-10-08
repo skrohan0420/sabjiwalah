@@ -71,7 +71,7 @@ button {
   margin: 0 auto;
   padding-bottom: calc(var(--bottom-nav-height) + 18px);
   overflow-x: clip;
-  background: #f8f0d7;
+  background: #f7f5ef;
   box-shadow: 0 0 0 1px rgba(15, 58, 24, 0.04);
   transition: padding-bottom 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }

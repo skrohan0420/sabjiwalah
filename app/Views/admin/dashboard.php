@@ -13,6 +13,6 @@
         <li>Orders: <?= esc($orderCount) ?></li>
         <li>Customers: <?= esc($customerCount) ?></li>
     </ul>
-    <p><a href="/logout">Logout</a></p>
+    <p><a href="<?= esc(base_url('logout'), 'attr') ?>">Logout</a></p>
 </body>
 </html>

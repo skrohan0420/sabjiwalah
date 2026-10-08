@@ -1,6 +1,13 @@
 # Disable directory browsing
 Options -Indexes
 
+# Public files remain readable when the project-root gateway is used.
+<IfModule mod_authz_core.c>
+    <FilesMatch "^(?:favicon\.ico|robots\.txt)$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
+
 # ----------------------------------------------------------------------
 # Rewrite engine
 # ----------------------------------------------------------------------
@@ -16,9 +23,8 @@ Options -Indexes
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
 	# RewriteBase /
 
-	# Redirect old front-controller URLs to clean URLs.
-	RewriteCond %{THE_REQUEST} \s/+index\.php/?([^\s?]*) [NC]
-	RewriteRule ^index\.php/?(.*)$ /$1 [R=301,L]
+	# Legacy index.php redirects are handled by public/index.php, which
+	# preserves the installation's subdirectory and query string.
 
 	# Redirect Trailing Slashes...
 	RewriteCond %{REQUEST_FILENAME} !-d

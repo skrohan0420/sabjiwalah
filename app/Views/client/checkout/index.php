@@ -21,7 +21,8 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($pageTitle) ?> - Sabjiwalah</title>
-    <link rel="stylesheet" href="/assets/css/cart.css">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/cart.css'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body class="checkout-body">
     <main
@@ -32,9 +33,9 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
         <?= $isLoggedIn ? 'data-checkout-page' : '' ?>
     >
         <header class="checkout-topbar">
-            <a class="checkout-icon-link" href="<?= esc($backUrl, 'attr') ?>" aria-label="Go back" data-history-back></a>
+            <a class="checkout-icon-link" href="<?= esc(app_asset_url($backUrl), 'attr') ?>" aria-label="Go back" data-history-back></a>
             <h1><?= esc($pageTitle) ?></h1>
-            <a class="checkout-text-link" href="/products">Shop</a>
+            <a class="checkout-text-link" href="<?= esc(base_url('products'), 'attr') ?>">Shop</a>
         </header>
 
         <?php if (! $isLoggedIn) : ?>
@@ -67,11 +68,11 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                                 data-product-uid="<?= esc($product['uid'], 'attr') ?>"
                                 data-product-name="<?= esc($product['name'], 'attr') ?>"
                                 data-product-unit="<?= esc($product['unit'], 'attr') ?>"
-                                data-product-image="<?= esc($product['image'], 'attr') ?>"
+                                data-product-image="<?= esc(app_asset_url($product['image']), 'attr') ?>"
                                 data-product-price="<?= esc((string) $unitPrice, 'attr') ?>"
                                 data-current-quantity="<?= esc((string) $item['quantity'], 'attr') ?>"
                             >
-                                <img src="<?= esc($product['image'] ?: '/assets/images/product-placeholder.svg', 'attr') ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
+                                <img src="<?= esc(app_asset_url($product['image'] ?: '/assets/images/product-placeholder.svg'), 'attr') ?>" alt="" data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>">
                                 <div>
                                     <h3><?= esc($product['name']) ?></h3>
                                     <p><?= esc($product['unit']) ?></p>
@@ -92,7 +93,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                     </div>
                 </section>
 
-                <a class="checkout-action-row" href="/products">
+                <a class="checkout-action-row" href="<?= esc(base_url('products'), 'attr') ?>">
                     <span class="checkout-row-icon coupon" aria-hidden="true"></span>
                     <strong>Use Coupons</strong>
                     <i aria-hidden="true"></i>
@@ -226,10 +227,10 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
         <?php endif; ?>
     </main>
 
-    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
     <?php if ($isLoggedIn) : ?>
-        <script src="/assets/js/checkout.js"></script>
+        <script src="<?= esc(base_url('assets/js/checkout.js'), 'attr') ?>"></script>
     <?php endif; ?>
 </body>
 </html>

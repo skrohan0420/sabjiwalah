@@ -190,9 +190,25 @@ class Database extends Config
         ],
     ];
 
+    /** Environment-specific connections, populated from database.local/server.*. */
+    public array $local = [];
+    public array $server = [];
+
     public function __construct()
     {
+        // Seed all driver options so BaseConfig can apply nested .env values.
+        $this->local = $this->default;
+        $this->server = $this->default;
+        $this->server['DBDebug'] = false;
         parent::__construct();
+
+        if (ENVIRONMENT === 'production') {
+            $this->default = $this->server;
+            $this->defaultGroup = 'default';
+        } elseif (ENVIRONMENT === 'development') {
+            $this->default = $this->local;
+            $this->defaultGroup = 'default';
+        }
 
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that

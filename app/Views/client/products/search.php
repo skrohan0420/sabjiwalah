@@ -11,7 +11,7 @@ $fallbackImages = [
     'https://images.unsplash.com/photo-1506806732259-39c2d0268443?auto=format&fit=crop&w=420&q=80',
 ];
 
-$accountUrl = '/account';
+$accountUrl = base_url('account');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,13 +21,14 @@ $accountUrl = '/account';
     <meta name="description" content="Search fresh vegetables, fruits and daily groceries from Sabjiwalah">
     <title><?= esc($displayQuery) ?> - Sabjiwalah Search</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body class="search-body">
     <div class="app-shell search-app-shell">
         <header class="search-results-header">
-            <form class="search-results-bar" action="/search" method="get" role="search">
-                <a class="search-back-button" href="/" aria-label="Go back" data-history-back></a>
+            <form class="search-results-bar" action="<?= esc(base_url('search'), 'attr') ?>" method="get" role="search">
+                <a class="search-back-button" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back></a>
                 <label class="sr-only" for="search-results-input">Search products</label>
                 <input
                     id="search-results-input"
@@ -108,14 +109,14 @@ $accountUrl = '/account';
                                         aria-label="Save <?= esc($product['name'], 'attr') ?>"
                                         aria-pressed="false"
                                     ></button>
-                                    <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>" data-product-carousel>
+                                    <a class="product-photo" href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>" data-product-carousel>
                                         <span class="product-carousel-viewport">
                                             <span class="product-carousel-track" data-carousel-track>
                                                 <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
                                                     <img
-                                                        src="<?= esc($carouselImage) ?>"
+                                                        src="<?= esc(app_asset_url($carouselImage)) ?>"
                                                         alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                                                        data-fallback-image="/assets/images/product-placeholder.svg"
+                                                        data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
                                                         draggable="false"
                                                         <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                                                     >
@@ -148,7 +149,7 @@ $accountUrl = '/account';
                                             data-product-name="<?= esc($product['name'], 'attr') ?>"
                                             data-product-unit="<?= esc($product['unit'], 'attr') ?>"
                                             data-product-price="<?= esc((string) $effectivePrice, 'attr') ?>"
-                                            data-product-image="<?= esc($image, 'attr') ?>"
+                                            data-product-image="<?= esc(app_asset_url($image), 'attr') ?>"
                                             data-current-quantity="0"
                                         >
                                             <button
@@ -180,7 +181,7 @@ $accountUrl = '/account';
                                         <?= $discount > 0 ? esc($discount . '% OFF on MRP') : 'Price Drop' ?>
                                     </p>
                                     <h3>
-                                        <a href="/products/<?= esc($product['uid'], 'url') ?>">
+                                        <a href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>">
                                             <?= esc($product['name']) ?>
                                         </a>
                                     </h3>
@@ -196,7 +197,7 @@ $accountUrl = '/account';
             <?php endif; ?>
         </main>
 
-        <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
+        <a class="floating-cart-bar" href="<?= esc(base_url('checkout'), 'attr') ?>" data-floating-cart hidden>
             <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
             <span>
                 <strong>Checkout</strong>
@@ -206,7 +207,7 @@ $accountUrl = '/account';
         </a>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
-            <a href="/">
+            <a href="<?= esc(base_url(''), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M3.8 10.9 12 4.2l8.2 6.7"></path>
@@ -217,7 +218,7 @@ $accountUrl = '/account';
                 </span>
                 Home
             </a>
-            <a href="/orders">
+            <a href="<?= esc(base_url('orders'), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
@@ -228,7 +229,7 @@ $accountUrl = '/account';
                 </span>
                 My Orders
             </a>
-            <a href="/products">
+            <a href="<?= esc(base_url('products'), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <rect x="4.8" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
@@ -251,7 +252,7 @@ $accountUrl = '/account';
             </a>
         </nav>
     </div>
-    <script src="/assets/js/navigation.js?v=20261004-history-back"></script>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
 </body>
 </html>

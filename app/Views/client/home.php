@@ -29,7 +29,7 @@ $productSections = [
 ];
 
 $isLoggedIn = (bool) session('is_logged_in');
-$accountUrl = '/account';
+$accountUrl = base_url('account');
 $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 ?>
 <!DOCTYPE html>
@@ -40,17 +40,18 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <meta name="description" content="Sabjiwalah fresh grocery and vegetable delivery">
     <title>Sabjiwalah - Fresh Grocery Delivery</title>
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="preload" href="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" as="image" type="image/png">
-    <link rel="preload" href="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" as="image" type="image/png">
-    <link rel="stylesheet" href="/assets/css/home.css?v=20261005-orders-nav">
+    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
+    <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
+    <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body>
     <div class="app-shell">
         <header class="home-header">
             <div class="status-row" aria-label="Service status">
                 <span class="brand-mark" aria-label="Sabjiwalah">
-                    <img class="brand-cart-logo" src="/assets/images/sabjiwalah-cart-logo-header.png?v=20261003" alt="" width="184" height="132" decoding="async" fetchpriority="high">
-                    <img class="brand-wordmark" src="/assets/images/sabjiwalah-wordmark-header.png?v=20261003" alt="" width="620" height="160" decoding="async" fetchpriority="high">
+                    <img class="brand-cart-logo" src="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" alt="" width="184" height="132" decoding="async" fetchpriority="high">
+                    <img class="brand-wordmark" src="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" alt="" width="620" height="160" decoding="async" fetchpriority="high">
                 </span>
                 <div class="header-icons">
                     <button class="home-share-button" type="button" aria-label="Share Sabjiwalah" data-share-page></button>
@@ -75,7 +76,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         </header>
 
         <div class="sticky-shop-controls">
-            <form class="search-box" action="/search" method="get" role="search" data-search-redirect="/search">
+            <form class="search-box" action="<?= esc(base_url('search'), 'attr') ?>" method="get" role="search" data-search-redirect="<?= esc(base_url('search'), 'attr') ?>">
                 <label class="sr-only" for="home-search">Search products</label>
                 <span class="search-icon" aria-hidden="true"></span>
                 <input
@@ -94,7 +95,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 
             <nav class="category-tabs" aria-label="Shop categories">
                 <?php foreach ($categoryTabs as $category) : ?>
-                    <a class="<?= ! empty($category['active']) ? 'is-active' : '' ?>" href="/products">
+                    <a class="<?= ! empty($category['active']) ? 'is-active' : '' ?>" href="<?= esc(base_url('products'), 'attr') ?>">
                         <span class="tab-icon tab-<?= esc($category['icon'], 'attr') ?>" aria-hidden="true">
                             <?php if ($category['icon'] === 'bag') : ?>
                                 <svg viewBox="0 0 24 24" focusable="false">
@@ -197,14 +198,14 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                             aria-label="Save <?= esc($product['name'], 'attr') ?>"
                                             aria-pressed="false"
                                         ></button>
-                                        <a class="product-photo" href="/products/<?= esc($product['uid'], 'url') ?>" data-product-carousel>
+                                        <a class="product-photo" href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>" data-product-carousel>
                                             <span class="product-carousel-viewport">
                                                 <span class="product-carousel-track" data-carousel-track>
                                                     <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
                                                         <img
-                                                            src="<?= esc($carouselImage) ?>"
+                                                            src="<?= esc(app_asset_url($carouselImage)) ?>"
                                                             alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                                                            data-fallback-image="/assets/images/product-placeholder.svg"
+                                                            data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
                                                             draggable="false"
                                                             <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
                                                         >
@@ -237,7 +238,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                                 data-product-name="<?= esc($product['name'], 'attr') ?>"
                                                 data-product-unit="<?= esc($product['unit'], 'attr') ?>"
                                                 data-product-price="<?= esc((string) $effectivePrice, 'attr') ?>"
-                                                data-product-image="<?= esc($image, 'attr') ?>"
+                                                data-product-image="<?= esc(app_asset_url($image), 'attr') ?>"
                                                 data-current-quantity="0"
                                             >
                                                 <button
@@ -269,7 +270,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                                             <?= $discount > 0 ? esc($discount . '% OFF on MRP') : 'Price Drop' ?>
                                         </p>
                                         <h3>
-                                            <a href="/products/<?= esc($product['uid'], 'url') ?>">
+                                            <a href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>">
                                                 <?= esc($product['name']) ?>
                                             </a>
                                         </h3>
@@ -283,11 +284,11 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                         </div>
 
                         <?php if (! empty($section['show_all'])) : ?>
-                            <a class="see-all-products" href="/products">
+                            <a class="see-all-products" href="<?= esc(base_url('products'), 'attr') ?>">
                                 <span>
                                     <?php foreach (array_slice($section['products'], 0, 3) as $thumbIndex => $thumbProduct) : ?>
                                         <?php $thumbImage = $thumbProduct['image'] ?: $fallbackImages[$thumbIndex % count($fallbackImages)]; ?>
-                                        <img src="<?= esc($thumbImage) ?>" alt="" data-fallback-image="/assets/images/product-placeholder.svg">
+                                        <img src="<?= esc(app_asset_url($thumbImage)) ?>" alt="" data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>">
                                     <?php endforeach; ?>
                                 </span>
                                 See all products
@@ -300,7 +301,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             
         </main>
 
-        <a class="floating-cart-bar" href="/checkout" data-floating-cart hidden>
+        <a class="floating-cart-bar" href="<?= esc(base_url('checkout'), 'attr') ?>" data-floating-cart hidden>
             <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
             <span>
                 <strong>Checkout</strong>
@@ -336,7 +337,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         </div>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
-            <a class="is-active" href="/">
+            <a class="is-active" href="<?= esc(base_url(''), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M3.8 10.9 12 4.2l8.2 6.7"></path>
@@ -347,7 +348,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                 </span>
                 Home
             </a>
-            <a href="/orders">
+            <a href="<?= esc(base_url('orders'), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M6.2 4.7h11.6v15l-2-1.2-1.9 1.2-1.9-1.2-1.9 1.2-1.9-1.2-2 1.2v-15Z"></path>
@@ -358,7 +359,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                 </span>
                 My Orders
             </a>
-            <a href="/products">
+            <a href="<?= esc(base_url('products'), 'attr') ?>">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" focusable="false">
                         <rect x="4.8" y="4.8" width="5.2" height="5.2" rx="1.3"></rect>
@@ -381,6 +382,6 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </a>
         </nav>
     </div>
-    <script src="/assets/js/cart.js?v=20261005-search-redirect"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
 </body>
 </html>

@@ -10,6 +10,11 @@ Current phase: customer home and product detail design after the backend and API
 
 Done:
 
+- Added Google Maps delivery selection with landmark search, a fixed center pin, GPS accuracy feedback, checkout address prefill and exact order coordinates. Move the map beneath the pin to choose the delivery point. See `deployment/README.md` for Google key setup and the schema update.
+- Fixed phone-number entry selecting the entire value after each keystroke; typing now retains the caret while the OTP Change action still focuses the phone field.
+- Replaced the default CodeIgniter favicon with the header cart logo across all pages, including a multi-size ICO and an Apple touch icon.
+- Slimmed the fixed product purchase bar to 64px, with smaller pack/price typography and matching offsets for the cart pill and details sheet.
+- Added an optional development-only ngrok preview URL that keeps localhost and the hosted production profile working independently, with phone-preview instructions and URL/database selection checks.
 - Refined the product overview into a compact bordered card with inline highlights, a tighter price row, and an integrated description link.
 - Added a swipeable product hero carousel with image dots, mouse dragging, keyboard navigation, and full/close-up/detail views of the current product photo.
 - Shared the home product-card markup, ADD/quantity controls, and floating checkout pill with the product detail page, including carousel, saved-product, and cart animations.

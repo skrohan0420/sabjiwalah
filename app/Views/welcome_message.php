@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sabjiwalah web application">
     <title>Sabjiwalah</title>
-    <link rel="shortcut icon" type="image/png" href="<?= esc(base_url('favicon.ico'), 'attr') ?>">
     <style {csp-style-nonce}>
         :root {
             color-scheme: light;

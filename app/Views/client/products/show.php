@@ -17,11 +17,12 @@ $icon = static fn ($name) => '<svg viewBox="0 0 24 24" aria-hidden="true">' . $i
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($product['name']) ?> - Sabjiwalah</title>
     <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261008-shared'), 'attr') ?>">
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/product-detail.css?v=20261008-compact'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/product-detail.css?v=20261008-compact-bar'), 'attr') ?>">
     <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
 </head>
 <body class="product-detail-page">

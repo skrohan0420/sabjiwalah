@@ -7,6 +7,7 @@ $errorId = uniqid('error', true);
 <!doctype html>
 <html>
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex">
 

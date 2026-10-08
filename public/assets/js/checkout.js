@@ -218,6 +218,29 @@
   });
 
   if (document.querySelector('[data-checkout-page]')) {
+    const form = document.querySelector('[data-checkout-form]');
+    try {
+      const pin = JSON.parse(localStorage.getItem('sabjiwalah.deliveryLocation'));
+      if (form && pin?.version === 2 && Number.isFinite(pin.latitude) && Number.isFinite(pin.longitude)
+          && Math.abs(pin.latitude) <= 90 && Math.abs(pin.longitude) <= 180) {
+        const values = { address_line: [pin.addressLine, pin.detail].filter(Boolean).join(', ').slice(0, 500),
+          city: pin.city, state: pin.state, postal_code: pin.postalCode,
+          delivery_latitude: pin.latitude, delivery_longitude: pin.longitude };
+        Object.entries(values).forEach(([name, value]) => {
+          const input = form.elements.namedItem(name);
+          if (input && !input.value && value !== undefined && value !== null) input.value = value;
+        });
+        const notice = form.querySelector('[data-checkout-pin]');
+        notice.hidden = false;
+        notice.textContent = 'Your confirmed delivery pin is attached. Check the address and add your house number.';
+        form.addEventListener('input', event => {
+          if (!['city', 'state', 'postal_code'].includes(event.target.name)) return;
+          form.elements.namedItem('delivery_latitude').value = '';
+          form.elements.namedItem('delivery_longitude').value = '';
+          notice.textContent = 'Address changed. Return home to confirm a matching delivery pin.';
+        });
+      }
+    } catch { /* Checkout stays available when browser storage is unavailable. */ }
     loadSummary().catch((error) => setMessage(error.message, true));
   }
 })();

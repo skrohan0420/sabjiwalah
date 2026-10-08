@@ -276,7 +276,7 @@
     }
   }
 
-  function showOtpPanel(form, isVisible) {
+  function showOtpPanel(form, isVisible, focusPhone = true) {
     if (!form) {
       return;
     }
@@ -312,7 +312,7 @@
 
     if (isVisible) {
       otpDigitInputs(form)[0]?.focus();
-    } else {
+    } else if (focusPhone) {
       phoneInput?.focus();
       phoneInput?.select();
     }
@@ -401,7 +401,8 @@
         savedPhoneNode.hidden = phoneInput.value !== savedProfile.phone;
       }
 
-      showOtpPanel(phoneInput.closest('[data-auth-form]'), false);
+      // Editing must retain the caret, rather than select and replace every digit.
+      showOtpPanel(phoneInput.closest('[data-auth-form]'), false, false);
       showOtp(phoneInput.closest('[data-auth-form]'), '');
     }
 

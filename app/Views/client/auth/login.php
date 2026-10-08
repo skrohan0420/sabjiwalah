@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sabjiwalah</title>
@@ -149,6 +150,6 @@
     </main>
 
     <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
-    <script src="<?= esc(base_url('assets/js/auth.js'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/auth.js?v=20261008-phone-input'), 'attr') ?>"></script>
 </body>
 </html>

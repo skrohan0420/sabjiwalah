@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="utf-8">
     <title><?= lang('Errors.badRequest') ?></title>
 

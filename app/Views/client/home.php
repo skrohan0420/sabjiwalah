@@ -35,6 +35,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sabjiwalah fresh grocery and vegetable delivery">
@@ -42,8 +43,9 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-cart-logo-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
     <link rel="preload" href="<?= esc(base_url('assets/images/sabjiwalah-wordmark-header.png?v=20261003'), 'attr') ?>" as="image" type="image/png">
-    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261005-orders-nav'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/home.css?v=20261008-location-compact'), 'attr') ?>">
     <script src="<?= esc(base_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
+    <link rel="stylesheet" href="<?= esc(base_url('assets/css/location.css?v=20261008-centered-pin'), 'attr') ?>">
 </head>
 <body>
     <div class="app-shell">
@@ -68,8 +70,8 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                     </strong>
                     <span class="sr-only">Delivery location</span>
                     <span class="delivery-location-lines">
-                        <span data-current-location-label>Surajpur, Greater Noida</span>
-                        <small data-current-location-detail>Uttar Pradesh, India</small>
+                        <span data-current-location-label>Choose delivery location</span>
+                        <small data-current-location-detail>Pin your address on the map</small>
                     </span>
                 </button>
             </div>
@@ -192,31 +194,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 
         <?= view('client/products/_floating_cart') ?>
 
-        <div class="location-sheet" id="location-sheet" data-location-sheet hidden>
-            <button class="location-close" type="button" data-location-close aria-label="Close location selector"></button>
-            <section class="location-panel" role="dialog" aria-modal="true" aria-labelledby="location-title">
-                <h2 id="location-title">Select delivery location</h2>
-                <form class="location-search" data-location-search-form>
-                    <span aria-hidden="true"></span>
-                    <label class="sr-only" for="location-search-input">Search delivery location</label>
-                    <input
-                        id="location-search-input"
-                        name="location"
-                        type="search"
-                        autocomplete="street-address"
-                        placeholder="Search for area, street name..."
-                        data-location-search
-                    >
-                </form>
-                <div class="location-results" data-location-results hidden></div>
-                <button class="location-current" type="button" data-use-current-location>
-                    <span aria-hidden="true"></span>
-                    <strong>Use current location</strong>
-                    <em data-location-current-address>Surajpur, Greater Noida, Uttar Pradesh, India</em>
-                    <i aria-hidden="true"></i>
-                </button>
-            </section>
-        </div>
+        <?= view('client/products/_location_picker') ?>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
             <a class="is-active" href="<?= esc(base_url(''), 'attr') ?>">
@@ -264,6 +242,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             </a>
         </nav>
     </div>
-    <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/cart.js?v=20261008-location-map'), 'attr') ?>"></script>
+    <script src="<?= esc(base_url('assets/js/location.js?v=20261008-centered-pin'), 'attr') ?>"></script>
 </body>
 </html>

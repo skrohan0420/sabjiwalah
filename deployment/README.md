@@ -65,6 +65,47 @@ before changing configuration. There is no config cache enabled by this change.
 Local development is configured for `php spark serve` at `http://localhost:8080/`.
 Select `development` and run `php spark serve`. For local Apache instead, set
 `app.localBaseURL = 'http://localhost/sabjiwalah/'` once.
+
+### Phone preview through ngrok
+
+Keep `CI_ENVIRONMENT = development`. Set your ngrok HTTPS address in the local
+`.env` once:
+
+```ini
+app.previewBaseURL = 'https://your-domain.ngrok-free.dev/'
+```
+
+Run these in two terminals from the project directory:
+
+```powershell
+php spark serve
+ngrok http 8080
+```
+
+Open the HTTPS forwarding URL on your phone. Edits are available when you refresh;
+FTP is only needed when you deploy to the hosted server. localhost continues to
+work at the same time. Both use the local database. The hosted production profile
+ignores `app.previewBaseURL` and keeps its existing URL and database settings.
+
+The preview URL must match the forwarding URL exactly. Update only this setting
+if ngrok changes your domain. Do not use `--host-header=rewrite`: the app needs
+the original ngrok Host header to select the preview URL. Forward to port 8080
+for Spark, rather than port 80 for XAMPP. There is no need to disable CSRF or CORS.
+If ngrok shows its initial browser notice, open the forwarding URL and continue
+to the site before testing cart requests. On your phone, localhost refers to
+the phone itself; generated URLs must therefore use the configured preview host.
+
+Preview config checks (no database connections):
+
+```powershell
+php tests/deployment/preview.php tunnel
+php tests/deployment/preview.php localhost
+php tests/deployment/preview.php unknown
+php tests/deployment/preview.php forwarded
+php tests/deployment/preview.php invalid
+php tests/deployment/preview.php production
+```
+
 Environment checks make no database connections:
 
 ```bash
@@ -81,3 +122,49 @@ updates for phpMyAdmin when the host has no terminal. There is no public web
 migration or seeding endpoint.
 
 Reference: https://codeigniter.com/user_guide/installation/running.html
+
+### Delivery map (Google Maps)
+
+The home picker uses Google Maps with normal street and landmark labels, a
+compact roadmap controls, submitted Google Places searches and a fixed center
+pin. Move the map until the entrance is under the pin, add a house/landmark, and confirm.
+Panning updates the selected coordinates beneath the center pin. GPS collects improving
+readings for up to 20 seconds and shows the reported accuracy circle. It does not
+guarantee a doorstep location; users must check the pin before confirming.
+
+Set these in the private `.env` on local and test hosts:
+
+```ini
+maps.googleApiKey = 'YOUR_GOOGLE_BROWSER_API_KEY'
+maps.googleMapId = 'DEMO_MAP_ID'
+```
+
+Create a Google Cloud project with billing enabled, and enable **Maps JavaScript
+API**, **Places API (New)** and **Geocoding API**. Restrict the browser key to those
+APIs and HTTP referrers:
+
+- `http://localhost:8080/*` (add the XAMPP URL if used)
+- `http://127.0.0.1:8080/*`
+- `https://cristine-nonsubordinate-stevie.ngrok-free.dev/*`
+- `https://sabjiwalah.site.je/*`
+
+Use a JavaScript map ID with the default Google style for the host; DEMO_MAP_ID is
+provided for development. Keep streets and POIs visible if you customize its style.
+The browser API key is visible to visitors by design, so the referrer/API
+restrictions matter. No key is committed. Without a configured key the picker
+shows an unavailable state and prevents confirmation rather than using another
+provider silently. See [Google setup](https://developers.google.com/maps/documentation/javascript/get-api-key)
+and [key restrictions](https://developers.google.com/maps/api-security-best-practices).
+
+The confirmed pin is saved in this browser and prefilled at checkout. Changing
+city, state or postcode detaches the pin; adding a house number keeps it. Existing
+saved coordinate pins remain compatible. Google reverse geocoding provides an
+address label; it never replaces the user-selected coordinates with a street center.
+
+Run `php spark migrate` locally. On the test host, import
+`deployment/add-delivery-pin.sql` once through phpMyAdmin before uploading the
+checkout changes. It adds two nullable coordinate columns to existing orders.
+
+Checks: `node --test tests/frontend/location.test.cjs` (mocked Google API interaction)
+and `php tests/deployment/delivery-pin.php` (validation and local schema, no orders).
+Actual Google labels, search and device GPS require the configured key for live testing.

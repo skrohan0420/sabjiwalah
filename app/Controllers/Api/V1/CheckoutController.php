@@ -99,6 +99,8 @@ class CheckoutController extends BaseApiController
             'state'          => 'permit_empty|max_length[120]',
             'postal_code'    => 'required|max_length[20]',
             'notes'          => 'permit_empty|max_length[1000]',
+            'delivery_latitude' => 'permit_empty|numeric|greater_than_equal_to[-90]|less_than_equal_to[90]',
+            'delivery_longitude' => 'permit_empty|numeric|greater_than_equal_to[-180]|less_than_equal_to[180]',
         ];
 
         if (! $this->validateData($data, $rules)) {

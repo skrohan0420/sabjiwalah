@@ -45,6 +45,16 @@ class OrderService
 
     public function createFromCart(int $userId, array $data): array
     {
+        $latitude = $data['delivery_latitude'] ?? null;
+        $longitude = $data['delivery_longitude'] ?? null;
+        $latitude = $latitude === '' ? null : $latitude;
+        $longitude = $longitude === '' ? null : $longitude;
+        if (($latitude === null) !== ($longitude === null)
+            || ($latitude !== null && (! is_numeric($latitude) || ! is_numeric($longitude)
+                || ! is_finite((float) $latitude) || ! is_finite((float) $longitude)
+                || abs((float) $latitude) > 90 || abs((float) $longitude) > 180))) {
+            throw new InvalidArgumentException('Choose a valid delivery point.');
+        }
         $cart = new CartService();
         $cartItems = $cart->items();
 
@@ -112,6 +122,8 @@ class OrderService
                 'city'            => trim((string) $data['city']),
                 'state'           => trim((string) ($data['state'] ?? '')),
                 'postal_code'     => trim((string) $data['postal_code']),
+                'delivery_latitude' => $latitude === null ? null : (float) $latitude,
+                'delivery_longitude' => $longitude === null ? null : (float) $longitude,
                 'notes'           => trim((string) ($data['notes'] ?? '')) ?: null,
             ]);
 

@@ -18,6 +18,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($pageTitle) ?> - Sabjiwalah</title>
@@ -189,6 +190,9 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                         Notes
                         <textarea name="notes" rows="3"></textarea>
                     </label>
+                    <input type="hidden" name="delivery_latitude" data-delivery-latitude>
+                    <input type="hidden" name="delivery_longitude" data-delivery-longitude>
+                    <p data-checkout-pin hidden></p>
 
                     <button type="submit" data-place-order disabled>Place Order</button>
                 </form>
@@ -230,7 +234,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
     <script src="<?= esc(base_url('assets/js/navigation.js?v=20261004-history-back'), 'attr') ?>"></script>
     <script src="<?= esc(base_url('assets/js/cart.js?v=20261005-search-redirect'), 'attr') ?>"></script>
     <?php if ($isLoggedIn) : ?>
-        <script src="<?= esc(base_url('assets/js/checkout.js'), 'attr') ?>"></script>
+        <script src="<?= esc(base_url('assets/js/checkout.js?v=20261008-delivery-pin'), 'attr') ?>"></script>
     <?php endif; ?>
 </body>
 </html>

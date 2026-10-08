@@ -32,6 +32,8 @@ class OrderModel extends Model
         'city',
         'state',
         'postal_code',
+        'delivery_latitude',
+        'delivery_longitude',
         'notes',
     ];
 

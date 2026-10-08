@@ -21,6 +21,8 @@ class App extends BaseConfig
     // Both profiles are loaded from the same .env. CI_ENVIRONMENT selects one.
     public string $localBaseURL = 'http://localhost:8080/';
     public string $serverBaseURL = 'https://sabjiwalah.site.je/';
+    // Optional phone preview. Only requests for this exact host use it.
+    public string $previewBaseURL = '';
     public bool $localForceHTTPS = false;
     public bool $serverForceHTTPS = true;
 
@@ -34,7 +36,34 @@ class App extends BaseConfig
         } elseif (ENVIRONMENT === 'development') {
             $this->baseURL = $this->localBaseURL;
             $this->forceGlobalSecureRequests = $this->localForceHTTPS;
+            $this->usePreviewURL();
         }
+    }
+
+    private function usePreviewURL(): void
+    {
+        $url = trim($this->previewBaseURL);
+        $parts = parse_url($url);
+        if (! is_array($parts) || ($parts['scheme'] ?? '') !== 'https'
+            || empty($parts['host']) || isset($parts['user']) || isset($parts['pass'])
+            || isset($parts['query']) || isset($parts['fragment'])) {
+            return;
+        }
+
+        $authority = strtolower($parts['host']);
+        if (isset($parts['port']) && $parts['port'] !== 443) {
+            $authority .= ':' . $parts['port'];
+        }
+        $requestHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        if ($requestHost !== $authority && $requestHost !== $authority . ':443') {
+            return;
+        }
+
+        $this->baseURL = rtrim($url, '/') . '/';
+        // The local ngrok agent terminates HTTPS and forwards over loopback.
+        // Trust forwarded headers only from that local agent, never arbitrary IPs.
+        $this->proxyIPs['127.0.0.1'] = 'X-Forwarded-For';
+        $this->proxyIPs['::1'] = 'X-Forwarded-For';
     }
 
     /**

@@ -111,6 +111,8 @@ abstract class BaseApiController extends BaseController
             'city'            => $order['city'],
             'state'           => $order['state'],
             'postal_code'     => $order['postal_code'],
+            'delivery_latitude' => isset($order['delivery_latitude']) ? (float) $order['delivery_latitude'] : null,
+            'delivery_longitude' => isset($order['delivery_longitude']) ? (float) $order['delivery_longitude'] : null,
             'notes'           => $order['notes'],
             'created_at'      => $order['created_at'],
             'updated_at'      => $order['updated_at'],

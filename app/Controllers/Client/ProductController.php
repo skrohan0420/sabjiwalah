@@ -57,6 +57,11 @@ class ProductController extends BaseController
 
         return view('client/products/show', [
             'product' => $product,
+            'suggestions' => (new ProductModel())
+                ->where('is_active', 1)
+                ->where('id !=', (int) $product['id'])
+                ->orderBy('name', 'ASC')
+                ->findAll(6),
         ]);
     }
 }

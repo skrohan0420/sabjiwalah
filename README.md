@@ -6,9 +6,15 @@ The current priority is backend foundation first: database structure, authentica
 
 ## Project Status
 
-Current phase: customer home page design started after the backend and API foundations.
+Current phase: customer home and product detail design after the backend and API foundations.
 
 Done:
+
+- Refined the product overview into a compact bordered card with inline highlights, a tighter price row, and an integrated description link.
+- Added a swipeable product hero carousel with image dots, mouse dragging, keyboard navigation, and full/close-up/detail views of the current product photo.
+- Shared the home product-card markup, ADD/quantity controls, and floating checkout pill with the product detail page, including carousel, saved-product, and cart animations.
+- Redesigned product details with a full-width image, transparent header that becomes white and shows the product name on scroll, and a fixed purchase bar.
+- Added a description bottom sheet with highlights and expandable information, plus six active product suggestions using the existing cart and saved-product controls.
 
 - Matched the storefront container background to the product sections so bottom spacing no longer shows a yellow strip.
 
@@ -81,7 +87,7 @@ Done:
 
 In progress / next:
 
-- Refine customer frontend styling across product, auth, account, and future cart pages.
+- Refine customer frontend styling across product listings, auth, account, and future cart pages.
 - Add automated feature tests once project PHPUnit dependencies are installed with Composer.
 - Add proper admin CRUD screens for products, users, orders, offers, and promotions.
 - Add customer saved address management.

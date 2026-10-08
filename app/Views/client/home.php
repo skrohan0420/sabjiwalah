@@ -168,118 +168,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
                     <?php else : ?>
                         <div class="commerce-grid">
                             <?php foreach ($section['products'] as $index => $product) : ?>
-                                <?php
-                                $effectivePrice = (float) ($product['sale_price'] ?? $product['price']);
-                                $originalPrice = (float) $product['price'];
-                                $image = $product['image'] ?: $fallbackImages[($index + $sectionIndex) % count($fallbackImages)];
-                                $carouselImages = [$image];
-                                for ($offset = 1; count($carouselImages) < 4 && $offset <= count($fallbackImages); $offset++) {
-                                    $candidateImage = $fallbackImages[($index + $sectionIndex + $offset) % count($fallbackImages)];
-                                    if (! in_array($candidateImage, $carouselImages, true)) {
-                                        $carouselImages[] = $candidateImage;
-                                    }
-                                }
-                                $discount = $originalPrice > $effectivePrice && $originalPrice > 0
-                                    ? (int) round((($originalPrice - $effectivePrice) / $originalPrice) * 100)
-                                    : 0;
-                                $ratingCount = number_format(6400 + (($index + 1) * 1207) + ($sectionIndex * 237));
-                                ?>
-                                <article class="catalog-card">
-                                    <div class="product-media">
-                                        <?php if ($index === 2 && $sectionIndex === 0) : ?>
-                                            <span class="product-ribbon" aria-label="Fasting Special">
-                                                <span aria-hidden="true">Fasting Special</span>
-                                            </span>
-                                        <?php endif; ?>
-                                        <button
-                                            class="save-button"
-                                            type="button"
-                                            data-save-product="<?= esc($product['uid'], 'attr') ?>"
-                                            aria-label="Save <?= esc($product['name'], 'attr') ?>"
-                                            aria-pressed="false"
-                                        ></button>
-                                        <a class="product-photo" href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>" data-product-carousel>
-                                            <span class="product-carousel-viewport">
-                                                <span class="product-carousel-track" data-carousel-track>
-                                                    <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
-                                                        <img
-                                                            src="<?= esc(app_asset_url($carouselImage)) ?>"
-                                                            alt="<?= $slideIndex === 0 ? esc($product['name']) : '' ?>"
-                                                            data-fallback-image="<?= esc(base_url('assets/images/product-placeholder.svg'), 'attr') ?>"
-                                                            draggable="false"
-                                                            <?= $slideIndex > 0 ? 'loading="lazy"' : '' ?>
-                                                        >
-                                                    <?php endforeach; ?>
-                                                </span>
-                                            </span>
-                                        </a>
-                                        <div class="media-footer">
-                                            <span class="media-dots" role="tablist" aria-label="<?= esc($product['name'], 'attr') ?> images">
-                                                <?php foreach ($carouselImages as $slideIndex => $carouselImage) : ?>
-                                                    <button
-                                                        class="<?= $slideIndex === 0 ? 'is-active' : '' ?>"
-                                                        type="button"
-                                                        data-carousel-dot
-                                                        data-carousel-index="<?= esc((string) $slideIndex, 'attr') ?>"
-                                                        aria-label="Show image <?= esc((string) ($slideIndex + 1), 'attr') ?>"
-                                                        aria-selected="<?= $slideIndex === 0 ? 'true' : 'false' ?>"
-                                                        role="tab"
-                                                    ></button>
-                                                <?php endforeach; ?>
-                                            </span>
-                                            <span class="veg-mark" aria-label="Vegetarian product"></span>
-                                        </div>
-                                        <div class="pack-action-row">
-                                            <span class="pack-size"><?= esc($product['unit']) ?></span>
-                                            <div
-                                                class="cart-card-control"
-                                                data-cart-control
-                                                data-product-uid="<?= esc($product['uid'], 'attr') ?>"
-                                                data-product-name="<?= esc($product['name'], 'attr') ?>"
-                                                data-product-unit="<?= esc($product['unit'], 'attr') ?>"
-                                                data-product-price="<?= esc((string) $effectivePrice, 'attr') ?>"
-                                                data-product-image="<?= esc(app_asset_url($image), 'attr') ?>"
-                                                data-current-quantity="0"
-                                            >
-                                                <button
-                                                    class="cart-add-button"
-                                                    type="button"
-                                                    data-add-to-cart
-                                                    data-product-uid="<?= esc($product['uid'], 'attr') ?>"
-                                                    data-quantity="1"
-                                                >
-                                                    ADD
-                                                </button>
-                                                <div class="cart-stepper" aria-label="Cart quantity">
-                                                    <button type="button" data-cart-decrement aria-label="Decrease quantity">&minus;</button>
-                                                    <span data-cart-quantity-value>1</span>
-                                                    <button type="button" data-cart-increment aria-label="Increase quantity">+</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="catalog-copy">
-                                        <div class="catalog-price">
-                                            <strong>Rs <?= esc(number_format($effectivePrice, 0)) ?></strong>
-                                            <?php if ($originalPrice > $effectivePrice) : ?>
-                                                <s>Rs <?= esc(number_format($originalPrice, 0)) ?></s>
-                                            <?php endif; ?>
-                                        </div>
-                                        <p class="catalog-offer">
-                                            <?= $discount > 0 ? esc($discount . '% OFF on MRP') : 'Price Drop' ?>
-                                        </p>
-                                        <h3>
-                                            <a href="<?= esc(base_url('products/'), 'attr') ?><?= esc($product['uid'], 'url') ?>">
-                                                <?= esc($product['name']) ?>
-                                            </a>
-                                        </h3>
-                                        <div class="rating-row" aria-label="Product rating">
-                                            <span class="rating-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-                                            <span><?= esc($ratingCount) ?></span>
-                                        </div>
-                                    </div>
-                                </article>
+                                <?= view('client/products/_catalog_card', compact('product', 'index', 'sectionIndex', 'fallbackImages')) ?>
                             <?php endforeach; ?>
                         </div>
 
@@ -301,14 +190,7 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
             
         </main>
 
-        <a class="floating-cart-bar" href="<?= esc(base_url('checkout'), 'attr') ?>" data-floating-cart hidden>
-            <span class="floating-cart-thumbs" data-floating-cart-thumbs aria-hidden="true"></span>
-            <span>
-                <strong>Checkout</strong>
-                <em data-floating-cart-count>0 items</em>
-            </span>
-            <i aria-hidden="true"></i>
-        </a>
+        <?= view('client/products/_floating_cart') ?>
 
         <div class="location-sheet" id="location-sheet" data-location-sheet hidden>
             <button class="location-close" type="button" data-location-close aria-label="Close location selector"></button>

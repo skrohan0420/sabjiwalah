@@ -179,7 +179,7 @@ class OrderService
         return $orders->find((int) $orderId);
     }
 
-    public function changeStatus(int $orderId, string $newStatus, ?int $changedBy = null, ?string $notes = null): bool
+    public function changeStatus(int $orderId, string $newStatus, ?int $changedBy = null, ?string $notes = null, ?string $expectedStatus = null): bool
     {
         $orders = new OrderModel();
         $history = new OrderStatusHistoryModel();
@@ -191,24 +191,45 @@ class OrderService
 
         $oldStatus = $order['order_status'];
 
+        if ($expectedStatus !== null && $oldStatus !== $expectedStatus) {
+            throw new OrderConflictException('This order changed. Refresh its details before trying again.');
+        }
+
         if (! $this->canTransition($oldStatus, $newStatus)) {
             throw new InvalidArgumentException("Order cannot move from {$oldStatus} to {$newStatus}.");
         }
 
         $db = db_connect();
-        $db->transStart();
-        $orders->update($orderId, ['order_status' => $newStatus]);
-        $history->insert([
-            'order_id'   => $orderId,
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-            'changed_by' => $changedBy,
-            'notes'      => $notes,
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
-        $db->transComplete();
+        if (! $db->transBegin()) {
+            throw new \RuntimeException('Unable to begin order update.');
+        }
+        try {
+            // Compare-and-set prevents competing requests applying the same old transition.
+            $updated = $db->table('orders')->where('id', $orderId)->where('order_status', $oldStatus)
+                ->update(['order_status' => $newStatus, 'updated_at' => date('Y-m-d H:i:s')]);
+            if (! $updated) {
+                throw new \RuntimeException('Unable to update order.');
+            }
+            if ($db->affectedRows() !== 1) {
+                throw new OrderConflictException('This order changed. Refresh its details before trying again.');
+            }
+            $historyId = $history->insert([
+                'order_id'   => $orderId,
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'changed_by' => $changedBy,
+                'notes'      => $notes,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+            if (! $historyId || ! $db->transStatus() || ! $db->transCommit()) {
+                throw new \RuntimeException('Unable to save order history.');
+            }
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            throw $exception;
+        }
 
-        return $db->transStatus();
+        return true;
     }
 
     public function canTransition(string $oldStatus, string $newStatus): bool

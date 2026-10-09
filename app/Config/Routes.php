@@ -8,6 +8,7 @@ $routes->get('search', 'Client\ProductController::search');
 $routes->get('orders', 'Client\OrderController::index');
 $routes->get('products', 'Client\ProductController::index');
 $routes->get('products/(:segment)', 'Client\ProductController::show/$1');
+$routes->get('media/products/(:segment)', 'ProductMediaController::show/$1');
 $routes->get('account', 'Client\AuthController::account');
 $routes->get('checkout', 'Client\CheckoutController::index');
 
@@ -19,6 +20,9 @@ $routes->get('logout', 'Client\AuthController::logout', ['filter' => 'auth']);
 
 $routes->group('admin', ['filter' => 'role:admin'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Admin\DashboardController::index');
+    $routes->get('orders', 'Admin\OrderController::index');
+    $routes->get('products', 'Admin\ProductController::index');
+    $routes->get('customers', 'Admin\CustomerController::index');
 });
 
 $routes->group('delivery', ['filter' => 'role:delivery'], static function (RouteCollection $routes): void {
@@ -53,12 +57,18 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     $routes->patch('account/profile', 'AccountController::updateProfile', ['filter' => 'apiRole:customer']);
 
     $routes->group('admin', ['namespace' => 'App\Controllers\Api\V1\Admin', 'filter' => 'apiRole:admin'], static function (RouteCollection $routes): void {
+        $routes->get('dashboard', 'DashboardController::show');
+        $routes->get('customers', 'CustomerController::index');
+        $routes->get('customers/(:segment)', 'CustomerController::show/$1');
+        $routes->patch('customers/(:segment)/status', 'CustomerController::updateStatus/$1');
         $routes->get('products', 'ProductController::index');
         $routes->post('products', 'ProductController::create');
         $routes->get('products/(:segment)', 'ProductController::show/$1');
         $routes->put('products/(:segment)', 'ProductController::update/$1');
         $routes->patch('products/(:segment)', 'ProductController::update/$1');
         $routes->delete('products/(:segment)', 'ProductController::delete/$1');
+        $routes->post('products/(:segment)/image', 'ProductController::uploadImage/$1');
+        $routes->delete('products/(:segment)/image', 'ProductController::removeImage/$1');
 
         $routes->get('orders', 'OrderController::index');
         $routes->get('orders/(:segment)', 'OrderController::show/$1');

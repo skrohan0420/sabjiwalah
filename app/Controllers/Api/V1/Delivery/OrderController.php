@@ -71,8 +71,13 @@ class OrderController extends BaseApiController
                 (int) session('user_id'),
                 $data['notes'] ?? null,
             );
+        } catch (\App\Services\OrderConflictException $exception) {
+            return $this->error($exception->getMessage(), ResponseInterface::HTTP_CONFLICT);
         } catch (\InvalidArgumentException $exception) {
             return $this->error($exception->getMessage(), ResponseInterface::HTTP_BAD_REQUEST);
+        } catch (\Throwable $exception) {
+            log_message('error', 'Delivery order status update failed: {type}', ['type' => $exception::class]);
+            return $this->error('Unable to update this order. Please try again.', ResponseInterface::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return $this->success([

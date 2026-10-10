@@ -11,7 +11,7 @@ DirectoryIndex index.php
     RewriteEngine On
 
     # Never expose application code, credentials, dependencies or runtime data.
-    RewriteRule ^(?:\.|app(?:/|$)|system(?:/|$)|vendor(?:/|$)|writable(?:/|$)|tests(?:/|$)|deployment(?:/|$)) - [F,L,NC]
+    RewriteRule ^(?:\.|app(?:/|$)|system(?:/|$)|vendor(?:/|$)|writable(?:/|$)|tests(?:/|$)|deployment(?:/|$)|build(?:/|$)) - [F,L,NC]
 
     # Serve only public assets; do not allow PHP execution through this path.
     RewriteRule ^(?:public/)?assets/.*\.(?:php[0-9]?|phtml|phar)(?:/|$) - [F,L,NC]

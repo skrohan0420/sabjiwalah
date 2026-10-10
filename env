@@ -35,3 +35,7 @@ database.server.DBDebug = false
 maps.googleApiKey = ''
 # DEMO_MAP_ID works for development; use your Google JavaScript map ID on the host.
 maps.googleMapId = 'DEMO_MAP_ID'
+
+# Opt in only for localhost development OTP testing. Production and remote requests are denied.
+# Keep false on deployments; connect a real SMS verification provider before production login.
+otp.developmentMode = false

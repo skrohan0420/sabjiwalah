@@ -40,9 +40,6 @@ class OrderService
         ],
     ];
 
-    private const DELIVERY_CHARGE = 40.00;
-    private const FREE_DELIVERY_MINIMUM = 499.00;
-
     public function createFromCart(int $userId, array $data): array
     {
         $latitude = $data['delivery_latitude'] ?? null;
@@ -62,119 +59,131 @@ class OrderService
             throw new InvalidArgumentException('Cart is empty.');
         }
 
-        $pricing = (new PricingService())->calculateCart($cartItems);
-
-        if ($pricing['lines'] === []) {
-            throw new InvalidArgumentException('Cart has no available products.');
-        }
-
-        $subtotal = (float) $pricing['subtotal'];
-        $discountAmount = 0.00;
-        $deliveryCharge = $subtotal >= self::FREE_DELIVERY_MINIMUM ? 0.00 : self::DELIVERY_CHARGE;
-        $totalAmount = $subtotal - $discountAmount + $deliveryCharge;
-
-        $orders = new OrderModel();
-        $orderItems = new OrderItemModel();
-        $history = new OrderStatusHistoryModel();
-        $products = new ProductModel();
-
-        foreach ($pricing['lines'] as $line) {
-            $product = $products->find((int) $line['product']['id']);
-            $quantity = (int) $line['quantity'];
-
-            if (! $product || ! (bool) $product['is_active']) {
-                throw new InvalidArgumentException('One or more products are no longer available.');
-            }
-
-            if ($quantity > (int) $product['stock_quantity']) {
-                throw new InvalidArgumentException("Not enough stock for {$product['name']}.");
-            }
-        }
-
         $db = db_connect();
-        $db->transStart();
+        if (!$db->transBegin()) throw new \RuntimeException('Unable to begin checkout.');
+        try {
+            // The singleton lock serializes acceptance/capacity checks with settings updates and other checkouts.
+            $settings = (new OperationalSettingsService())->get(true);
+            $customer = $db->query('SELECT id FROM ' . $db->protectIdentifiers('users', true) . " WHERE id = ? AND role = 'customer' AND status = 'active' FOR UPDATE", [$userId])->getRowArray();
+            if (!$customer) throw new InvalidArgumentException('An active customer account is required.');
+            $query = $db->table('products')->whereIn('uid', array_column($cartItems, 'product_uid'))->orderBy('id', 'ASC')->getCompiledSelect();
+            $lockedProducts = [];
+            foreach ($db->query($query . ' FOR UPDATE')->getResultArray() as $product) $lockedProducts[$product['uid']] = $product;
+            $pricing = (new PricingService())->calculateCart($cartItems, $lockedProducts);
 
-        foreach ($pricing['lines'] as $line) {
-            $product = $products->find((int) $line['product']['id']);
-            $quantity = (int) $line['quantity'];
-            $products
-                ->skipValidation(true)
-                ->update((int) $product['id'], [
-                    'stock_quantity' => (int) $product['stock_quantity'] - $quantity,
-                ]);
-        }
+            if ($pricing['lines'] === [] || count($pricing['lines']) !== count($cartItems)) {
+                throw new InvalidArgumentException('Cart has no available products.');
+            }
 
-        $orderId = $orders
-            ->skipValidation(true)
-            ->insert([
-                'order_number'    => $this->generateOrderNumber(),
-                'user_id'         => $userId,
-                'subtotal'        => $subtotal,
-                'discount_amount' => $discountAmount,
-                'delivery_charge' => $deliveryCharge,
-                'total_amount'    => $totalAmount,
-                'payment_method'  => 'cod',
-                'payment_status'  => 'pending',
-                'order_status'    => self::STATUS_PENDING,
-                'customer_name'   => trim((string) $data['customer_name']),
-                'customer_phone'  => trim((string) $data['customer_phone']),
-                'address_line'    => trim((string) $data['address_line']),
-                'city'            => trim((string) $data['city']),
-                'state'           => trim((string) ($data['state'] ?? '')),
-                'postal_code'     => trim((string) $data['postal_code']),
-                'delivery_latitude' => $latitude === null ? null : (float) $latitude,
-                'delivery_longitude' => $longitude === null ? null : (float) $longitude,
-                'notes'           => trim((string) ($data['notes'] ?? '')) ?: null,
-            ]);
+            $code = (string)(session('checkout_offer') ?? '');
+            $quote = (new CheckoutSummaryService())->quote($pricing, $code, true, $settings);
+            if (!$quote['can_place_order']) throw new OrderConflictException($quote['checkout_notice'] ?? 'This order cannot be accepted.');
+            if (($code !== '' || isset($data['quote_token'])) && (!is_string($data['quote_token'] ?? null)
+                || !hash_equals($quote['quote_token'], $data['quote_token']))) throw new OrderConflictException('Your cart, coupon or checkout rules changed. Review the current checkout total before placing the order.');
+            $subtotal = $quote['subtotal']; $discountAmount = $quote['discount_amount'];
+            $deliveryCharge = $quote['delivery_charge']; $totalAmount = $quote['total_amount'];
 
-        if (! $orderId) {
-            $db->transRollback();
-            throw new InvalidArgumentException('Unable to place order.');
-        }
+            $orders = new OrderModel();
+            $orderItems = new OrderItemModel();
+            $history = new OrderStatusHistoryModel();
+            $products = new ProductModel();
 
-        foreach ($pricing['lines'] as $line) {
-            $itemId = $orderItems
+            foreach ($pricing['lines'] as $line) {
+                $product = $line['product'];
+                $quantity = (int) $line['quantity'];
+
+                if (! $product || ! (bool) $product['is_active']) {
+                    throw new InvalidArgumentException('One or more products are no longer available.');
+                }
+
+                if ($quantity > (int) $product['stock_quantity']) {
+                    throw new InvalidArgumentException("Not enough stock for {$product['name']}.");
+                }
+            }
+
+            foreach ($pricing['lines'] as $line) {
+                $product = $line['product'];
+                $quantity = (int) $line['quantity'];
+                $stockUpdated = $products
+                    ->skipValidation(true)
+                    ->update((int) $product['id'], [
+                        'stock_quantity' => (int) $product['stock_quantity'] - $quantity,
+                    ]);
+                if (!$stockUpdated) throw new \RuntimeException('Unable to update product stock.');
+            }
+
+            $orderId = $orders
                 ->skipValidation(true)
                 ->insert([
-                    'order_id'     => $orderId,
-                    'product_id'   => (int) $line['product']['id'],
-                    'product_name' => $line['product']['name'],
-                    'unit'         => $line['product']['unit'],
-                    'quantity'     => (int) $line['quantity'],
-                    'unit_price'   => (float) $line['unit_price'],
-                    'total_price'  => (float) $line['total'],
-                    'created_at'   => date('Y-m-d H:i:s'),
+                    'order_number'    => $this->generateOrderNumber(),
+                    'user_id'         => $userId,
+                    'subtotal'        => $subtotal,
+                    'discount_amount' => $discountAmount,
+                    'delivery_charge' => $deliveryCharge,
+                    'total_amount'    => $totalAmount,
+                    'payment_method'  => 'cod',
+                    'payment_status'  => 'pending',
+                    'order_status'    => self::STATUS_PENDING,
+                    'customer_name'   => trim((string) $data['customer_name']),
+                    'customer_phone'  => trim((string) $data['customer_phone']),
+                    'address_line'    => trim((string) $data['address_line']),
+                    'city'            => trim((string) $data['city']),
+                    'state'           => trim((string) ($data['state'] ?? '')),
+                    'postal_code'     => trim((string) $data['postal_code']),
+                    'delivery_latitude' => $latitude === null ? null : (float) $latitude,
+                    'delivery_longitude' => $longitude === null ? null : (float) $longitude,
+                    'notes'           => trim((string) ($data['notes'] ?? '')) ?: null,
                 ]);
 
-            if (! $itemId) {
-                $db->transRollback();
-                throw new InvalidArgumentException('Unable to create order items.');
+            if (! $orderId) {
+                throw new InvalidArgumentException('Unable to place order.');
             }
-        }
+            if ($quote['offer'] !== null) (new OfferService())->record((int)$orderId, $quote['offer']);
 
-        $historyId = $history
-            ->skipValidation(true)
-            ->insert([
-                'order_id'   => $orderId,
-                'old_status' => null,
-                'new_status' => self::STATUS_PENDING,
-                'changed_by' => $userId,
-                'notes'      => 'Order placed by customer.',
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
+            foreach ($pricing['lines'] as $line) {
+                $itemId = $orderItems
+                    ->skipValidation(true)
+                    ->insert([
+                        'order_id'     => $orderId,
+                        'product_id'   => (int) $line['product']['id'],
+                        'product_name' => $line['product']['name'],
+                        'unit'         => $line['product']['unit'],
+                        'quantity'     => (int) $line['quantity'],
+                        'unit_price'   => (float) $line['unit_price'],
+                        'total_price'  => (float) $line['total'],
+                        'created_at'   => date('Y-m-d H:i:s'),
+                    ]);
 
-        if (! $historyId) {
+                if (! $itemId) {
+                    throw new InvalidArgumentException('Unable to create order items.');
+                }
+            }
+
+            $historyId = $history
+                ->skipValidation(true)
+                ->insert([
+                    'order_id'   => $orderId,
+                    'old_status' => null,
+                    'new_status' => self::STATUS_PENDING,
+                    'changed_by' => $userId,
+                    'notes'      => 'Order placed by customer.',
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+
+            if (! $historyId) {
+                throw new InvalidArgumentException('Unable to create order history.');
+            }
+
+            if (!$db->transStatus() || !$db->transCommit()) {
+                throw new InvalidArgumentException('Unable to place order.');
+            }
+        } catch (\Throwable $exception) {
             $db->transRollback();
-            throw new InvalidArgumentException('Unable to create order history.');
-        }
-
-        $db->transComplete();
-
-        if (! $db->transStatus()) {
-            throw new InvalidArgumentException('Unable to place order.');
+            throw $exception;
         }
 
         $cart->clear();
+        session()->remove('checkout_offer');
 
         return $orders->find((int) $orderId);
     }
@@ -190,6 +199,16 @@ class OrderService
         }
 
         $oldStatus = $order['order_status'];
+
+        if ($newStatus === self::STATUS_DELIVERED) {
+            $proof = (new \App\Models\DeliveryCompletionModel())->find($orderId);
+            if (!$proof || (int) $proof['delivery_user_id'] !== $changedBy || empty($proof['verified_at'])) {
+                throw new InvalidArgumentException('Complete this delivery through PIN verification and cash confirmation.');
+            }
+        }
+        if ($newStatus === self::STATUS_DELIVERY_FAILED && trim((string) $notes) === '') {
+            throw new InvalidArgumentException('Provide a reason for the failed delivery.');
+        }
 
         if ($expectedStatus !== null && $oldStatus !== $expectedStatus) {
             throw new OrderConflictException('This order changed. Refresh its details before trying again.');

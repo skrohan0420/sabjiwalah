@@ -30,7 +30,8 @@ class AdminOrderModel extends OrderModel
                 $counts[$count['order_id']] = (int) $count['item_count'];
             }
             foreach ($this->db->table('delivery_assignments a')->select('a.order_id, u.name')
-                ->join('users u', 'u.id = a.delivery_user_id', 'left')->whereIn('a.order_id', $ids)->where('a.completed_at', null)
+                ->join('users u', 'u.id = a.delivery_user_id', 'left')->whereIn('a.order_id', $ids)
+                ->where('NOT EXISTS (SELECT 1 FROM delivery_assignments n WHERE n.order_id = a.order_id AND n.id > a.id)', null, false)
                 ->orderBy('a.assigned_at', 'DESC')->orderBy('a.id', 'DESC')->get()->getResultArray() as $assignment) {
                 $assigned[$assignment['order_id']] ??= $assignment['name'];
             }
@@ -64,6 +65,6 @@ class AdminOrderModel extends OrderModel
     {
         return $this->db->table('delivery_assignments a')->select('a.uid, a.assigned_at, a.completed_at, u.name AS delivery_name, manager.name AS assigned_by_name')
             ->join('users u', 'u.id = a.delivery_user_id', 'left')->join('users manager', 'manager.id = a.assigned_by', 'left')
-            ->where('a.order_id', $orderId)->orderBy('a.assigned_at', 'DESC')->orderBy('a.id', 'DESC')->get()->getResultArray();
+            ->where('a.order_id', $orderId)->orderBy('a.id', 'DESC')->get()->getResultArray();
     }
 }

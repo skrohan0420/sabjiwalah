@@ -6,16 +6,16 @@ use App\Models\ProductModel;
 
 class PricingService
 {
-    public function calculateCart(array $cartItems): array
+    public function calculateCart(array $cartItems, ?array $lockedProducts = null): array
     {
         $products = new ProductModel();
         $subtotal = 0.0;
         $lines = [];
 
         foreach ($cartItems as $item) {
-            $product = isset($item['product_uid'])
+            $product = $lockedProducts !== null ? ($lockedProducts[$item['product_uid']] ?? null) : (isset($item['product_uid'])
                 ? $products->findByUid((string) $item['product_uid'])
-                : $products->find((int) $item['product_id']);
+                : $products->find((int) $item['product_id']));
 
             if (! $product || ! $product['is_active']) {
                 continue;

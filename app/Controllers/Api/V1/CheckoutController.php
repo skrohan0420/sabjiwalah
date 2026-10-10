@@ -10,86 +10,74 @@ use InvalidArgumentException;
 
 class CheckoutController extends BaseApiController
 {
-    private const DELIVERY_CHARGE = 40.00;
-    private const FREE_DELIVERY_MINIMUM = 499.00;
-    private const OTP_TTL_SECONDS = 600;
-
     public function summary()
     {
-        return $this->success([
+        $this->response->setHeader('Cache-Control', 'private, no-store');
+        try { return $this->success([
             'checkout' => $this->checkoutPayload(),
-        ]);
+        ]); } catch (\Throwable) { return $this->error('Checkout totals are temporarily unavailable.', 503); }
+    }
+
+    public function applyOffer()
+    {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
+        $data = $this->requestData();
+        if (array_keys($data) !== ['code'] || !is_string($data['code']) || !preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/D', trim($data['code'])))
+            return $this->validationError(['code' => 'Enter only a valid coupon code.']);
+        $code = strtoupper(trim($data['code']));
+        try {
+            $pricing = (new PricingService())->calculateCart((new CartService())->items());
+            (new \App\Services\CheckoutSummaryService())->quote($pricing, $code);
+            session()->set('checkout_offer', $code);
+            return $this->success(['checkout' => $this->checkoutPayload()], 'Coupon applied.');
+        } catch (InvalidArgumentException $e) { return $this->error($e->getMessage(), 422);
+        } catch (\Throwable) { return $this->error('Coupons are temporarily unavailable.', 503); }
+    }
+
+    public function removeOffer()
+    {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
+        if ($this->requestData() !== []) return $this->validationError(['payload' => 'No fields are accepted.']);
+        try {
+            session()->remove('checkout_offer');
+            return $this->success(['checkout' => $this->checkoutPayload()], 'Coupon removed.');
+        } catch (\Throwable) { return $this->error('Checkout totals are temporarily unavailable.', 503); }
     }
 
     public function startOtp()
     {
-        $data = $this->requestData();
-        $rules = [
-            'customer_phone' => 'required|max_length[30]',
-        ];
-
-        if (! $this->validateData($data, $rules)) {
-            return $this->validationError($this->validator->getErrors());
-        }
-
-        $phone = $this->normalizePhone((string) $data['customer_phone']);
-        $code = (string) random_int(100000, 999999);
-        $expiresAt = time() + self::OTP_TTL_SECONDS;
-
-        session()->set('checkout_otp', [
-            'phone'      => $phone,
-            'code'       => $code,
-            'verified'   => false,
-            'expires_at' => $expiresAt,
-        ]);
-
-        return $this->success([
-            'dev_otp'    => $code,
-            'expires_at' => date(DATE_ATOM, $expiresAt),
-        ], 'OTP generated for checkout testing.');
+        return $this->otpResponse(function () {
+            $data = $this->otpInput(false);
+            return $this->success((new \App\Services\OtpService())->start('checkout', $data['customer_phone']), 'OTP generated for local development testing.');
+        });
     }
 
     public function verifyOtp()
     {
+        return $this->otpResponse(function () {
+            $data = $this->otpInput(true);
+            if (! (new \App\Services\OtpService())->verify('checkout', $data['customer_phone'], $data['otp'])) {
+                return $this->error('Invalid or expired OTP. Please request a new code when the resend wait has ended.', 400);
+            }
+            return $this->success(['verified' => true], 'Phone verified for checkout.');
+        });
+    }
+
+    private function otpInput(bool $verify): array
+    {
         $data = $this->requestData();
-        $rules = [
-            'customer_phone' => 'required|max_length[30]',
-            'otp'            => 'required|numeric|exact_length[6]',
-        ];
-
-        if (! $this->validateData($data, $rules)) {
-            return $this->validationError($this->validator->getErrors());
+        $allowed = $verify ? ['customer_phone', 'otp'] : ['customer_phone'];
+        if (array_diff(array_keys($data), $allowed) || ! is_string($data['customer_phone'] ?? null)
+            || ($verify && (! is_string($data['otp'] ?? null) || ! preg_match('/^\d{6}$/D', $data['otp'])))) {
+            throw new InvalidArgumentException('Enter only a phone number and, when verifying, a six-digit OTP.');
         }
-
-        $otp = session('checkout_otp');
-
-        if (! is_array($otp)) {
-            return $this->error('Please request an OTP first.', ResponseInterface::HTTP_BAD_REQUEST);
-        }
-
-        if (time() > (int) $otp['expires_at']) {
-            session()->remove('checkout_otp');
-
-            return $this->error('OTP expired. Please request a new OTP.', ResponseInterface::HTTP_BAD_REQUEST);
-        }
-
-        if (
-            $this->normalizePhone((string) $data['customer_phone']) !== $otp['phone']
-            || (string) $data['otp'] !== $otp['code']
-        ) {
-            return $this->error('Invalid OTP.', ResponseInterface::HTTP_BAD_REQUEST);
-        }
-
-        $otp['verified'] = true;
-        session()->set('checkout_otp', $otp);
-
-        return $this->success([
-            'verified' => true,
-        ], 'Phone verified for checkout.');
+        $data['customer_phone'] = \App\Services\OtpService::normalizePhone($data['customer_phone']);
+        return $data;
     }
 
     public function place()
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
         $data = $this->requestData();
         $rules = [
             'customer_name'  => 'required|max_length[120]',
@@ -101,20 +89,30 @@ class CheckoutController extends BaseApiController
             'notes'          => 'permit_empty|max_length[1000]',
             'delivery_latitude' => 'permit_empty|numeric|greater_than_equal_to[-90]|less_than_equal_to[90]',
             'delivery_longitude' => 'permit_empty|numeric|greater_than_equal_to[-180]|less_than_equal_to[180]',
+            'quote_token' => 'permit_empty|regex_match[/^[a-f0-9]{64}$/D]',
         ];
+        if (array_diff(array_keys($data), array_keys($rules))) return $this->validationError(['payload' => 'Unknown checkout fields. Prices and discounts are calculated by the server.']);
+        foreach ($data as $key => $value) if ($value !== null && !is_string($value) && !is_int($value) && !is_float($value)) return $this->validationError([$key => 'Use a single field value.']);
 
         if (! $this->validateData($data, $rules)) {
             return $this->validationError($this->validator->getErrors());
         }
 
-        if (! $this->hasVerifiedOtpFor((string) $data['customer_phone'])) {
-            return $this->error('Please verify the checkout phone number before placing the order.', ResponseInterface::HTTP_FORBIDDEN);
-        }
+        try {
+            if (! (new \App\Services\OtpService())->verifiedForCheckout((string) $data['customer_phone'])) {
+                return $this->error('Please verify the checkout phone number before placing the order.', ResponseInterface::HTTP_FORBIDDEN);
+            }
+        } catch (InvalidArgumentException $e) { return $this->validationError(['customer_phone' => $e->getMessage()]);
+        } catch (\App\Services\OtpUnavailableException $e) { return $this->error($e->getMessage(), 503); }
 
         try {
             $order = (new OrderService())->createFromCart((int) session('user_id'), $data);
+        } catch (\App\Services\OrderConflictException $exception) {
+            return $this->error($exception->getMessage(), 409);
         } catch (InvalidArgumentException $exception) {
             return $this->error($exception->getMessage(), ResponseInterface::HTTP_BAD_REQUEST);
+        } catch (\Throwable) {
+            return $this->error('Unable to confirm this order. Check your orders before trying again.', 503);
         }
 
         session()->remove('checkout_otp');
@@ -126,50 +124,7 @@ class CheckoutController extends BaseApiController
 
     private function checkoutPayload(): array
     {
-        $cart = new CartService();
-        $pricing = (new PricingService())->calculateCart($cart->items());
-        $subtotal = (float) $pricing['subtotal'];
-        $discountAmount = 0.00;
-        $deliveryCharge = $subtotal >= self::FREE_DELIVERY_MINIMUM || $subtotal <= 0 ? 0.00 : self::DELIVERY_CHARGE;
-
-        return [
-            'items' => array_map(
-                fn (array $line): array => [
-                    'product'    => $this->publicProduct($line['product']),
-                    'quantity'   => (int) $line['quantity'],
-                    'unit_price' => (float) $line['unit_price'],
-                    'total'      => (float) $line['total'],
-                ],
-                $pricing['lines'],
-            ),
-            'count'                 => $cart->count(),
-            'subtotal'              => $subtotal,
-            'discount_amount'       => $discountAmount,
-            'delivery_charge'       => $deliveryCharge,
-            'total_amount'          => $subtotal - $discountAmount + $deliveryCharge,
-            'free_delivery_minimum' => self::FREE_DELIVERY_MINIMUM,
-        ];
+        return (new \App\Services\CheckoutSummaryService())->summary();
     }
 
-    private function hasVerifiedOtpFor(string $phone): bool
-    {
-        $otp = session('checkout_otp');
-
-        return is_array($otp)
-            && (bool) ($otp['verified'] ?? false)
-            && time() <= (int) ($otp['expires_at'] ?? 0)
-            && $this->normalizePhone($phone) === ($otp['phone'] ?? null);
-    }
-
-    private function normalizePhone(string $phone): string
-    {
-        $digits = preg_replace('/\D+/', '', trim($phone)) ?? '';
-        $digits = ltrim($digits, '0');
-
-        if (strlen($digits) > 10) {
-            return substr($digits, -10);
-        }
-
-        return $digits;
-    }
 }

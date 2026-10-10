@@ -22,7 +22,8 @@
 
     <testsuites>
         <testsuite name="App">
-            <directory>./tests</directory>
+            <directory>./tests/unit</directory>
+            <directory>./tests/session</directory>
         </testsuite>
     </testsuites>
 

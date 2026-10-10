@@ -11,6 +11,7 @@ class OrderController extends BaseController
 {
     public function index(): string
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0');
         $user = (new AuthService())->user();
         $orders = [];
 

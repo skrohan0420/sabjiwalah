@@ -10,6 +10,7 @@ class CheckoutController extends BaseController
 {
     public function index(): string
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
         $user = (new AuthService())->user();
 
         return view('client/checkout/index', [

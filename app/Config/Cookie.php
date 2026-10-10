@@ -7,6 +7,13 @@ use DateTimeInterface;
 
 class Cookie extends BaseConfig
 {
+    public function __construct()
+    {
+        parent::__construct();
+        // Production authentication and CSRF cookies must never travel over plain HTTP.
+        if (ENVIRONMENT === 'production') $this->secure = true;
+    }
+
     /**
      * --------------------------------------------------------------------------
      * Cookie Prefix

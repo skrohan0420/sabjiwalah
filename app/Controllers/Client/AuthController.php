@@ -9,6 +9,7 @@ class AuthController extends BaseController
 {
     public function login(): string
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
         return view('client/auth/login', [
             'redirect' => $this->safeRedirect((string) $this->request->getGet('redirect')),
         ]);
@@ -22,16 +23,24 @@ class AuthController extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->back()->with('errors', $this->validator->getErrors());
         }
 
         $auth = new AuthService();
 
-        if (! $auth->verifyPhoneOtp(
+        try { if (! $auth->verifyPhoneOtp(
             (string) $this->request->getPost('phone'),
             (string) $this->request->getPost('otp')
         )) {
-            return redirect()->back()->withInput()->with('error', 'Invalid or expired OTP.');
+            return redirect()->back()->with('error', 'Invalid or expired OTP.');
+        } } catch (\App\Services\OtpRateLimitException $e) {
+            return redirect()->to(site_url('login'))->with('error', 'Wait ' . $e->retryAfter . ' seconds before trying another OTP.');
+        } catch (\App\Services\OtpUnavailableException $e) {
+            return redirect()->to(site_url('login'))->with('error', $e->getMessage());
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->to(site_url('login'))->with('error', $e->getMessage());
+        } catch (\Throwable) {
+            return redirect()->to(site_url('login'))->with('error', 'Unable to complete phone verification. Please try again later.');
         }
 
         return $this->redirectByRole($this->safeRedirect((string) $this->request->getPost('redirect')));
@@ -58,6 +67,7 @@ class AuthController extends BaseController
 
     public function account(): string
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
         if (! session('is_logged_in')) {
             return view('client/account_guest');
         }
@@ -87,7 +97,8 @@ class AuthController extends BaseController
     {
         $redirect = trim($redirect);
 
-        if ($redirect === '' || ! str_starts_with($redirect, '/') || str_starts_with($redirect, '//')) {
+        if ($redirect === '' || ! str_starts_with($redirect, '/')
+            || ! (new \App\Services\CampaignLocationService())->safe($redirect)) {
             return null;
         }
 

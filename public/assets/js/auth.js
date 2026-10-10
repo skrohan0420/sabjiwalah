@@ -2,6 +2,7 @@
   const savedPhoneStorageKey = 'sabjiwalah.loginPhone';
   const savedProfileStorageKey = 'sabjiwalah.loginProfile';
   let isVerifyingOtp = false;
+  let isSendingOtp = false;
 
   function digitsOnly(value, maxLength = 10) {
     const digits = String(value || '').replace(/\D/g, '');
@@ -225,7 +226,7 @@
   }
 
   async function verifyOtp(form) {
-    if (!form || isVerifyingOtp) {
+    if (!form || isVerifyingOtp || isSendingOtp) {
       return;
     }
 
@@ -337,6 +338,7 @@
     const changePhoneButton = event.target.closest('[data-change-auth-phone]');
 
     if (changePhoneButton) {
+      if (isSendingOtp || isVerifyingOtp) return;
       const form = changePhoneButton.closest('[data-auth-form]');
 
       showOtpPanel(form, false);
@@ -345,7 +347,7 @@
       return;
     }
 
-    if (!button) {
+    if (!button || isSendingOtp || isVerifyingOtp) {
       return;
     }
 
@@ -359,6 +361,9 @@
 
     showOtp(form, '');
     setMessage(form, 'Sending OTP...');
+    isSendingOtp = true;
+    button.disabled = true;
+    if (phoneInput) phoneInput.disabled = true;
 
     try {
       saveProfile(phone);
@@ -376,6 +381,10 @@
       setMessage(form, 'OTP generated. Enter the testing OTP shown above.');
     } catch (error) {
       setMessage(form, error.message, true);
+    } finally {
+      isSendingOtp = false;
+      button.disabled = false;
+      if (phoneInput) phoneInput.disabled = false;
     }
   });
 

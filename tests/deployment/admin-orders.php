@@ -8,7 +8,7 @@ require $paths->systemDirectory . '/Boot.php';
 CodeIgniter\Boot::bootConsole($paths);
 $db = db_connect();
 if ($db->DBDriver !== 'MySQLi' || $db->DBPrefix !== '') throw new RuntimeException('Use local MySQL without a prefix.');
-foreach (['orders', 'order_items', 'order_status_history', 'delivery_assignments', 'users'] as $table) {
+foreach (['orders', 'order_items', 'order_status_history', 'delivery_assignments', 'users', 'delivery_completions'] as $table) {
     $definition = $db->query("SHOW CREATE TABLE {$table}")->getRowArray()['Create Table'];
     $definition = str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $definition);
     // MySQL temporary tables do not support foreign keys; preserve columns and indexes.
@@ -53,8 +53,9 @@ $transitions->changeStatus($one, 'ready_for_delivery', 1);
 orderCheck($service->details($uid)['allowed_actions'] === [], 'Ready orders must not expose future dispatch/completion UI actions.');
 try { $transitions->changeStatus($one, 'cancelled', 1); throw new RuntimeException('Late cancellation accepted.'); } catch (InvalidArgumentException) {}
 $transitions->changeStatus($one, 'out_for_delivery', 2);
-$transitions->changeStatus($one, 'delivered', 2);
-orderCheck($orders->find($one)['order_status'] === 'delivered', 'Existing delivery transition flow must remain supported.');
+try { $transitions->changeStatus($one, 'delivered', 2); throw new RuntimeException('Unverified delivery accepted.'); } catch (InvalidArgumentException) {}
+$transitions->changeStatus($one, 'delivery_failed', 2, 'Customer unavailable.');
+orderCheck($orders->find($one)['order_status'] === 'delivery_failed', 'Failed delivery transition must remain supported.');
 $cancel = fixtureOrder($orders, 'SW_FIXTURE_CANCEL', 'pending', '2026-10-09 10:00:00');
 $transitions->changeStatus($cancel, 'cancelled', 1, 'Cancelled fixture', 'pending');
 orderCheck($orders->find($cancel)['order_status'] === 'cancelled', 'Permitted cancellation must succeed.');

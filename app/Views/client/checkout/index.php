@@ -4,6 +4,7 @@ $checkout = $checkout ?? [
     'items'           => [],
     'count'           => 0,
     'subtotal'        => 0,
+    'discount_amount' => 0,
     'delivery_charge' => 0,
     'total_amount'    => 0,
 ];
@@ -30,8 +31,8 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
     <main
         class="checkout-page<?= $isLoggedIn ? ' is-authenticated' : ' is-guest' ?>"
         data-checkout-review-page
-        data-delivery-charge="<?= esc((string) ($checkout['delivery_charge'] > 0 ? $checkout['delivery_charge'] : 40), 'attr') ?>"
-        data-free-delivery-minimum="<?= esc((string) ($checkout['free_delivery_minimum'] ?? 499), 'attr') ?>"
+        data-delivery-charge="<?= esc((string) ($checkout['standard_delivery_charge'] ?? 0), 'attr') ?>"
+        data-free-delivery-minimum="<?= esc((string) ($checkout['free_delivery_minimum'] ?? ''), 'attr') ?>"
         <?= $isLoggedIn ? 'data-checkout-page' : '' ?>
     >
         <header class="checkout-topbar">
@@ -40,6 +41,15 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
             <a class="checkout-text-link" href="<?= esc(base_url('products'), 'attr') ?>">Shop</a>
         </header>
 
+        <p class="checkout-card" data-checkout-policy role="status"><?= esc($checkout['checkout_notice'] ?? 'Orders are currently accepted.') ?></p>
+        <?php if ($isLoggedIn): ?>
+        <form class="checkout-card checkout-coupon" data-coupon-form>
+            <label for="checkout-coupon">Coupon code</label>
+            <div><input id="checkout-coupon" name="code" maxlength="80" pattern="[A-Za-z0-9][A-Za-z0-9_-]{0,79}" autocomplete="off" required data-coupon-code>
+            <button type="submit" data-coupon-apply>Apply</button><button type="button" data-coupon-remove hidden>Remove</button></div>
+            <p data-coupon-status role="status" aria-live="polite"></p>
+        </form>
+        <?php endif ?>
         <?php if (! $isLoggedIn) : ?>
             <section class="checkout-stack" aria-label="Checkout review">
                 <section class="checkout-card checkout-items-card" aria-labelledby="checkout-items-title">
@@ -95,11 +105,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                     </div>
                 </section>
 
-                <a class="checkout-action-row" href="<?= esc(base_url('products'), 'attr') ?>">
-                    <span class="checkout-row-icon coupon" aria-hidden="true"></span>
-                    <strong>Use Coupons</strong>
-                    <i aria-hidden="true"></i>
-                </a>
+                <p class="checkout-card">Sign in to apply a coupon at checkout.</p>
 
                 <section class="checkout-card checkout-bill-card" aria-labelledby="bill-title">
                     <h2 id="bill-title">Bill details</h2>
@@ -107,9 +113,6 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                         <div>
                             <dt>Items total</dt>
                             <dd>
-                                <?php if ((float) ($checkout['discount_amount'] ?? 0) > 0) : ?>
-                                    <em>Saved <?= esc($compactMoney((float) $checkout['discount_amount'])) ?></em>
-                                <?php endif; ?>
                                 <strong data-checkout-subtotal><?= esc($compactMoney((float) $checkout['subtotal'])) ?></strong>
                             </dd>
                         </div>
@@ -117,6 +120,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                             <dt>Delivery charge</dt>
                             <dd data-checkout-delivery><?= esc($compactMoney((float) $checkout['delivery_charge'])) ?></dd>
                         </div>
+                        <div><dt>Coupon discount</dt><dd data-checkout-discount><?= esc($compactMoney((float) $checkout['discount_amount'])) ?></dd></div>
                         <div class="grand-total">
                             <dt>Grand total</dt>
                             <dd data-checkout-total><?= esc($compactMoney((float) $checkout['total_amount'])) ?></dd>
@@ -221,6 +225,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                             <dt>Delivery</dt>
                             <dd data-checkout-delivery><?= esc($money((float) $checkout['delivery_charge'])) ?></dd>
                         </div>
+                        <div><dt>Coupon discount</dt><dd data-checkout-discount><?= esc($money((float) $checkout['discount_amount'])) ?></dd></div>
                         <div>
                             <dt>Total</dt>
                             <dd data-checkout-total><?= esc($money((float) $checkout['total_amount'])) ?></dd>

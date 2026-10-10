@@ -652,10 +652,12 @@
 
   function checkoutTotals(cart) {
     const page = document.querySelector('[data-checkout-review-page]');
-    const deliveryCharge = Number(page?.dataset.deliveryCharge ?? 40) || 0;
-    const freeDeliveryMinimum = Number(page?.dataset.freeDeliveryMinimum ?? 499) || 0;
+    const rules = cart.checkout_rules || {};
+    const deliveryCharge = Number(rules.delivery_charge ?? page?.dataset.deliveryCharge ?? 0) || 0;
+    const threshold = Object.hasOwn(rules, 'free_delivery_minimum') ? rules.free_delivery_minimum : page?.dataset.freeDeliveryMinimum;
+    const freeDeliveryMinimum = threshold == null || threshold === '' ? null : Number(threshold);
     const subtotal = Number(cart.subtotal) || 0;
-    const delivery = subtotal > 0 && subtotal < freeDeliveryMinimum ? deliveryCharge : 0;
+    const delivery = subtotal > 0 && (freeDeliveryMinimum === null || subtotal < freeDeliveryMinimum) ? deliveryCharge : 0;
 
     return {
       subtotal,
@@ -722,9 +724,15 @@
 
     setText('[data-checkout-review-count]', String(count));
     setText('[data-checkout-review-count-label]', count === 1 ? 'item' : 'items');
-    setText('[data-checkout-subtotal]', compactMoney(totals.subtotal));
-    setText('[data-checkout-delivery]', compactMoney(totals.delivery));
-    setText('[data-checkout-total]', compactMoney(totals.total));
+    if (page.hasAttribute('data-checkout-page')) {
+      // Customer totals, including coupon eligibility, come from the checkout API.
+      setText('[data-checkout-total]', 'Updating…');
+      window.dispatchEvent(new CustomEvent('sabjiwalah:cart-changed'));
+    } else {
+      setText('[data-checkout-subtotal]', compactMoney(totals.subtotal));
+      setText('[data-checkout-delivery]', compactMoney(totals.delivery));
+      setText('[data-checkout-total]', compactMoney(totals.total));
+    }
 
     if (!items) {
       return;

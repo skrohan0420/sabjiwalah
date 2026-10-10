@@ -1,0 +1,7 @@
+.order-card .order-delivery-pin { margin-top: 16px; border-top: 1px solid #dce5df; padding-top: 14px; }
+.order-card .order-delivery-pin p { line-height: 1.5; margin-bottom: 12px; }
+.order-delivery-pin button { border: 0; border-radius: 10px; background: #177a48; color: #fff; padding: 12px 16px; font: inherit; cursor: pointer; min-height: 44px; }
+.order-delivery-pin button:disabled { opacity: .6; cursor: wait; }
+.order-delivery-pin button:focus-visible { outline: 3px solid #efb92f; outline-offset: 3px; }
+.order-delivery-pin output { display: block; font-size: 30px; font-weight: 700; letter-spacing: 6px; padding: 12px 0; }
+.order-delivery-pin output[hidden] { display: none; }

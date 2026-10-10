@@ -7,6 +7,19 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 abstract class BaseApiController extends BaseController
 {
+    protected function otpResponse(callable $action)
+    {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
+        try { return $action(); }
+        catch (\App\Services\OtpRateLimitException $e) {
+            $this->response->setHeader('Retry-After', (string) $e->retryAfter);
+            return $this->error($e->getMessage() . ' Try again in ' . $e->retryAfter . ' seconds.', 429, null, ['retry_after' => $e->retryAfter]);
+        }
+        catch (\App\Services\OtpUnavailableException $e) { return $this->error($e->getMessage(), 503); }
+        catch (\InvalidArgumentException $e) { return $this->validationError(['phone_or_otp' => $e->getMessage()]); }
+        catch (\Throwable) { return $this->error('Unable to complete phone verification. Please try again later.', 503); }
+    }
+
     protected function success(mixed $data = null, ?string $message = null, int $status = ResponseInterface::HTTP_OK)
     {
         return $this->response

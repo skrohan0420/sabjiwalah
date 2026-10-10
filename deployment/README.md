@@ -114,8 +114,106 @@ php tests/deployment/environment.php production
 php tests/deployment/environment.php testing
 ```
 
-Current OTP endpoints still return development OTP codes. This deployment is
-for development testing; environment selection does not add an SMS provider.
+### Authentication rollout (Phase 11A)
+
+Production phone login and checkout are unavailable until a real SMS verification
+provider is integrated. OTP endpoints return HTTP 503 without a testing code in
+production, even if `otp.developmentMode = true`. Existing legacy login cookies
+and sessions established with testing OTPs are revoked on their next production
+request. Plan for this login interruption before uploading this change; this is
+not a production-ready authentication deployment.
+
+For local testing, use `CI_ENVIRONMENT = development` and explicitly set
+`otp.developmentMode = true` in the local `.env`, then open the local `/login`
+page. Use an existing active administrator's phone number to enter the admin
+panel; new phone numbers register as customers. The form displays the testing
+OTP only when the request's direct address and Host are loopback, with no
+forwarding headers. Localhost, 127.0.0.1 and IPv6 loopback are accepted; public
+Host values and Forwarded/X-Forwarded-*/X-Real-IP headers deny testing codes.
+Keep the setting false on deployments. Do not expose opted-in development
+through a proxy/tunnel that strips forwarding headers and rewrites Host to
+localhost; such traffic cannot be distinguished from a direct local client.
+
+Before deploying the code, run `php spark migrate` to create `otp_rate_limits`.
+For hosts without a terminal, import an up-to-date migrated schema using the
+existing phpMyAdmin workflow. Missing rate-limit storage fails closed. Bucket
+keys are hashed; the table does not store raw phone numbers or IP addresses.
+Each phone and purpose allows five sends and five verification submissions per
+fifteen minutes (successful submissions count too), with sixty seconds between
+sends. IP limits are shared across login and checkout: twenty sends and sixty
+verification submissions per fifteen minutes. Resending or opening a new browser
+session does not reset these budgets. HTTP 429 includes Retry-After.
+
+Run `php spark otp:prune` periodically to remove at most 1000 expired buckets
+per run, preserving active resend cooldowns. Repeat batches if needed. No
+scheduled maintenance task is installed by this change.
+
+Focused checks use temporary SQL and isolated session storage:
+
+```bash
+php tests/deployment/otp-security.php
+php tests/deployment/otp-security.php --production
+node tests/deployment/otp-security-session.cjs
+node tests/deployment/otp-security-session.cjs --production
+node --test tests/frontend/auth-security.test.cjs
+```
+
+Production-mode HTTP fixtures deliberately use local SQL and disable forced
+HTTPS redirection inside the fixture only, with a simulated HTTPS server flag
+to verify Secure/HttpOnly/SameSite cookies. They verify OTP/session behavior,
+including destroyed periodic-session replay, and do not verify production
+certificates or transport configuration.
+
+### Final local hardening checks (Phase 11B)
+
+Use PHP 8.2+ and `composer install` with the tracked lock file. `composer test`
+runs project PHPUnit; do not use the old global XAMPP/PEAR PHPUnit. Production
+packages can use `composer install --no-dev --optimize-autoloader`; run tests
+before excluding development dependencies. Keep build reports and dependencies
+private, and preserve the updated root `.htaccess` if using the htdocs gateway.
+
+```bash
+composer test -- --no-coverage
+node tests/deployment/admin-security-session.cjs
+php tests/deployment/admin-performance.php
+node tests/deployment/concurrent-admin.cjs
+node tests/deployment/admin-products-upload.cjs
+node tests/deployment/apache-isolated.cjs
+```
+
+The concurrent check requires local MySQL CREATE/DROP DATABASE privileges. It
+creates a random `sw_hardening_*` database, clones structure only, races real
+independent processes, and drops only the database recorded in its ownership
+marker. It never modifies source business tables. If interrupted before cleanup,
+inspect the fixture's ownership marker in the `sabjiwalah-concurrent-*` temporary
+directory before manually removing an abandoned fixture database. Do not grant
+these test-only privileges to the production application user.
+
+The isolated Apache command requires local XAMPP Apache/PHP modules (override
+APACHE_BINARY/XAMPP_PHP_DIR if needed). It binds only loopback on an ephemeral
+port, performs guest/read-only business requests and removes its own temporary
+configuration/session files. It does not change running Apache configuration.
+On the hosted deployment, also run `node tests/deployment/apache-smoke.cjs URL/`
+against the actual base URL to verify private paths and rewrites.
+
+Production requires working HTTPS before cookies can be issued; the application
+enforces Secure cookies even if an environment override tries to disable them.
+Normal session cookies are HttpOnly/SameSite=Lax, and expired IDs are destroyed
+during periodic rotation. Customer logout is POST-only with CSRF. Personalized
+pages/APIs are private/no-store and cannot use automatic shared page caching;
+generated product images retain public caching. Dispatch lock contention returns
+a rollback-safe 409 requiring reload. Rider workload lists contain active orders;
+latest-owner detail access remains compatible for historical records.
+
+Before production acceptance, verify the SMS flow, hosted certificate/HTTPS,
+PHP intl/mbstring/mysqli/fileinfo, writable session/upload storage, migrations,
+private directories, database backups and restore, and representative load.
+These local races prove conflict behavior, not production capacity. All-time
+dashboard aggregates and the singleton checkout acceptance lock still need load
+monitoring. Product/customer/personnel/campaign edits lack a complete general
+administrator audit trail; order, assignment, settings and cash history exist.
+Retained old product uploads need an operator retention/cleanup policy. These
+requirements remain open; the local checks do not certify production readiness.
 
 Future schema changes can be migrated locally and supplied as reviewed SQL
 updates for phpMyAdmin when the host has no terminal. There is no public web

@@ -8,6 +8,7 @@ class CsrfController extends BaseApiController
 {
     public function show()
     {
+        $this->response->setHeader('Cache-Control', 'private, no-store');
         $security = config(Security::class);
 
         return $this->success([

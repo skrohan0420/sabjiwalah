@@ -13,6 +13,7 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
     <meta name="description" content="View your Sabjiwalah orders">
     <title>My Orders - Sabjiwalah</title>
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/delivery-pin.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
     <?= view('shared/theme') ?>
 </head>
@@ -60,6 +61,14 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
                                     <dd><?= esc($statusLabel((string) $order['payment_status'])) ?></dd>
                                 </div>
                             </dl>
+                            <?php if ($order['order_status'] === 'out_for_delivery') : ?>
+                                <section class="order-delivery-pin" data-delivery-pin="<?= esc($order['uid'], 'attr') ?>" aria-label="Delivery PIN for <?= esc($order['order_number'], 'attr') ?>">
+                                    <p>Generate your delivery PIN when your order arrives. Share it only after receiving your groceries. Each PIN expires after 30 minutes.</p>
+                                    <button type="button" data-pin-generate>Generate delivery PIN</button>
+                                    <output data-pin-value aria-label="Your delivery PIN" hidden></output>
+                                    <p data-pin-message role="status" aria-live="polite">Shown once. Generating a new PIN replaces the previous one.</p>
+                                </section>
+                            <?php endif; ?>
                         </article>
                     <?php endforeach; ?>
                 </section>
@@ -114,5 +123,6 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
     </div>
     <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
     <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>
+    <script src="<?= esc(app_static_url('assets/js/delivery-pin.js'), 'attr') ?>"></script>
 </body>
 </html>

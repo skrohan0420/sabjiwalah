@@ -5,17 +5,22 @@ $rows = [
     ['label' => 'Account privacy', 'path' => 'M6 10h12v10H6V10Zm3 0V7a3 3 0 0 1 6 0v3m-3 4v2', 'dialog' => 'privacy-dialog'],
     ['label' => 'Notification preferences', 'path' => 'M5 17h14l-2-3V9a5 5 0 0 0-10 0v5l-2 3Zm5 3h4', 'dialog' => 'notifications-dialog'],
 ];
-if (!empty($loggedIn)) $rows[] = ['label' => 'Log out', 'path' => 'M10 4H5v16h5m-2-8h12m-4-4 4 4-4 4', 'url' => base_url('logout')];
+if (!empty($loggedIn)) $rows[] = ['label' => 'Log out', 'path' => 'M10 4H5v16h5m-2-8h12m-4-4 4 4-4 4', 'logout' => true];
 ?>
 <section class="account-list" aria-labelledby="account-other-title">
     <h2 id="account-other-title">Other information</h2>
     <?php foreach ($rows as $row) : ?>
-        <?php if (isset($row['url'])) : ?><a class="account-row" href="<?= esc($row['url'], 'attr') ?>">
+        <?php if (!empty($row['logout'])) : ?>
+            <form action="<?= esc(site_url('logout'), 'attr') ?>" method="post">
+                <?= csrf_field() ?>
+                <button class="account-row" type="submit">
+        <?php elseif (isset($row['url'])) : ?><a class="account-row" href="<?= esc($row['url'], 'attr') ?>">
         <?php else : ?><button class="account-row" type="button" <?= !empty($row['share']) ? 'data-share-app' : 'data-account-dialog="' . esc($row['dialog'], 'attr') . '"' ?>><?php endif; ?>
             <span class="account-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="<?= esc($row['path'], 'attr') ?>"/></svg></span>
             <span><?= esc($row['label']) ?></span>
             <svg class="account-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
         <?= isset($row['url']) ? '</a>' : '</button>' ?>
+        <?php if (!empty($row['logout'])) : ?></form><?php endif; ?>
     <?php endforeach; ?>
 </section>
 <p class="account-menu-message" data-account-menu-message role="status"></p>

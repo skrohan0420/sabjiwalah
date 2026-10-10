@@ -15,7 +15,7 @@ class ProductMediaController extends BaseController
         }
         $type = ['jpg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp'][$match[1]];
         return $this->response->setHeader('X-Content-Type-Options', 'nosniff')
-            ->setHeader('Cache-Control', 'public, max-age=86400')->setContentType($type)
+            ->removeHeader('Cache-Control')->setHeader('Cache-Control', 'public, max-age=86400')->setContentType($type)
             ->setBody(file_get_contents($path));
     }
 }

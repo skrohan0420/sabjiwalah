@@ -5,6 +5,7 @@
   });
 
   let otpVerified = false;
+  let mutationBusy = false, quotePending = true, quoteToken = null, summaryGeneration = 0, placementUncertain = false;
 
   async function getCsrf() {
     const response = await fetch(window.Sabjiwalah.url('/api/v1/csrf'), {
@@ -45,7 +46,7 @@
     const payload = await response.json();
 
     if (!response.ok || !payload.success) {
-      throw new Error(payload.message || 'Request failed');
+      throw Object.assign(new Error(payload.message || 'Request failed'), {status: response.status});
     }
 
     return payload;
@@ -85,7 +86,7 @@
     otpVerified = verified;
     const submit = document.querySelector('[data-place-order]');
     if (submit) {
-      submit.disabled = !verified;
+      submit.disabled = !verified || mutationBusy || quotePending || !quoteToken || placementUncertain;
     }
   }
 
@@ -105,14 +106,18 @@
 
     setText('[data-checkout-subtotal]', money.format(checkout.subtotal));
     setText('[data-checkout-delivery]', money.format(checkout.delivery_charge));
+    setText('[data-checkout-discount]', money.format(checkout.discount_amount));
     setText('[data-checkout-total]', money.format(checkout.total_amount));
+    quoteToken = checkout.quote_token;
+    if (checkout.can_place_order === false) quoteToken = null;
+    setText('[data-checkout-policy]', checkout.checkout_notice || 'Orders are currently accepted. Minimum subtotal: ' + money.format(checkout.minimum_order_amount || 0) + '.');
+    const status = document.querySelector('[data-coupon-status]'), remove = document.querySelector('[data-coupon-remove]');
+    if (status) status.textContent = checkout.offer_error || (checkout.applied_code ? checkout.applied_code + ' applied. You save ' + money.format(checkout.discount_amount) + '.' : 'One coupon per order. Delivery charges use the subtotal before discounts.');
+    if (remove) remove.hidden = !checkout.selected_code;
   }
 
   function setText(selector, value) {
-    const node = document.querySelector(selector);
-    if (node) {
-      node.textContent = value;
-    }
+    document.querySelectorAll(selector).forEach(node => { node.textContent = value; });
   }
 
   function escapeHtml(value) {
@@ -122,9 +127,41 @@
   }
 
   async function loadSummary() {
-    const payload = await api('/api/v1/checkout/summary');
-    renderSummary(payload.data.checkout);
+    const generation = ++summaryGeneration; quotePending = true; quoteToken = null; setOtpVerified(otpVerified);
+    try {
+      const payload = await api('/api/v1/checkout/summary');
+      if (generation !== summaryGeneration) return;
+      renderSummary(payload.data.checkout);
+    } finally {
+      if (generation === summaryGeneration) { quotePending = false; setOtpVerified(otpVerified); }
+    }
   }
+
+  function busy(working) {
+    mutationBusy = working;
+    document.querySelectorAll('[data-send-otp], [data-verify-otp], [data-coupon-apply], [data-coupon-remove]').forEach(button => { button.disabled = working; });
+    setOtpVerified(otpVerified);
+  }
+
+  async function coupon(method) {
+    if (mutationBusy) return;
+    busy(true); ++summaryGeneration; quotePending = true; quoteToken = null;
+    const status = document.querySelector('[data-coupon-status]');
+    try {
+      setMessage('');
+      const code = document.querySelector('[data-coupon-code]').value.trim();
+      const payload = await api('/api/v1/checkout/offer', {method, body: JSON.stringify(method === 'POST' ? {code} : {})});
+      renderSummary(payload.data.checkout);
+    } catch (error) { if (status) status.textContent = error.message; setMessage(error.message, true); }
+    finally { quotePending = false; busy(false); }
+    // Re-read the selected server coupon after rejected or ambiguous requests; never repeat the mutation.
+    await loadSummary().catch(error => setMessage(error.message, true));
+  }
+
+  window.addEventListener('sabjiwalah:cart-changed', () => {
+    if (!mutationBusy) loadSummary().catch(error => setMessage(error.message, true));
+    else { ++summaryGeneration; quoteToken = null; quotePending = true; }
+  });
 
   async function sendOtp() {
     const phone = document.querySelector('[data-checkout-phone]')?.value || '';
@@ -159,22 +196,25 @@
 
   document.addEventListener('click', async (event) => {
     if (event.target.closest('[data-send-otp]')) {
+      if (mutationBusy) return; busy(true);
       try {
         await sendOtp();
       } catch (error) {
         setOtpVerified(false);
         setOtpStatus(error.message, true);
-      }
+      } finally { busy(false); if (quotePending) loadSummary().catch(error => setMessage(error.message, true)); }
     }
 
     if (event.target.closest('[data-verify-otp]')) {
+      if (mutationBusy) return; busy(true);
       try {
         await verifyOtp();
       } catch (error) {
         setOtpVerified(false);
         setOtpStatus(error.message, true);
-      }
+      } finally { busy(false); if (quotePending) loadSummary().catch(error => setMessage(error.message, true)); }
     }
+    if (event.target.closest('[data-coupon-remove]')) await coupon('DELETE');
   });
 
   document.addEventListener('input', (event) => {
@@ -186,6 +226,7 @@
   });
 
   document.addEventListener('submit', async (event) => {
+    if (event.target.matches('[data-coupon-form]')) { event.preventDefault(); await coupon('POST'); return; }
     const form = event.target.closest('[data-checkout-form]');
 
     if (!form) {
@@ -193,16 +234,20 @@
     }
 
     event.preventDefault();
+    if (mutationBusy || placementUncertain) return;
     setMessage('');
 
     const data = Object.fromEntries(new FormData(form).entries());
     delete data.otp;
+    data.quote_token = quoteToken;
 
     if (!otpVerified) {
       setMessage('Please verify the phone number before placing the order.', true);
       return;
     }
 
+    if (quotePending || !quoteToken) { setMessage('Review a current checkout total and remove any unavailable coupon before placing the order.', true); return; }
+    busy(true);
     try {
       const payload = await api('/api/v1/checkout/place', {
         method: 'POST',
@@ -211,10 +256,14 @@
 
       setMessage(`Order placed. Order number: ${payload.data.order.order_number}`);
       form.reset();
+      setOtpVerified(false); setDevOtp('');
       await loadSummary();
     } catch (error) {
+      placementUncertain = !error.status || error.status >= 500;
       setMessage(error.message, true);
-    }
+      if (placementUncertain) setMessage(error.message + ' Check your orders before reloading this page to try again.', true);
+      else await loadSummary().catch(summaryError => setMessage(summaryError.message, true));
+    } finally { busy(false); }
   });
 
   if (document.querySelector('[data-checkout-page]')) {

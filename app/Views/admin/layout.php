@@ -16,12 +16,15 @@
 <div class="admin-brand-row"><a href="<?= esc(site_url('admin'), 'attr') ?>" class="admin-brand"><img src="<?= esc(app_static_url('assets/images/sabjiwalah-wordmark-header.png'), 'attr') ?>" alt="Sabjiwalah"><span>ADMIN PANEL</span></a><button class="admin-icon-button admin-mobile-only" type="button" data-admin-close aria-label="Close navigation">×</button></div>
 <p class="admin-nav-label">WORKSPACE</p>
 <nav aria-label="Main navigation">
-<?php foreach (['dashboard' => ['Dashboard', 'admin'], 'orders' => ['Orders', 'admin/orders'], 'products' => ['Products', 'admin/products'], 'customers' => ['Customers', 'admin/customers']] as $key => [$label, $path]): ?>
+<?php foreach (['dashboard' => ['Dashboard', 'admin'], 'orders' => ['Orders', 'admin/orders'], 'products' => ['Products', 'admin/products'], 'customers' => ['Customers', 'admin/customers'], 'delivery' => ['Delivery Management', 'admin/delivery-personnel']] as $key => [$label, $path]): ?>
 <a class="admin-nav-item <?= ($activeNav ?? 'dashboard') === $key ? 'is-active' : '' ?>" href="<?= esc(site_url($path), 'attr') ?>" <?= ($activeNav ?? 'dashboard') === $key ? 'aria-current="page"' : '' ?>><?= esc($label) ?></a>
 <?php endforeach ?>
-<?php foreach (['Delivery Management', 'Offers', 'Promotions', 'Settings'] as $label): ?>
-<span class="admin-nav-item is-disabled" aria-disabled="true"><?= esc($label) ?><small>Coming soon</small></span>
+<a class="admin-nav-item <?= ($activeNav ?? '') === 'dispatch' ? 'is-active' : '' ?>" href="<?= esc(site_url('admin/dispatch'), 'attr') ?>" <?= ($activeNav ?? '') === 'dispatch' ? 'aria-current="page"' : '' ?>>Dispatch</a>
+<a class="admin-nav-item <?= ($activeNav ?? '') === 'cash' ? 'is-active' : '' ?>" href="<?= esc(site_url('admin/cash'), 'attr') ?>">COD reconciliation</a>
+<?php foreach (['offers' => 'Offers', 'promotions' => 'Promotions'] as $key => $label): ?>
+<a class="admin-nav-item <?= ($activeNav ?? '') === $key ? 'is-active' : '' ?>" href="<?= esc(site_url('admin/' . $key), 'attr') ?>" <?= ($activeNav ?? '') === $key ? 'aria-current="page"' : '' ?>><?= esc($label) ?></a>
 <?php endforeach ?>
+<a class="admin-nav-item <?= ($activeNav ?? '') === 'settings' ? 'is-active' : '' ?>" href="<?= esc(site_url('admin/settings'),'attr') ?>" <?= ($activeNav ?? '') === 'settings' ? 'aria-current="page"' : '' ?>>Settings</a>
 </nav>
 <div class="admin-sidebar-footer"><span class="admin-badge admin-badge-success">Sabjiwalah</span><p class="admin-caption">Store administration</p></div>
 </aside>

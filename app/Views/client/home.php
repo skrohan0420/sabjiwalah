@@ -154,6 +154,19 @@ $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
         </div>
 
         <main>
+            <?php if (!empty($promotions)): ?>
+            <section class="commerce-section scheduled-promotions" aria-labelledby="store-promotions-title">
+                <h2 id="store-promotions-title">Store highlights</h2>
+                <div class="store-promotion-grid">
+                    <?php foreach ($promotions as $promotion): ?>
+                    <a class="store-promotion" href="<?= esc(app_asset_url($promotion['link']), 'attr') ?>" rel="noopener noreferrer">
+                        <?php if ($promotion['image']): ?><img src="<?= esc(app_asset_url($promotion['image']), 'attr') ?>" alt="" loading="lazy" referrerpolicy="no-referrer"><?php endif ?>
+                        <strong><?= esc($promotion['title']) ?></strong>
+                    </a>
+                    <?php endforeach ?>
+                </div>
+            </section>
+            <?php endif ?>
             <section class="banner-carousel" aria-label="Fresh picks and offers" aria-roledescription="carousel" data-banner-carousel>
                 <div class="banner-track" data-banner-track>
                     <a class="deal-hero banner-slide" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="Weekend fresh drop: Steal Rs 9 Deal. Browse products." aria-roledescription="slide" data-banner-slide>

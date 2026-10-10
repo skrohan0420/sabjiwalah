@@ -16,6 +16,7 @@ class HomeController extends BaseController
 
         return view('client/home', [
             'products' => $products,
+            'promotions' => (new \App\Services\PromotionService())->home(),
         ]);
     }
 }

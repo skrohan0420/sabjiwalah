@@ -6,8 +6,7 @@ use App\Models\UserModel;
 
 class AuthService
 {
-    private const OTP_TTL_SECONDS = 600;
-
+    public const SESSION_PROOF_VERSION = 1;
     private UserModel $users;
 
     public function __construct(?UserModel $users = null)
@@ -31,21 +30,10 @@ class AuthService
 
     public function startPhoneOtp(string $phone, ?string $name = null): array
     {
-        $phone = $this->normalizePhone($phone);
+        $phone = OtpService::normalizePhone($phone);
+        $otp = (new OtpService())->start('auth', $phone);
         $user = $this->findByPhone($phone);
-        $code = (string) random_int(100000, 999999);
-        $expiresAt = time() + self::OTP_TTL_SECONDS;
-
-        session()->set('auth_otp', [
-            'phone'      => $phone,
-            'name'       => trim((string) $name),
-            'code'       => $code,
-            'expires_at' => $expiresAt,
-        ]);
-
-        return [
-            'dev_otp'     => $code,
-            'expires_at'  => date(DATE_ATOM, $expiresAt),
+        return $otp + [
             'user_exists' => $user !== null,
             'user_name'   => $user ? (string) ($user['name'] ?? '') : null,
         ];
@@ -53,15 +41,8 @@ class AuthService
 
     public function verifyPhoneOtp(string $phone, string $code, ?string $name = null): bool
     {
-        $phone = $this->normalizePhone($phone);
-        $otp = session('auth_otp');
-
-        if (
-            ! is_array($otp)
-            || time() > (int) ($otp['expires_at'] ?? 0)
-            || $phone !== ($otp['phone'] ?? null)
-            || $code !== (string) ($otp['code'] ?? '')
-        ) {
+        $phone = OtpService::normalizePhone($phone);
+        if (! (new OtpService())->verify('auth', $phone, $code)) {
             return false;
         }
 
@@ -84,7 +65,7 @@ class AuthService
             return false;
         }
 
-        $this->loginUser($user);
+        $this->loginUser($user, 'local_development');
         session()->remove('auth_otp');
 
         return true;
@@ -120,8 +101,11 @@ class AuthService
             'user_phone',
             'user_role',
             'is_logged_in',
+            'auth_proof_version',
+            'auth_method',
             'auth_otp',
             'checkout_otp',
+            'checkout_offer',
         ]);
         session()->regenerate(true);
     }
@@ -194,8 +178,9 @@ class AuthService
             ->first();
     }
 
-    private function loginUser(array $user): void
+    private function loginUser(array $user, string $method = 'password'): void
     {
+        session()->remove(['checkout_otp', 'checkout_offer']);
         session()->regenerate(true);
         session()->set([
             'user_id'       => (int) $user['id'],
@@ -205,6 +190,8 @@ class AuthService
             'user_phone'    => $user['phone'],
             'user_role'     => $user['role'],
             'is_logged_in'  => true,
+            'auth_proof_version' => self::SESSION_PROOF_VERSION,
+            'auth_method' => $method,
         ]);
     }
 

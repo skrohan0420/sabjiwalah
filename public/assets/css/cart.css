@@ -822,3 +822,9 @@ input {
     grid-template-columns: 1fr;
   }
 }
+.checkout-coupon label { display: block; font-weight: 700; margin-bottom: 12px; }
+.checkout-coupon > div { display: flex; flex-wrap: wrap; gap: 10px; }
+.checkout-coupon input { min-width: 0; flex: 1 1 150px; padding: 12px; border: 1px solid #cedbcc; border-radius: 10px; }
+.checkout-coupon button { padding: 12px 18px; border: 0; border-radius: 10px; background: #2c6738; color: white; cursor: pointer; }
+.checkout-coupon button:disabled { opacity: .6; cursor: wait; }
+.checkout-coupon p { margin-bottom: 0; overflow-wrap: anywhere; }

@@ -3,29 +3,30 @@
 namespace App\Controllers\Api\V1\Delivery;
 
 use App\Controllers\Api\V1\BaseApiController;
-use App\Models\DeliveryAssignmentModel;
+use App\Models\DeliveryOrderModel;
 use App\Models\OrderModel;
-use App\Services\OrderService;
+use App\Services\DeliveryOrderService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class OrderController extends BaseApiController
 {
+    public function complete(string $uid)
+    {
+        $this->response->setHeader('Cache-Control','private, no-store');
+        $data=$this->requestData();
+        if (array_diff(array_keys($data),['pin','cash_received']) || !$this->validateData($data,['pin'=>'required|regex_match[/^[0-9]{6}$/]']) || !isset($data['cash_received']) || !is_bool($data['cash_received'])) return $this->validationError(['completion'=>'Enter the six-digit customer PIN and a boolean cash confirmation.']);
+        try {
+            (new \App\Services\DeliveryCompletionService())->complete($uid,(int)session('user_id'),(string)$data['pin'],$data['cash_received']);
+            return $this->success(null,'Delivery completed.');
+        } catch (\OutOfBoundsException $e) { return $this->error('Order not found.',404);
+        } catch (\App\Services\DeliveryVerificationException $e) { return $this->error($e->getMessage(),$e->httpStatus);
+        } catch (\App\Services\OrderConflictException $e) { return $this->error($e->getMessage(),409);
+        } catch (\Throwable) { return $this->error('Unable to confirm delivery. Reload the order before trying again.',503); }
+    }
     public function index()
     {
-        $deliveryUserId = (int) session('user_id');
-        $assignmentRows = (new DeliveryAssignmentModel())
-            ->where('delivery_user_id', $deliveryUserId)
-            ->findAll();
-        $orderIds = array_column($assignmentRows, 'order_id');
-
-        if ($orderIds === []) {
-            return $this->success(['items' => []]);
-        }
-
-        $orders = (new OrderModel())
-            ->whereIn('id', $orderIds)
-            ->orderBy('created_at', 'DESC')
-            ->findAll();
+        $this->response->setHeader('Cache-Control', 'no-store, private');
+        $orders = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), null, true);
 
         return $this->success([
             'items' => array_map(fn (array $order): array => $this->publicOrder($order), $orders),
@@ -34,9 +35,10 @@ class OrderController extends BaseApiController
 
     public function show(string $uid)
     {
-        $order = (new OrderModel())->findByUid($uid);
+        $this->response->setHeader('Cache-Control', 'no-store, private');
+        $order = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
 
-        if (! $order || ! $this->isAssignedToCurrentDeliveryUser((int) $order['id'])) {
+        if (! $order) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
@@ -48,9 +50,10 @@ class OrderController extends BaseApiController
     public function updateStatus(string $uid)
     {
         $orders = new OrderModel();
-        $order = $orders->findByUid($uid);
+        $this->response->setHeader('Cache-Control', 'no-store, private');
+        $order = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
 
-        if (! $order || ! $this->isAssignedToCurrentDeliveryUser((int) $order['id'])) {
+        if (! $order) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
@@ -58,6 +61,7 @@ class OrderController extends BaseApiController
         $rules = [
             'status' => 'required|in_list[out_for_delivery,delivered,delivery_failed]',
             'notes'  => 'permit_empty|max_length[1000]',
+            'expected_status' => 'permit_empty|in_list[ready_for_delivery,out_for_delivery]',
         ];
 
         if (! $this->validateData($data, $rules)) {
@@ -65,12 +69,15 @@ class OrderController extends BaseApiController
         }
 
         try {
-            (new OrderService())->changeStatus(
-                (int) $order['id'],
+            (new DeliveryOrderService())->changeStatus(
+                $uid,
                 (string) $data['status'],
                 (int) session('user_id'),
                 $data['notes'] ?? null,
+                ($data['expected_status'] ?? '') ?: null,
             );
+        } catch (\OutOfBoundsException $exception) {
+            return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         } catch (\App\Services\OrderConflictException $exception) {
             return $this->error($exception->getMessage(), ResponseInterface::HTTP_CONFLICT);
         } catch (\InvalidArgumentException $exception) {
@@ -85,11 +92,4 @@ class OrderController extends BaseApiController
         ], 'Order status updated');
     }
 
-    private function isAssignedToCurrentDeliveryUser(int $orderId): bool
-    {
-        return (new DeliveryAssignmentModel())
-            ->where('order_id', $orderId)
-            ->where('delivery_user_id', (int) session('user_id'))
-            ->first() !== null;
-    }
 }

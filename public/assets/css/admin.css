@@ -28,3 +28,21 @@ html[data-theme="dark"] .admin-body{--admin-bg:var(--theme-bg);--admin-panel:var
 @media(max-width:1200px){.customer-row{grid-template-columns:minmax(140px,1fr) 140px 70px 80px}.customer-row>button{grid-column:1/-1;justify-self:start}}
 @media(max-width:600px){.customer-row{grid-template-columns:1fr 1fr;gap:16px}.customer-row>div:first-child{grid-column:1/-1}.customer-profile,.customer-history-row{grid-template-columns:1fr}.customer-row>div,.customer-profile>div{min-width:0;overflow-wrap:anywhere}}
 .customer-details>.orders-detail-heading{position:sticky;top:0;background:var(--admin-panel);z-index:1;padding:8px 0}
+.rider-row{display:grid;grid-template-columns:minmax(180px,2fr) repeat(4,minmax(80px,1fr)) auto;align-items:center;gap:16px;margin-bottom:12px}
+.rider-row h2{font-size:16px;margin:0}.rider-row strong,.rider-row .admin-caption{display:block}.rider-row>div{min-width:0;overflow-wrap:anywhere}
+.rider-availability-form{display:flex;align-items:end;gap:12px;margin-top:20px}.rider-availability-form .admin-field{flex:1}
+#rider-create-form>.admin-field{margin:18px 0}
+@media(max-width:1100px){.rider-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.rider-row{grid-template-columns:repeat(2,minmax(0,1fr))}.rider-row>div:first-child,.rider-row>button{grid-column:1/-1}.rider-availability-form{align-items:stretch;flex-direction:column}}
+.dispatch-row{display:grid;grid-template-columns:minmax(160px,1.4fr) minmax(140px,1fr) minmax(120px,1fr) auto;align-items:center;gap:18px;margin-bottom:12px;overflow-wrap:anywhere}.dispatch-row a{font-weight:700}.dispatch-row p{margin-top:6px}.dispatch-row .admin-badge{display:block;margin-top:6px;width:fit-content}.dispatch-candidate{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--admin-line)}.dispatch-candidate strong{overflow-wrap:anywhere;min-width:0}
+@media(max-width:1100px){.dispatch-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.dispatch-row{grid-template-columns:1fr}}
+.delivery-record,.cash-record{margin-bottom:16px;overflow-wrap:anywhere;min-width:0}
+.delivery-record .rider-availability-form{flex-wrap:wrap}
+.campaign-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.campaign-record { margin-bottom: 16px; min-width: 0; overflow-wrap: anywhere; }
+.campaign-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.campaign-editor { width: min(640px, calc(100vw - 32px)); }
+.campaign-editor .admin-field { margin-bottom: 16px; min-width: 0; }
+.campaign-editor input, .campaign-editor select { max-width: 100%; }
+@media (max-width: 600px) { .campaign-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }

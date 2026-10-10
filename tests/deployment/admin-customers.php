@@ -8,9 +8,10 @@ require $paths->systemDirectory . '/Boot.php';
 CodeIgniter\Boot::bootConsole($paths);
 service('session');
 session_start();
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1'; config('Otp')->developmentMode = true;
 $db = db_connect();
 if ($db->DBDriver !== 'MySQLi' || $db->DBPrefix !== '') throw new RuntimeException('Use local MySQL without a prefix.');
-foreach (['users', 'orders'] as $table) {
+foreach (['users', 'orders', 'otp_rate_limits'] as $table) {
     $definition = $db->query("SHOW CREATE TABLE {$table}")->getRowArray()['Create Table'];
     $definition = str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $definition);
     $definition = preg_replace('/^\s*CONSTRAINT .* FOREIGN KEY .*\n/m', '', $definition);
@@ -71,6 +72,7 @@ customerCheck(!session('is_logged_in') && !session('auth_otp') && !session('chec
 $auth = new App\Services\AuthService();$otp = $auth->startPhoneOtp('9876543210');
 customerCheck(!$auth->verifyPhoneOtp('9876543210', $otp['dev_otp']), 'Inactive customer logged in.');
 customerAction('updateStatus', ['status' => 'active', 'expected_status' => 'inactive'], $uid);
+$db->table('otp_rate_limits')->set('last_used_at', time()-60)->update();$otp=$auth->startPhoneOtp('9876543210');
 customerCheck($auth->verifyPhoneOtp('9876543210', $otp['dev_otp']), 'Reactivated customer cannot log in.');
 (new App\Services\ActiveSessionService())->validate();customerCheck((bool)session('is_logged_in'), 'Active customer session rejected.');
 $db->table('users')->where('id', $one)->update(['name' => 'Updated fixture name']);

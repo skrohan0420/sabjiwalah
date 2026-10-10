@@ -98,6 +98,7 @@ class CartController extends BaseApiController
     {
         $cart = new CartService();
         $pricing = (new PricingService())->calculateCart($cart->items());
+        $settings = (new \App\Services\OperationalSettingsService())->get();
 
         return [
             'items' => array_map(
@@ -111,6 +112,8 @@ class CartController extends BaseApiController
             ),
             'count'    => $cart->count(),
             'subtotal' => (float) $pricing['subtotal'],
+            'checkout_rules' => ['delivery_charge' => (float)$settings['delivery_charge'],
+                'free_delivery_minimum' => $settings['free_delivery_minimum'] === null ? null : (float)$settings['free_delivery_minimum']],
         ];
     }
 

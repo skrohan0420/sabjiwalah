@@ -46,6 +46,7 @@ class Filters extends BaseFilters
         'apiRole'       => ApiRoleFilter::class,
         'customerSetup' => \App\Filters\CustomerSetupFilter::class,
         'activeSession' => \App\Filters\ActiveSessionFilter::class,
+        'privateResponses' => \App\Filters\PrivateResponseFilter::class,
     ];
 
     /**
@@ -64,10 +65,9 @@ class Filters extends BaseFilters
     public array $required = [
         'before' => [
             'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
         ],
         'after' => [
-            'pagecache',   // Web Page Caching
+            'privateResponses', // Applies even when authorization rejects a request.
             'performance', // Performance Metrics
         ],
     ];

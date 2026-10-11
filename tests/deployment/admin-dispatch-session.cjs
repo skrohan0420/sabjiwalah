@@ -9,10 +9,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=req
 if(PHP_SAPI!=='cli-server'||!in_array($_SERVER['REMOTE_ADDR'],['127.0.0.1','::1'],true))exit;
 header('X-Sabjiwalah-Fixture: ${fixtureToken}');$path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 if($path==='/admin'){header('Location: /admin/dispatch');exit;}if(str_starts_with($path,'/assets/'))return false;
-if(!preg_match('#^/(?:login|delivery|admin/(?:dispatch|orders|delivery-personnel)|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|delivery/orders(?:/[^/]+(?:/status)?)?|admin/(?:dispatch(?:/candidates)?|orders(?:/[^/]+(?:/assignment|/status)?)?|delivery-personnel(?:/[^/]+(?:/status|/availability)?)?)))$#D',$path)){http_response_code(404);exit;}
+if(!preg_match('#^/(?:login|delivery(?:/(?:deliveries|history|profile|orders/[^/]+))?|admin/(?:dispatch|orders|delivery-personnel)|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|delivery/dashboard|delivery/orders(?:/[^/]+(?:/status)?)?|admin/(?:dispatch(?:/candidates)?|orders(?:/[^/]+(?:/assignment|/status)?)?|delivery-personnel(?:/[^/]+(?:/status|/availability)?)?)))$#D',$path)){http_response_code(404);exit;}
 define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);config('Otp')->developmentMode=true;config('App')->baseURL='${base}';
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix');
-$tables=['users','orders','delivery_assignments','delivery_personnel_profiles','order_status_history','order_items','otp_rate_limits'];
+$tables=['delivery_locations','users','orders','delivery_assignments','delivery_personnel_profiles','order_status_history','order_items','otp_rate_limits'];
 foreach($tables as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
 $stateFile=__DIR__.'/state.json';
 if(is_file($stateFile)){$state=json_decode(file_get_contents($stateFile),true);foreach($tables as $table)if($state[$table])$db->table($table)->insertBatch($state[$table]);}
@@ -40,6 +40,8 @@ $app->run();$state=[];foreach($tables as $table)$state[$table]=$db->table($table
     const first=(await competing.find(response=>response.status===200).json()).data;const firstOne=first.rider_uid==='usr_fixture_rider_one',former=firstOne?one:two,current=firstOne?two:one,currentUid=firstOne?'usr_fixture_rider_two':'usr_fixture_rider_one';
     const reassign=await mutate(admin,action,{rider_uid:currentUid,expected_assignment_uid:first.assignment_uid});assert.equal(reassign.status,200);const latest=(await reassign.json()).data;
     assert.equal((await former('api/v1/delivery/orders/ord_fixture_1')).status,404);assert.equal((await mutate(former,'api/v1/delivery/orders/ord_fixture_1/status',{status:'out_for_delivery'},'PATCH')).status,404);
+    const formerDetail=await former('delivery/orders/ord_fixture_1');assert.equal(formerDetail.status,404);assert.ok(!(await formerDetail.text()).includes('Sample Customer'));
+    const currentDetail=await current('delivery/orders/ord_fixture_1');assert.equal(currentDetail.status,200);assert.match(currentDetail.headers.get('cache-control'),/no-store/);
     assert.ok(!(await(await former('api/v1/delivery/orders')).json()).data.items.some(order=>order.uid==='ord_fixture_1'));
     const history=(await(await admin('api/v1/admin/orders/ord_fixture_1')).json()).data;assert.equal(history.assignments.length,2);assert.equal(history.assignments[0].uid,latest.assignment_uid);
     assert.equal((await mutate(admin,'api/v1/admin/orders/ord_fixture_2/assignment',{rider_uid:currentUid,expected_assignment_uid:'none'})).status,409);

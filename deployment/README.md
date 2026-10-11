@@ -264,6 +264,71 @@ shows an unavailable state and prevents confirmation rather than using another
 provider silently. See [Google setup](https://developers.google.com/maps/documentation/javascript/get-api-key)
 and [key restrictions](https://developers.google.com/maps/api-security-best-practices).
 
+### Rider map and driving routes
+
+Order details reuse `maps.googleApiKey` and `maps.googleMapId`. Use a browser key
+restricted to the deployment's exact HTTP referrers and permitted APIs. Enable
+**Maps JavaScript API** and **Routes API**, with billing enabled, for the rider
+map and the current JavaScript Routes library. Add Routes API to the browser
+key's API restrictions; keep the customer picker's Places (New)/Geocoding APIs
+if that picker uses the same key. Do not put a server credential in this setting.
+See [Routes setup](https://developers.google.com/maps/documentation/javascript/routes/start).
+
+The rider map uses saved order coordinates and performs no address geocoding.
+Invalid/missing coordinates retain the address and encoded directions fallback.
+Use HTTPS in production for GPS; localhost is the browser's development exception.
+GPS is a single reading requested by the rider. It is cleared when the page is
+hidden, the assignment becomes terminal, access fails, or the rider clears it.
+These map controls are separate from the explicit delivery-tracking control below.
+
+Driving routes use `Route.computeRoutes` with path, distance and duration fields.
+Requests are manual, non-overlapping and at least 60 seconds apart; the last
+route is reused for five minutes if the origin remains within 100 metres. Cache
+is in page memory only and clears when location is cleared, the destination
+changes, or the page is left.
+Estimates come from Google; route errors retain external navigation/browser
+directions. Configure Google Cloud quotas and billing alerts for deployed usage.
+The map still needs Maps JavaScript API even when external directions work.
+
+### Rider GPS uploads (Phase 5)
+
+Run `php spark migrate` to apply `2026-10-11-000001_CreateDeliveryLocations`.
+On hosts without a console, apply `deployment/add-delivery-locations.sql` once
+through phpMyAdmin instead; preserve existing data. The local development
+migration was applied on 11 October 2026. Hosted deployment is still required.
+
+`POST /api/v1/delivery/location` accepts only the session rider's current
+out-for-delivery order and assignment UID, numeric latitude/longitude, accuracy
+0–100 metres, and a capture timestamp in milliseconds (at most 60 seconds old,
+at most 10 seconds ahead). Recorded/expiry timestamps are server-generated UTC.
+The rider/order locks serialize updates against dispatch/completion; exact
+duplicates are idempotent, older/conflicting updates are rejected, and new
+samples are limited to one every 15 seconds across sessions. No location read
+endpoint is provided in this phase. All mutations require delivery role and CSRF.
+
+Tracking starts only with Enable tracking on the active order detail page.
+Uploads require a visible online page and fresh GPS accurate within 100 metres.
+The client sends after 25 metres of movement or a one-minute heartbeat, at least
+15 seconds apart, and checks current order authorization every 15 seconds while
+tracking. It stops on hidden/offline/departure, access loss, delivery actions,
+assignment/status change or sign out. Returning does not automatically restart.
+It never queues GPS offline or computes a Google route on GPS updates.
+
+One latest record per rider replaces history. Stop tracking clears coordinates
+after any in-flight upload settles; terminal order transitions and reassignment
+clear them inside the business transaction. Logout clears them when storage is
+available. Departure/offline may leave the last server sample until expiry.
+Samples expire after 55 minutes. **Schedule `php spark delivery:prune-locations`
+every five minutes on the hosting server** to enforce physical retention within
+one hour and clear inactive/reassigned samples. It removes up to 1000 expired
+records per run; increase cadence/capacity if the workload exceeds that. This
+repository does not install a hosting cron job. Do not promise the one-hour
+physical retention limit until this job is configured and monitored.
+
+Production requires HTTPS and device location permission. Browser GPS is limited
+to the active visible page; dependable locked-phone/background tracking requires
+a native app. Admin/customer tracking views remain separately approved phases.
+
 The confirmed pin is saved in this browser and prefilled at checkout. Changing
 city, state or postcode detaches the pin; adding a house number keeps it. Existing
 saved coordinate pins remain compatible. Google reverse geocoding provides an

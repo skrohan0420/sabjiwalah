@@ -11,6 +11,24 @@ class DeliveryCompletionModel extends Model
     {
         return $this->db->query($this->db->table($this->table)->where('order_id',$orderId)->getCompiledSelect().' FOR UPDATE')->getRowArray();
     }
+    public function riderToday(int $riderId, string $start, string $end): array
+    {
+        $completed = $this->db->table($this->table)->where('delivery_user_id', $riderId)
+            ->where('verified_at >=', $start)->where('verified_at <', $end)->countAllResults();
+        // Legacy deliveries without a verification record need a recorded completion time.
+        $legacy = $this->db->table('delivery_assignments a')->join('orders o', 'o.id = a.order_id')
+            ->join('delivery_completions c', 'c.order_id = o.id', 'left')
+            ->join('order_status_history h', "h.order_id = o.id AND h.new_status = 'delivered' AND h.changed_by = a.delivery_user_id", 'left')
+            ->where('a.delivery_user_id', $riderId)->where('o.order_status', 'delivered')->where('c.order_id', null)
+            ->where('NOT EXISTS (SELECT 1 FROM delivery_assignments n WHERE n.order_id = a.order_id AND n.id > a.id)', null, false)
+            ->groupStart()->groupStart()->where('a.completed_at >=', $start)->where('a.completed_at <', $end)->groupEnd()
+            ->orGroupStart()->where('a.completed_at', null)->where('h.created_at >=', $start)->where('h.created_at <', $end)->groupEnd()->groupEnd()
+            ->select('COUNT(DISTINCT o.id) AS total', false)->get()->getRowArray();
+        $cash = $this->db->table($this->table)->where('delivery_user_id', $riderId)
+            ->where('collected_at >=', $start)->where('collected_at <', $end)
+            ->select('COALESCE(SUM(cash_amount),0) AS total', false)->get()->getRowArray();
+        return ['completed_today' => $completed + (int) $legacy['total'], 'cod_collected_today' => number_format((float) $cash['total'], 2, '.', '')];
+    }
     public function cashListing(array $filters): array
     {
         $query=$this->db->table('delivery_completions c')->join('orders o','o.id=c.order_id')->join('users u','u.id=c.delivery_user_id')->join('users manager','manager.id=c.reconciled_by','left')->where('c.cash_amount IS NOT NULL',null,false);

@@ -31,6 +31,8 @@ const {spawn}=require('node:child_process'),{randomBytes}=require('node:crypto')
     result=await race('checkout-capacity',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');assert.equal(state.orders.length,before+1);assert.equal(state.orders.filter(r=>r.order_status==='pending').length,1);checks.push('shop order capacity');
     await launch('prepare-checkout','coupon');before=(await launch('state')).orders.length;
     result=await race('checkout-coupon',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');assert.equal(state.orders.length,before+1);assert.equal(state.offer_redemptions.length,1);checks.push('last coupon use');
+    await launch('prepare-availability');result=await race('availability-dispatch',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');const assigned=state.delivery_assignments.some(row=>Number(row.order_id)===100);const profile=state.delivery_personnel_profiles.find(row=>Number(row.user_id)===5);assert.equal(profile.availability,assigned?'available':'offline');checks.push('rider availability versus dispatch');
+    result=await race('availability-stale',2);assert.deepEqual(counts(result),{ok:1,conflict:1});checks.push('rider availability compare-and-set');
     result=await race('otp-phone',8);assert.deepEqual(counts(result),{ok:1,limited:7});checks.push('cross-session phone OTP cooldown');
     // One IP send was consumed above; nineteen additional requests may succeed.
     result=await race('otp-ip',26);assert.deepEqual(counts(result),{ok:19,limited:7});checks.push('shared IP OTP limit');

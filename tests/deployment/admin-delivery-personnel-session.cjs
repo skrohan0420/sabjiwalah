@@ -17,7 +17,7 @@ define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '
 $paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);
 config('Otp')->developmentMode=true;config('App')->baseURL='${base}';
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix');
-foreach(['users','orders','delivery_assignments','delivery_personnel_profiles','otp_rate_limits'] as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
+foreach(['delivery_locations','users','orders','delivery_assignments','delivery_personnel_profiles','otp_rate_limits'] as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
 $stateFile=__DIR__.'/state.json';
 $state=is_file($stateFile)?json_decode(file_get_contents($stateFile),true):['profiles'=>[], 'users'=>[
 ['id'=>1,'uid'=>'usr_fixture_admin','name'=>'Fixture Admin','email'=>null,'phone'=>'9000000001','role'=>'admin','status'=>'active','created_at'=>'2026-10-01 09:00:00'],

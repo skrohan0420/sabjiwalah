@@ -15,6 +15,31 @@ class AdminDeliveryPersonnelService
         return $data;
     }
 
+    /** Reuse dispatch's effective state for the signed-in rider's layout. */
+    public function availabilityFor(string $uid): string
+    {
+        $row = $this->personnel->personnel($uid);
+        if (! $row) return 'offline';
+        $row += $this->personnel->counts([$row['id']])[$row['id']] ?? ['workload' => 0, 'out_for_delivery' => 0, 'completed_deliveries' => 0];
+        return $this->publicPersonnel($row)['availability'];
+    }
+
+    public function availabilityStateFor(string $uid): array
+    {
+        $row = $this->personnel->personnel($uid);
+        if (! $row) throw new \OutOfBoundsException('Delivery account not found.');
+        $row += $this->personnel->counts([$row['id']])[$row['id']] ?? ['workload' => 0, 'out_for_delivery' => 0, 'completed_deliveries' => 0];
+        $state = $this->publicPersonnel($row);
+        return ['availability' => $state['availability'], 'base_availability' => $state['base_availability'], 'can_change_availability' => $row['status'] === 'active' && $row['workload'] === 0];
+    }
+
+    public function changeOwnAvailability(int $riderId, string $value, string $expected): string
+    {
+        $rider = $this->personnel->find($riderId);
+        if (! $rider || $rider['role'] !== 'delivery') return 'missing';
+        return $this->personnel->change($rider['uid'], 'availability', $value, $expected, true);
+    }
+
     public function details(string $uid, int $page, int $perPage, string $mode): ?array
     {
         $row = $this->personnel->personnel($uid);

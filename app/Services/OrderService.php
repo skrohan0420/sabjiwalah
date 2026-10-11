@@ -240,6 +240,7 @@ class OrderService
                 'notes'      => $notes,
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
+            if (in_array($newStatus, ['delivered', 'delivery_failed', 'cancelled'], true)) (new \App\Models\DeliveryLocationModel())->clearOrder($orderId);
             if (! $historyId || ! $db->transStatus() || ! $db->transCommit()) {
                 throw new \RuntimeException('Unable to save order history.');
             }

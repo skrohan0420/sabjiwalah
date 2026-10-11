@@ -45,6 +45,7 @@ class DispatchService
                 $id = $assignments->insert(['order_id' => $order['id'], 'delivery_user_id' => $rider['id'], 'assigned_by' => $actorId, 'assigned_at' => date('Y-m-d H:i:s')]);
                 if (! $id) throw new \RuntimeException('Unable to save assignment');
                 $assignmentUid = $assignments->find($id)['uid'];
+                (new \App\Models\DeliveryLocationModel())->clearOrder((int) $order['id']);
             }
             if (! $db->transStatus() || ! $db->transCommit()) throw new \RuntimeException('Unable to commit assignment');
             return ['order_uid' => $orderUid, 'assignment_uid' => $assignmentUid, 'rider_uid' => $riderUid];

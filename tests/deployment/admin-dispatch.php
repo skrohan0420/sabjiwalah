@@ -5,7 +5,7 @@ require dirname(__DIR__, 2) . '/app/Config/Paths.php'; $paths = new Config\Paths
 CodeIgniter\Boot::bootConsole($paths); service('session'); session_start(); $db = db_connect();
 date_default_timezone_set(config('App')->appTimezone);
 if ($db->DBDriver !== 'MySQLi' || $db->DBPrefix !== '') throw new RuntimeException('Use local MySQL without prefix.');
-foreach (['users','orders','delivery_assignments','delivery_personnel_profiles','order_status_history','order_items','delivery_completions'] as $table) {
+foreach (['delivery_locations','users','orders','delivery_assignments','delivery_personnel_profiles','order_status_history','order_items','delivery_completions'] as $table) {
     $ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table']; $ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl); $ddl=preg_replace('/^\s*CONSTRAINT .* FOREIGN KEY .*\n/m','',$ddl); $db->query(preg_replace('/,\s*\)/',')',$ddl));
 }
 function dispatchCheck(bool $ok, string $message): void { if (!$ok) throw new RuntimeException($message); }
@@ -28,6 +28,8 @@ foreach (['ready_for_delivery','ready_for_delivery','pending','delivered','cance
     $orderIds[]=$orders->skipValidation(true)->insert(['order_number'=>'DISPATCH_'.$i,'user_id'=>$customer,'subtotal'=>100,'total_amount'=>100,'payment_method'=>'cod','payment_status'=>'pending','order_status'=>$status,'customer_name'=>'PRIVATE_CONTACT','customer_phone'=>'9999999999','address_line'=>'PRIVATE_ADDRESS','city'=>'Fixture','postal_code'=>'700001']);
 }
 $uid=$orders->find($orderIds[0])['uid']; $secondUid=$orders->find($orderIds[1])['uid']; $riderUid=$users->find($one)['uid']; $twoUid=$users->find($two)['uid']; session()->set('user_id',$manager);
+$availability = new App\Services\AdminDeliveryPersonnelService();
+dispatchCheck($availability->availabilityFor($riderUid)==='available' && $availability->availabilityFor('usr_missing')==='offline','Layout base availability/fallback failed.');
 [$status,$data]=dispatchAction('index',[],null,['per_page'=>1]);dispatchCheck($status===200&&$data['data']['pager']['total']===3&&count($data['data']['items'])===1,'Queue/status pagination failed.');
 dispatchCheck(!str_contains(json_encode($data),'PRIVATE_CONTACT')&&!str_contains(json_encode($data),'PRIVATE_ADDRESS'),'Dispatch list leaked contact/address.');
 dispatchCheck(dispatchAction('candidates')[1]['data']['pager']['total']===2,'Candidate availability failed.');
@@ -36,6 +38,7 @@ foreach ([[],['rider_uid'=>[$riderUid],'expected_assignment_uid'=>'none'],['ride
 $payload=['rider_uid'=>$riderUid,'expected_assignment_uid'=>'none'];
 foreach ([[$users->find($offline)['uid'],409],[$users->find($customer)['uid'],404],['usr_missing',404]] as [$target,$code]) dispatchCheck(dispatchAction('assign',['rider_uid'=>$target,'expected_assignment_uid'=>'none'],$uid)[0]===$code,'Unavailable/non-rider assignment accepted.');
 [$status,$data]=dispatchAction('assign',$payload,$uid);dispatchCheck($status===200,'Assignment failed: '.json_encode($data));$firstAssignment=$data['data']['assignment_uid'];
+dispatchCheck($availability->availabilityFor($riderUid)==='assigned','Layout did not reflect assignment.');
 dispatchCheck($orders->find($orderIds[0])['order_status']==='ready_for_delivery','Assignment bypassed status flow.');
 dispatchCheck(dispatchAction('assign',$payload,$uid)[0]===409,'Duplicate/stale assignment accepted.');
 dispatchCheck(dispatchAction('assign',$payload,$secondUid)[0]===409,'Rider acquired conflicting workload.');
@@ -51,10 +54,12 @@ dispatchCheck(count(deliveryAction('index',$one,$uid)[1]['data']['items'])===0,'
 dispatchCheck(deliveryAction('show',$two,$uid)[0]===200,'Current rider lost details.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivered'])[0]===400,'Pickup transition bypassed.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'out_for_delivery','expected_status'=>'ready_for_delivery'])[0]===200,'Pickup failed.');
+dispatchCheck($availability->availabilityFor($twoUid)==='busy' && $availability->availabilityFor($riderUid)==='available','Layout busy/former-rider state failed.');
 session()->set('user_id',$manager);dispatchCheck(dispatchAction('assign',['rider_uid'=>$riderUid,'expected_assignment_uid'=>$secondAssignment],$uid)[0]===409,'In-transit reassignment accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'out_for_delivery','expected_status'=>'ready_for_delivery'])[0]===409,'Duplicate pickup accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivered','expected_status'=>'out_for_delivery'])[0]===400,'Unverified delivery accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivery_failed','expected_status'=>'out_for_delivery','notes'=>'Customer unavailable.'])[0]===200,'Failed delivery transition failed.');
+dispatchCheck($availability->availabilityFor($twoUid)==='available','Layout retained busy state after failed delivery.');
 dispatchCheck($db->table('order_status_history')->where('order_id',$orderIds[0])->countAllResults()===2,'Status history missing/duplicated.');
 session()->set('user_id',$manager);
 foreach (array_slice($orderIds,2) as $id) dispatchCheck(dispatchAction('assign',$payload,$orders->find($id)['uid'])[0]===409,'Terminal/non-ready assignment accepted.');

@@ -57,6 +57,10 @@ class AuthController extends BaseApiController
     public function logout()
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
+        if (session('user_role') === 'delivery' && db_connect()->tableExists('delivery_locations')) {
+            try { (new \App\Services\DeliveryLocationService())->stop((int) session('user_id')); }
+            catch (\Throwable) { /* Always allow logout; expiration/pruning handles unavailable storage. */ }
+        }
         (new AuthService())->logout();
 
         return $this->success(null, 'Logout successful');

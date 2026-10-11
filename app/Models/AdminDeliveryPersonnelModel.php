@@ -78,8 +78,9 @@ class AdminDeliveryPersonnelModel extends UserModel
         } catch (\Throwable $exception) { $this->db->transRollback(); throw $exception; }
     }
 
-    public function change(string $uid, string $field, string $value, string $expected): string
+    public function change(string $uid, string $field, string $value, string $expected, bool $selfService = false): string
     {
+        if ($selfService && ($field !== 'availability' || ! in_array($value, ['available', 'unavailable', 'offline'], true) || ! in_array($expected, ['available', 'unavailable', 'offline'], true))) throw new \InvalidArgumentException('Invalid availability control.');
         if (! $this->db->transBegin()) throw new \RuntimeException('Unable to begin account transaction');
         try {
             $user = $this->db->query('SELECT id, status FROM users WHERE uid = ? AND role = ? FOR UPDATE', [$uid, 'delivery'])->getRowArray();
@@ -89,6 +90,8 @@ class AdminDeliveryPersonnelModel extends UserModel
                 $observed = $field === 'status' ? $user['status'] : ($profile['availability'] ?? 'offline');
                 $result = $observed !== $expected ? 'conflict' : 'unchanged';
                 if ($field === 'availability' && $user['status'] !== 'active') $result = 'inactive';
+                // Dispatch locks this same user before assigning. Never override an active workload.
+                if ($selfService && $result !== 'inactive' && ($this->counts([$user['id']])[$user['id']]['workload'] ?? 0) > 0) $result = 'assigned';
                 if ($result === 'unchanged' && $value !== $observed) {
                     if ($field === 'status' && ! $this->db->table('users')->where('id', $user['id'])->update(['status' => $value, 'updated_at' => date('Y-m-d H:i:s')])) throw new \RuntimeException('Account update failed');
                     if ($field === 'availability' || $value === 'inactive') {

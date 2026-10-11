@@ -4,7 +4,6 @@ namespace App\Controllers\Api\V1\Delivery;
 
 use App\Controllers\Api\V1\BaseApiController;
 use App\Models\DeliveryOrderModel;
-use App\Models\OrderModel;
 use App\Services\DeliveryOrderService;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -29,7 +28,7 @@ class OrderController extends BaseApiController
         $orders = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), null, true);
 
         return $this->success([
-            'items' => array_map(fn (array $order): array => $this->publicOrder($order), $orders),
+            'items' => array_map(fn (array $order): array => $this->riderOrder($order), $orders),
         ]);
     }
 
@@ -42,14 +41,15 @@ class OrderController extends BaseApiController
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
         }
 
-        return $this->success([
-            'order' => $this->publicOrder($order),
-        ]);
+        $items = (new \App\Models\OrderItemModel())->select('product_name, unit, quantity, unit_price, total_price')->where('order_id', $order['id'])->orderBy('id', 'ASC')->findAll();
+        $history = (new \App\Models\OrderStatusHistoryModel())->select('new_status, created_at')->where('order_id', $order['id'])->orderBy('id', 'ASC')->findAll();
+        foreach ($history as &$entry) { $entry['occurred_at'] = $this->timestamp($entry['created_at']); unset($entry['created_at']); }
+        unset($entry);
+        return $this->success(['order' => $this->riderOrder($order), 'items' => $items, 'history' => $history]);
     }
 
     public function updateStatus(string $uid)
     {
-        $orders = new OrderModel();
         $this->response->setHeader('Cache-Control', 'no-store, private');
         $order = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
 
@@ -58,6 +58,8 @@ class OrderController extends BaseApiController
         }
 
         $data = $this->requestData();
+        if (array_diff(array_keys($data), ['status', 'notes', 'expected_status'])) return $this->validationError(['order' => 'Only status, notes and expected status may be supplied.']);
+        foreach (['status', 'notes', 'expected_status'] as $field) if (isset($data[$field]) && ! is_string($data[$field])) return $this->validationError([$field => 'Must be text.']);
         $rules = [
             'status' => 'required|in_list[out_for_delivery,delivered,delivery_failed]',
             'notes'  => 'permit_empty|max_length[1000]',
@@ -87,9 +89,21 @@ class OrderController extends BaseApiController
             return $this->error('Unable to update this order. Please try again.', ResponseInterface::HTTP_SERVICE_UNAVAILABLE);
         }
 
-        return $this->success([
-            'order' => $this->publicOrder($orders->find((int) $order['id'])),
-        ], 'Order status updated');
+        $current = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
+        return $this->success(['order' => $current ? $this->riderOrder($current) : null], 'Order status updated');
+    }
+
+    private function riderOrder(array $order): array
+    {
+        $result = $this->publicOrder($order);
+        $result['assignment_uid'] = $order['assignment_uid'] ?? null;
+        foreach (['created_at', 'updated_at', 'assigned_at', 'completed_at'] as $key) $result[$key] = $this->timestamp($order[$key] ?? null);
+        return $result;
+    }
+
+    private function timestamp(?string $value): ?string
+    {
+        return $value ? (new \DateTimeImmutable($value, new \DateTimeZone(config('App')->appTimezone)))->format(DATE_ATOM) : null;
     }
 
 }

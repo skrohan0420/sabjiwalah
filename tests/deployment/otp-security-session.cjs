@@ -16,7 +16,7 @@ define('ENVIRONMENT','${production?'production':'development'}');define('FCPATH'
 // it verifies production OTP behavior, not TLS transport. Application deployment settings are untouched.
 if(ENVIRONMENT==='production'){if(!in_array(config('Database')->local['hostname'],['localhost','127.0.0.1','::1'],true))throw new RuntimeException('A local fixture database is required.');config('Database')->default=config('Database')->local;config('App')->forceGlobalSecureRequests=false;$_SERVER['HTTPS']='on';}
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix.');
-$tables=['users','otp_rate_limits','operational_settings','operational_setting_history'];
+$tables=['delivery_locations','users','otp_rate_limits','operational_settings','operational_setting_history'];
 foreach($tables as$table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
 $file=__DIR__.'/state.json';if(is_file($file)){$state=json_decode(file_get_contents($file),true);foreach($tables as$table)if($state[$table])$db->table($table)->insertBatch($state[$table]);}
 else{$db->table('users')->insertBatch([

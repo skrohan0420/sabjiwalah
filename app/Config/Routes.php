@@ -33,6 +33,10 @@ $routes->group('admin', ['filter' => 'role:admin'], static function (RouteCollec
 
 $routes->group('delivery', ['filter' => 'role:delivery'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Delivery\DashboardController::index');
+    $routes->get('deliveries', 'Delivery\DashboardController::deliveries');
+    $routes->get('orders/(:segment)', 'Delivery\DashboardController::order/$1');
+    $routes->get('history', 'Delivery\DashboardController::history');
+    $routes->get('profile', 'Delivery\DashboardController::profile');
 });
 
 $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static function (RouteCollection $routes): void {
@@ -105,6 +109,10 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     });
 
     $routes->group('delivery', ['namespace' => 'App\Controllers\Api\V1\Delivery', 'filter' => 'apiRole:delivery'], static function (RouteCollection $routes): void {
+        $routes->post('location', 'LocationController::create');
+        $routes->delete('location', 'LocationController::stop');
+        $routes->get('dashboard', 'DashboardController::show');
+        $routes->patch('availability', 'DashboardController::updateAvailability');
         $routes->post('orders/(:segment)/complete', 'OrderController::complete/$1');
         $routes->get('orders', 'OrderController::index');
         $routes->get('orders/(:segment)', 'OrderController::show/$1');

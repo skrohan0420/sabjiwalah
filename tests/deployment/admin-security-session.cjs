@@ -19,6 +19,7 @@ foreach(['admin','customer','customer','delivery','delivery'] as$i=>$role)$db->t
 $db->table('products')->insert(['id'=>1,'uid'=>'prd_security','name'=>'Sample product','slug'=>'sample-security','price'=>10,'unit'=>'kg','stock_quantity'=>1,'is_active'=>1]);
 $db->table('orders')->insert(['id'=>1,'uid'=>'ord_security','order_number'=>'SW-SECURITY','user_id'=>2,'subtotal'=>10,'total_amount'=>50,'order_status'=>'out_for_delivery','customer_name'=>'Sample Person','customer_phone'=>'9000000002','address_line'=>'Sample','city'=>'Sample','postal_code'=>'700001','created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')]);
 $db->table('delivery_assignments')->insert(['id'=>1,'uid'=>'das_security','order_id'=>1,'delivery_user_id'=>4,'assigned_by'=>1,'assigned_at'=>date('Y-m-d H:i:s')]);
+$db->table('order_items')->insert(['id'=>1,'uid'=>'itm_security','order_id'=>1,'product_id'=>1,'product_name'=>'Sample product','unit'=>'kg','quantity'=>2,'unit_price'=>25,'total_price'=>50]);
 $completed=$db->table('orders')->where('id',1)->get()->getRowArray();$completed['id']=2;$completed['uid']='ord_security_completed';$completed['order_number']='SW-SECURITY-COMPLETED';$completed['order_status']='delivered';$db->table('orders')->insert($completed);
 $db->table('delivery_assignments')->insert(['id'=>2,'uid'=>'das_security_completed','order_id'=>2,'delivery_user_id'=>4,'assigned_by'=>1,'assigned_at'=>date('Y-m-d H:i:s')]);
 $db->table('operational_settings')->insert(['id'=>1,'shop_open'=>1,'orders_paused'=>0,'delivery_charge'=>40,'free_delivery_minimum'=>499,'minimum_order_amount'=>0,'revision'=>1,'updated_at'=>date('Y-m-d H:i:s')]);
@@ -36,6 +37,37 @@ $app->run();$after=hash('sha256',json_encode([$db->table('users')->get()->getRes
     let ready=false;for(let i=0;i<40;i++){try{const r=await fetch(base+'api/v1/csrf');if(r.headers.get('x-sabjiwalah-fixture')===token){ready=true;break;}}catch{}if(server.exitCode!==null)break;await new Promise(r=>setTimeout(r,100));}assert.ok(ready,diagnostics);
     if(!preview){
     const guest=client(),customer=client(),rider=client(),admin=client(),other=client();await seed(customer,2);await seed(rider,4);await seed(admin,1);await seed(other,3);
+    for(const [page,label] of [['delivery','Home'],['delivery/deliveries','Deliveries'],['delivery/history','History'],['delivery/profile','Profile']]){
+      for(const who of [guest,customer,admin]){const denied=await who(page);assert.equal(denied.status,302,'Delivery page allowed another role: '+page);privateResponse(denied);}
+      const allowed=await rider(page);assert.equal(allowed.status,200,await allowed.clone().text());privateResponse(allowed);
+      const html=await allowed.text();assert.match(html,/aria-label="Delivery navigation"/);assert.ok(html.includes('aria-current="page">'+label+'</a>'),'Incorrect active navigation: '+page);
+      assert.match(html,/Signed in as <strong id="delivery-rider-name">Sample Person 4<\/strong>/);assert.match(html,/id="delivery-logout"/);
+      assert.match(html,/Availability: <strong id="delivery-availability-value">Busy<\/strong>/);
+      assert.ok(!html.includes('assets/css/admin.css'),'Delivery layout depends on admin styling');
+      for(const id of ['delivery-network','delivery-progress','delivery-toast','delivery-confirm'])assert.ok(html.includes('id="'+id+'"'),'Missing shared delivery component: '+id);
+      assert.equal(html.includes('delivery-completion.js'),label==='Deliveries','Completion script loaded in wrong section');
+      if(label==='Deliveries')for(const id of ['delivery-list','delivery-message','delivery-refresh','delivery-count'])assert.ok(html.includes('id="'+id+'"'),'Missing delivery workflow element: '+id);
+    }
+    for(const [who,status] of [[guest,401],[customer,403],[admin,403]]){const denied=await who('api/v1/delivery/dashboard');assert.equal(denied.status,status);privateResponse(denied);}
+    const dashboard=await rider('api/v1/delivery/dashboard');assert.equal(dashboard.status,200,await dashboard.clone().text());privateResponse(dashboard);
+    const riderSnapshot=(await dashboard.json()).data;assert.equal(riderSnapshot.active_count,1);assert.equal(riderSnapshot.availability,'busy');assert.equal(riderSnapshot.rider_name,'Sample Person 4');assert.equal(riderSnapshot.active_order.order_number,'SW-SECURITY');
+    assert.ok(!JSON.stringify(riderSnapshot).includes('customer_phone')&&!JSON.stringify(riderSnapshot).includes('pin_hash'));
+    assert.equal((await rider('api/v1/delivery/dashboard?rider_id=5')).status,422);
+    assert.equal((await mutate(rider,'api/v1/delivery/dashboard',{})).status,404);
+    for(const who of [guest,customer,admin]){const denied=await who('delivery/orders/ord_security');assert.equal(denied.status,302);privateResponse(denied);}
+    const detailPage=await rider('delivery/orders/ord_security');assert.equal(detailPage.status,200);privateResponse(detailPage);assert.match(await detailPage.text(),/data-order-uid="ord_security"/);
+    const detail=await rider('api/v1/delivery/orders/ord_security');assert.equal(detail.status,200);privateResponse(detail);const detailData=(await detail.json()).data;assert.equal(detailData.items[0].product_name,'Sample product');assert.equal(Number(detailData.items[0].quantity),2);assert.match(detailData.order.assigned_at,/T.*[+Z]/);assert.ok(!('order_id' in detailData.items[0])&&!('product_id' in detailData.items[0]));
+    assert.equal((await rider('delivery/orders/missing')).status,404);
+    assert.equal((await mutate(rider,'api/v1/delivery/orders/ord_security/status',{status:'delivery_failed',notes:'Fixture',rider_id:5},'PATCH')).status,422);
+    assert.equal((await mutate(rider,'api/v1/delivery/orders/ord_security/status',{status:['out_for_delivery']},'PATCH')).status,422);
+    for(const [who,status] of [[guest,401],[customer,403],[admin,403]]){const denied=await mutate(who,'api/v1/delivery/availability',{availability:'available',expected_availability:'offline'},'PATCH');assert.equal(denied.status,status);privateResponse(denied);}
+    assert.equal(riderSnapshot.can_change_availability,false);assert.equal(riderSnapshot.base_availability,'offline');
+    const blocked=await mutate(rider,'api/v1/delivery/availability',{availability:'available',expected_availability:'offline'},'PATCH');assert.equal(blocked.status,409);privateResponse(blocked);
+    for(const body of [{availability:'busy',expected_availability:'offline'},{availability:'available',expected_availability:'offline',rider_id:5},{availability:['available'],expected_availability:'offline'},{}])assert.equal((await mutate(rider,'api/v1/delivery/availability',body,'PATCH')).status,422);
+    assert.equal((await rider('api/v1/delivery/availability',{method:'PATCH',headers:{'Content-Type':'application/json'},body:'{"availability":"available","expected_availability":"offline"}'})).status,403);
+    assert.equal((await mutate(rider,'api/v1/delivery/availability?rider_id=5',{availability:'available',expected_availability:'offline'},'PATCH')).status,422);
+    for(const method of ['POST','PUT','DELETE'])assert.equal((await mutate(rider,'api/v1/delivery/availability',{},method)).status,404);
+    const idleRider=client();await seed(idleRider,5);const updatedAvailability=await mutate(idleRider,'api/v1/delivery/availability',{availability:'available',expected_availability:'offline'},'PATCH');assert.equal(updatedAvailability.status,200,await updatedAvailability.clone().text());privateResponse(updatedAvailability);assert.equal((await updatedAvailability.json()).data.base_availability,'available');
     const source=await fs.readFile(path.join(root,'app/Config/Routes.php'),'utf8');
     const group=source.split("$routes->group('admin', ['namespace' => 'App\\Controllers\\Api\\V1\\Admin'")[1].split("$routes->group('delivery'")[0];
     const routes=[...group.matchAll(/\$routes->(get|post|put|patch|delete)\('([^']+)'/g)].map(m=>[m[1].toUpperCase(),'api/v1/admin/'+m[2].replaceAll('(:segment)','fixture_unknown')]);assert.ok(routes.length>=30);
@@ -53,6 +85,7 @@ $app->run();$after=hash('sha256',json_encode([$db->table('users')->get()->getRes
     for(const who of [guest,customer,rider]){const csrf=(await(await who('api/v1/csrf')).json()).data,body=new FormData();body.append('image',new Blob([png],{type:'image/png'}),'sample.png');const r=await who('api/v1/admin/products/prd_security/image',{method:'POST',headers:{[csrf.header_name]:csrf.token_value},body});assert.equal(r.status,who===guest?401:403);privateResponse(r);}
     assert.equal((await mutate(other,'api/v1/orders/ord_security/delivery-pin')).status,404,'Another customer accessed the delivery PIN.');
     const otherRider=client();await seed(otherRider,5);assert.equal((await otherRider('api/v1/delivery/orders/ord_security')).status,404);
+    const deniedDetail=await otherRider('delivery/orders/ord_security');assert.equal(deniedDetail.status,404);privateResponse(deniedDetail);assert.ok(!(await deniedDetail.text()).includes('Sample Person'));
     assert.equal((await mutate(otherRider,'api/v1/delivery/orders/ord_security/status',{status:'delivery_failed',notes:'Injected'},'PATCH')).status,404);
     assert.equal((await mutate(otherRider,'api/v1/delivery/orders/ord_security/complete',{pin:'123456',cash_received:true})).status,404);
     assert.equal((await rider('api/v1/delivery/orders/ord_security')).status,200);

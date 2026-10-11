@@ -48,7 +48,7 @@ if ($action === 'setup') {
     echo json_encode(['ok'=>true]); exit;
 }
 if ($action === 'state') {
-    $state=[]; foreach (['orders','products','order_status_history','delivery_assignments','offer_redemptions','operational_setting_history','otp_rate_limits'] as $table) $state[$table]=$db->table($table)->get()->getResultArray();
+    $state=[]; foreach (['orders','products','order_status_history','delivery_assignments','delivery_personnel_profiles','offer_redemptions','operational_setting_history','otp_rate_limits'] as $table) $state[$table]=$db->table($table)->get()->getResultArray();
     echo json_encode($state); exit;
 }
 if ($action === 'prepare-checkout') {
@@ -62,6 +62,12 @@ if ($action === 'prepare-dispatch') {
     echo json_encode(['ok'=>true]); exit;
 }
 // Each worker uses a distinct session and connection; a file barrier starts actual overlapping calls.
+if ($action === 'prepare-availability') {
+    $db->table('orders')->where('id >',0)->update(['order_status'=>'delivered']);
+    $db->table('delivery_personnel_profiles')->whereIn('user_id',[4,5])->update(['availability'=>'available']);
+    $order=$db->table('orders')->where('id',4)->get()->getRowArray();$order['id']=100;$order['uid']='ord_concurrent_availability';$order['order_number']='SW-AVAILABILITY';$order['order_status']='ready_for_delivery';$db->table('orders')->insert($order);
+    echo json_encode(['ok'=>true]); exit;
+}
 $worker=(int)($argv[4]??0); $_SERVER['REMOTE_ADDR']='127.0.0.1'; config('Otp')->developmentMode=true;
 service('session'); session_id('concurrent'.$action.$worker); session_start();
 session()->set(['user_id'=>$worker%2===0?2:3,'user_role'=>'customer','is_logged_in'=>true]);
@@ -77,6 +83,11 @@ try {
     if ($action==='status') (new App\Services\OrderService())->changeStatus(1,$worker===0?'confirmed':'cancelled',$worker===0?1:6,'Concurrent fixture','pending');
     elseif ($action==='dispatch-capacity') (new App\Services\DispatchService())->assign('ord_concurrent_'.($worker+2),'usr_concurrent_4','none',$worker===0?1:6);
     elseif ($action==='dispatch-same') (new App\Services\DispatchService())->assign('ord_concurrent_4','usr_concurrent_'.($worker===0?4:5),'none',$worker===0?1:6);
+    elseif ($action==='availability-dispatch') {
+        if ($worker===0) (new App\Services\DispatchService())->assign('ord_concurrent_availability','usr_concurrent_5','none',1);
+        else { $changed=(new App\Services\AdminDeliveryPersonnelService())->changeOwnAvailability(5,'offline','available');if($changed!=='changed')throw new App\Services\OrderConflictException($changed); }
+    }
+    elseif ($action==='availability-stale') { $changed=(new App\Services\AdminDeliveryPersonnelService())->changeOwnAvailability(4,$worker===0?'offline':'unavailable','available');if($changed!=='changed')throw new App\Services\OrderConflictException($changed); }
     elseif ($action==='otp-phone') (new App\Services\OtpService())->start('auth','9000000100');
     elseif ($action==='otp-ip') (new App\Services\OtpService())->start('auth','9000001'.str_pad((string)$worker,3,'0',STR_PAD_LEFT));
     elseif (str_starts_with($action,'checkout-')) {

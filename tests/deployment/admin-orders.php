@@ -8,7 +8,7 @@ require $paths->systemDirectory . '/Boot.php';
 CodeIgniter\Boot::bootConsole($paths);
 $db = db_connect();
 if ($db->DBDriver !== 'MySQLi' || $db->DBPrefix !== '') throw new RuntimeException('Use local MySQL without a prefix.');
-foreach (['orders', 'order_items', 'order_status_history', 'delivery_assignments', 'users', 'delivery_completions'] as $table) {
+foreach (['delivery_locations','orders', 'order_items', 'order_status_history', 'delivery_assignments', 'users', 'delivery_completions'] as $table) {
     $definition = $db->query("SHOW CREATE TABLE {$table}")->getRowArray()['Create Table'];
     $definition = str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $definition);
     // MySQL temporary tables do not support foreign keys; preserve columns and indexes.

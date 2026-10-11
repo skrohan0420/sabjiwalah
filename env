@@ -39,3 +39,4 @@ maps.googleMapId = 'DEMO_MAP_ID'
 # Opt in only for localhost development OTP testing. Production and remote requests are denied.
 # Keep false on deployments; connect a real SMS verification provider before production login.
 otp.developmentMode = false
+otp.previewDevelopmentMode = false

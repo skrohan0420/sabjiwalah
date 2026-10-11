@@ -127,12 +127,22 @@ For local testing, use `CI_ENVIRONMENT = development` and explicitly set
 `otp.developmentMode = true` in the local `.env`, then open the local `/login`
 page. Use an existing active administrator's phone number to enter the admin
 panel; new phone numbers register as customers. The form displays the testing
-OTP only when the request's direct address and Host are loopback, with no
+OTP by default only when the request's direct address and Host are loopback, with no
 forwarding headers. Localhost, 127.0.0.1 and IPv6 loopback are accepted; public
 Host values and Forwarded/X-Forwarded-*/X-Real-IP headers deny testing codes.
 Keep the setting false on deployments. Do not expose opted-in development
 through a proxy/tunnel that strips forwarding headers and rewrites Host to
 localhost; such traffic cannot be distinguished from a direct local client.
+
+Temporary ngrok testing can explicitly set `otp.previewDevelopmentMode = true`
+alongside `otp.developmentMode = true`. In development only, requests from the
+local tunnel agent with the exact HTTPS host in `app.previewBaseURL` may display
+testing OTPs despite forwarding headers. This permits login to active admin and
+rider accounts as well as customer accounts for anyone with the preview link.
+Set `otp.previewDevelopmentMode = false` when testing ends. Production always
+rejects testing OTPs even with both flags enabled. Existing cooldowns, attempt
+limits, CSRF and account authorization remain enforced; tunnel users share the
+local agent's IP budget.
 
 Before deploying the code, run `php spark migrate` to create `otp_rate_limits`.
 For hosts without a terminal, import an up-to-date migrated schema using the

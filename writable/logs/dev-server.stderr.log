@@ -1,0 +1,27 @@
+PHP Warning:  Module "openssl" is already loaded in Unknown on line 0
+[Sun Oct 11 13:02:08 2026] PHP Warning:  Module "openssl" is already loaded in Unknown on line 0
+[Sun Oct 11 13:02:08 2026] PHP 8.2.12 Development Server (http://localhost:8080) started
+[Sun Oct 11 13:02:11 2026] [::1]:50587 Accepted
+[Sun Oct 11 13:02:17 2026] [::1]:50587 Closing
+[Sun Oct 11 13:02:41 2026] [::1]:58040 Accepted
+[Sun Oct 11 13:02:41 2026] [::1]:58040 Closing
+[Sun Oct 11 13:02:41 2026] [::1]:58041 Accepted
+[Sun Oct 11 13:02:45 2026] [::1]:58041 Closing
+[Sun Oct 11 13:03:08 2026] [::1]:51954 Accepted
+[Sun Oct 11 13:03:12 2026] [::1]:51954 Closing
+[Sun Oct 11 13:03:12 2026] [::1]:55049 Accepted
+[Sun Oct 11 13:03:12 2026] [::1]:57923 Accepted
+[Sun Oct 11 13:03:16 2026] [::1]:55049 Closing
+[Sun Oct 11 13:03:16 2026] [::1]:57925 Accepted
+[Sun Oct 11 13:03:21 2026] [::1]:57923 Closing
+[Sun Oct 11 13:03:21 2026] [::1]:64471 Accepted
+[Sun Oct 11 13:03:25 2026] [::1]:57925 Closing
+[Sun Oct 11 13:03:25 2026] [::1]:58565 Accepted
+[Sun Oct 11 13:03:29 2026] [::1]:64471 Closing
+[Sun Oct 11 13:03:29 2026] [::1]:62462 Accepted
+[Sun Oct 11 13:03:33 2026] [::1]:58565 Closing
+[Sun Oct 11 13:03:33 2026] [::1]:63600 Accepted
+[Sun Oct 11 13:03:37 2026] [::1]:63600 Closing
+[Sun Oct 11 13:03:37 2026] [::1]:59029 Accepted
+[Sun Oct 11 13:03:37 2026] [::1]:59029 [200]: GET /favicon.ico?v=6066d5bddf5f
+[Sun Oct 11 13:03:37 2026] [::1]:59029 Closing

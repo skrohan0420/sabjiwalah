@@ -1,0 +1,19 @@
+t=2026-10-11T13:02:05+0530 lvl=info msg="no configuration paths supplied"
+t=2026-10-11T13:02:05+0530 lvl=info msg="using configuration at default config path" path=C:\\Users\\Rohan\\AppData\\Local/ngrok/ngrok.yml
+t=2026-10-11T13:02:05+0530 lvl=info msg="open config file" path=C:\\Users\\Rohan\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+t=2026-10-11T13:02:05+0530 lvl=info msg="FIPS 140 mode" enabled=false
+t=2026-10-11T13:02:06+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2026-10-11T13:02:06+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-10-11T13:02:06+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-10-11T13:02:06+0530 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:8080 url=https://cristine-nonsubordinate-stevie.ngrok-free.dev
+t=2026-10-11T13:02:06+0530 lvl=info msg="update available" obj=updater
+t=2026-10-11T13:02:12+0530 lvl=info msg=start pg=/api/tunnels id=8301b662f737a977
+t=2026-10-11T13:02:12+0530 lvl=info msg=end pg=/api/tunnels id=8301b662f737a977 status=200 dur=0s
+t=2026-10-11T13:02:41+0530 lvl=info msg="join connections" obj=join id=ef438c5f3121 l=[::1]:8080 r=152.56.156.124:58039
+t=2026-10-11T13:03:08+0530 lvl=info msg="join connections" obj=join id=32325052869f l=[::1]:8080 r=152.56.156.124:52627
+t=2026-10-11T13:03:10+0530 lvl=info msg="join connections" obj=join id=1f04070768a8 l=[::1]:8080 r=152.56.156.124:55048
+t=2026-10-11T13:03:12+0530 lvl=info msg="join connections" obj=join id=8ca7e5e3fab6 l=[::1]:8080 r=152.56.156.124:57922
+t=2026-10-11T13:03:13+0530 lvl=info msg="join connections" obj=join id=275373dedec7 l=[::1]:8080 r=152.56.156.124:57922
+t=2026-10-11T13:03:18+0530 lvl=info msg="join connections" obj=join id=5036cf3a947b l=[::1]:8080 r=152.56.156.124:64470
+t=2026-10-11T13:03:20+0530 lvl=info msg="join connections" obj=join id=01676fff26a5 l=[::1]:8080 r=152.56.156.124:58564
+t=2026-10-11T13:03:34+0530 lvl=info msg="join connections" obj=join id=494426cfb793 l=[::1]:8080 r=152.56.156.124:58564

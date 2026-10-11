@@ -31,15 +31,26 @@ class OtpService
     {
         $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
         $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        if (ENVIRONMENT !== 'development' || ! config('Otp')->developmentMode
+            || ! in_array($ip, ['127.0.0.1', '::1', '::ffff:127.0.0.1'], true)) {
+            throw new OtpUnavailableException();
+        }
+        $preview = parse_url(trim(config('App')->previewBaseURL));
+        if (config('Otp')->previewDevelopmentMode && is_array($preview)
+            && ($preview['scheme'] ?? '') === 'https' && ! empty($preview['host'])
+            && ! isset($preview['user']) && ! isset($preview['pass'])
+            && ! isset($preview['query']) && ! isset($preview['fragment'])
+            && (! isset($preview['port']) || $preview['port'] === 443)
+            && in_array(strtolower($host), [strtolower($preview['host']), strtolower($preview['host']) . ':443'], true)) {
+            return $ip;
+        }
         $localHost = preg_match('/^(?:localhost|127\.0\.0\.1|\[::1\])(?::[0-9]{1,5})?$/iD', $host) === 1;
         // A tunnel/proxy often connects from loopback. Its headers or public hostname must not
         // turn a remote requester into an administrator through a displayed testing code.
         foreach (['HTTP_FORWARDED','HTTP_X_FORWARDED_FOR','HTTP_X_FORWARDED_HOST','HTTP_X_FORWARDED_PROTO','HTTP_X_REAL_IP'] as $header) {
             if (trim((string) ($_SERVER[$header] ?? '')) !== '') throw new OtpUnavailableException();
         }
-        if (ENVIRONMENT !== 'development' || ! config('Otp')->developmentMode
-            || ($host !== '' && !$localHost) || (PHP_SAPI !== 'cli' && !$localHost)
-            || ! in_array($ip, ['127.0.0.1', '::1', '::ffff:127.0.0.1'], true)) {
+        if (($host !== '' && !$localHost) || (PHP_SAPI !== 'cli' && !$localHost)) {
             throw new OtpUnavailableException();
         }
         return $ip;

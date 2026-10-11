@@ -26,9 +26,32 @@ $testFiles = @(Get-ChildItem tests/frontend -Filter '*.test.cjs' | ForEach-Objec
 node --test @testFiles
 ```
 
-There are 117 frontend checks for safe rendering, authorization failures, polling,
+There are 145 frontend checks for safe rendering, authorization failures, polling,
 stale responses, drafts/conflicts, uncertain writes, checkout, OTP overlap and
 customer navigation/location/theme behavior.
+
+Customer tracking verification: `php tests/deployment/customer-tracking.php` checks
+every status, active ownership/IDOR, latest partner, actual timestamps and tracking
+privacy on temporary SQL. `node tests/deployment/delivery-pin-session.cjs` checks
+customer API/page roles, ownership, private caching, missing orders and delivered
+progress alongside PIN/completion/CSRF regressions. Its `--preview` uses disposable
+customer phone `9000000010` on port 8771. Frontend checks cover controlled polling,
+offline/hidden cancellation, failures, terminal stop, authorization clearing,
+safe rendering and PIN clearing with late response rejection.
+
+Phase 8 extends `delivery-completion.php` with remaining attempt-wait metadata and
+API `Retry-After` checks. Frontend completion tests verify six-digit input, full COD
+confirmation, unpaid prepaid rejection, expired PIN recovery, lockout preservation
+on refresh and confirmed preset/custom failure reasons. Existing HTTP PIN/completion
+tests still exercise ownership, CSRF, duplicate completion and server cash validation.
+
+Phase 9: `php tests/deployment/delivery-history.php` verifies terminal history,
+reassigned riders, one summary per order/rider, real completion/cash credit,
+status/search/date filters, pagination, India day boundaries, strict query
+validation and private data exclusion. The PIN HTTP runner also verifies
+history/profile roles, session scope, private caching and post-completion totals.
+Frontend history/profile tests cover filters, stale responses, bounded requests,
+page navigation, active-page cleanup, authorization loss and safe profile rendering.
 
 Delivery foundation verification uses `node tests/deployment/admin-security-session.cjs`
 for all four protected delivery pages, navigation, availability, shared components,
@@ -157,3 +180,12 @@ business requests. Hosted acceptance remains a separate deployment step; see
 `deployment/README.md`. The complete regression set also includes dashboard,
 products, orders, customers, personnel, campaigns, dispatch, PIN/completion,
 checkout-offer and operational-settings runners.
+
+Phase 11 audit: 138 frontend tests after removal of the eight PWA tests and PHPUnit's 24 tests / 32 assertions passed.
+The independent MySQL concurrency runner now covers 17 scenarios, including
+delivery completion/cash, PIN attempt limits, GPS duplicates/conflicts and pickup
+versus reassignment. Run `php tests/deployment/delivery-performance.php` for
+temporary-table query-growth/index checks. The location fixture verifies expiry
+cleanup beyond a single 1,000-row batch. Final results, browser evidence and
+unexecuted hosted/device checks are in
+`deployment/delivery-implementation-report.md`.

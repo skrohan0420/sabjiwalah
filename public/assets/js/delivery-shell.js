@@ -38,7 +38,8 @@
       try { data = await response.json(); }
       catch { throw Object.assign(new Error('Unexpected server response. Refresh before trying again.'), { status: response.ok ? undefined : response.status }); }
       if (!response.ok || !data.success) throw Object.assign(new Error(data.message || 'Request failed.'), {
-        status: response.status, code: response.status === 403 && /csrf/i.test(data.message || '') ? 'csrf' : undefined,
+        status: response.status, code: response.status === 403 && /csrf/i.test(data.message || '') ? 'csrf' : data.data?.code,
+        retryAfter: data.data?.retry_after,
       });
       return data;
     } catch (error) {

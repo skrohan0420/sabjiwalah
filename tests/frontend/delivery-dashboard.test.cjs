@@ -31,6 +31,11 @@ test('authorization loss clears private content and stops polling',async()=>{
 test('page departure discards late responses and sensitive DOM',async()=>{
  const s=setup();s.windowEvents.pagehide();s.requests[0].resolve({data:data()});await flush();assert.equal(s.ids['rider-active-order'].children.length,0);assert.equal(s.timers.size,0);
 });
+
+test('late dashboard response cannot repaint a hidden or offline page',async()=>{
+ for(const state of ['hidden','offline']){const s=setup();if(state==='hidden'){s.document.hidden=true;s.events.visibilitychange();}else{s.navigator.onLine=false;s.windowEvents.offline();}
+ s.requests[0].resolve({data:data()});await flush();assert.equal(s.ids['rider-active-order'].children.length,0);assert.equal(s.timers.size,0);if(state==='offline')assert.match(s.ids['rider-dashboard-updated'].textContent,/Offline/);}
+});
 test('polling defers during shared writes/dialogs and resumes on the next interval',async()=>{
  const s=setup();s.requests[0].resolve({data:data()});await flush();s.setBusy(true);s.ids['rider-dashboard-refresh'].events.click();assert.equal(s.requests.length,1);s.setBusy(false);[...s.timers.values()][0].fn();assert.equal(s.requests.length,2);
 });

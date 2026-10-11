@@ -25,7 +25,7 @@ if ($action === 'cleanup') { $source->query('DROP DATABASE `' . $database . '`')
 $config->default['database'] = $database;
 $db = db_connect(); $db->query('SET SESSION innodb_lock_wait_timeout=8');
 if ($action === 'setup') {
-    $tables = ['users','products','orders','order_items','order_status_history','delivery_assignments','delivery_personnel_profiles','offers','offer_redemptions','operational_settings','operational_setting_history','otp_rate_limits'];
+    $tables = ['users','products','orders','order_items','order_status_history','delivery_assignments','delivery_personnel_profiles','offers','offer_redemptions','operational_settings','operational_setting_history','otp_rate_limits','order_delivery_pins','delivery_completions','delivery_locations'];
     $db->query('SET FOREIGN_KEY_CHECKS=0');
     foreach ($tables as $table) {
         $ddl = $source->query('SHOW CREATE TABLE `' . $table . '`')->getRowArray()['Create Table'];
@@ -48,7 +48,8 @@ if ($action === 'setup') {
     echo json_encode(['ok'=>true]); exit;
 }
 if ($action === 'state') {
-    $state=[]; foreach (['orders','products','order_status_history','delivery_assignments','delivery_personnel_profiles','offer_redemptions','operational_setting_history','otp_rate_limits'] as $table) $state[$table]=$db->table($table)->get()->getResultArray();
+    $state=[]; foreach (['orders','products','order_status_history','delivery_assignments','delivery_personnel_profiles','offer_redemptions','operational_setting_history','otp_rate_limits','delivery_completions','delivery_locations'] as $table) $state[$table]=$db->table($table)->get()->getResultArray();
+    $state['pin_attempts']=$db->table('order_delivery_pins')->select('order_id,failed_attempts')->get()->getResultArray();
     echo json_encode($state); exit;
 }
 if ($action === 'prepare-checkout') {
@@ -62,6 +63,17 @@ if ($action === 'prepare-dispatch') {
     echo json_encode(['ok'=>true]); exit;
 }
 // Each worker uses a distinct session and connection; a file barrier starts actual overlapping calls.
+if ($action === 'prepare-delivery-race') {
+    $id=(int)($argv[4]??200);
+    $db->table('orders')->where('id >',0)->update(['order_status'=>'delivered']);
+    $db->table('orders')->insert(['id'=>$id,'uid'=>'ord_race_'.$id,'order_number'=>'SW-RACE-'.$id,'user_id'=>2,'subtotal'=>100,'total_amount'=>140,'payment_method'=>'cod','payment_status'=>'pending','order_status'=>$id===205?'ready_for_delivery':'out_for_delivery','customer_name'=>'Fixture','customer_phone'=>'9000000002','address_line'=>'Fixture','city'=>'Fixture','created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')]);
+    $db->table('delivery_personnel_profiles')->where('user_id',5)->update(['availability'=>'available']);
+    $db->table('delivery_assignments')->insert(['uid'=>'das_race_'.$id,'order_id'=>$id,'delivery_user_id'=>4,'assigned_by'=>1,'assigned_at'=>date('Y-m-d H:i:s')]);
+    $db->table('order_delivery_pins')->insert(['order_id'=>$id,'pin_hash'=>password_hash('123456',PASSWORD_DEFAULT),'expires_at'=>date('Y-m-d H:i:s',time()+900),'failed_attempts'=>0]);
+    $db->table('delivery_locations')->emptyTable();
+    file_put_contents($directory.'/delivery-race.json',json_encode(['id'=>$id,'captured_at_ms'=>(int)floor(microtime(true)*1000)]));
+    echo json_encode(['ok'=>true]);exit;
+}
 if ($action === 'prepare-availability') {
     $db->table('orders')->where('id >',0)->update(['order_status'=>'delivered']);
     $db->table('delivery_personnel_profiles')->whereIn('user_id',[4,5])->update(['availability'=>'available']);
@@ -90,12 +102,25 @@ try {
     elseif ($action==='availability-stale') { $changed=(new App\Services\AdminDeliveryPersonnelService())->changeOwnAvailability(4,$worker===0?'offline':'unavailable','available');if($changed!=='changed')throw new App\Services\OrderConflictException($changed); }
     elseif ($action==='otp-phone') (new App\Services\OtpService())->start('auth','9000000100');
     elseif ($action==='otp-ip') (new App\Services\OtpService())->start('auth','9000001'.str_pad((string)$worker,3,'0',STR_PAD_LEFT));
+    elseif (str_starts_with($action,'delivery-')) {
+        $fixture=json_decode(file_get_contents($directory.'/delivery-race.json'),true);$id=$fixture['id'];
+        if($action==='delivery-pickup-reassign') {
+            if($worker===0)(new App\Services\DeliveryOrderService())->changeStatus('ord_race_'.$id,'out_for_delivery',4,null,'ready_for_delivery');
+            else (new App\Services\DispatchService())->assign('ord_race_'.$id,'usr_concurrent_5','das_race_'.$id,1);
+        }
+        elseif($action==='delivery-reconcile') (new App\Services\DeliveryCompletionService())->reconcile('ord_race_'.$id,$worker===0?1:6);
+        elseif($action==='delivery-complete' || ($action==='delivery-terminal-location' && $worker===0)) (new App\Services\DeliveryCompletionService())->complete('ord_race_'.$id,4,'123456',true);
+        elseif($action==='delivery-wrong-pin') (new App\Services\DeliveryCompletionService())->complete('ord_race_'.$id,4,'000000',true);
+        else (new App\Services\DeliveryLocationService())->record(4,['order_uid'=>'ord_race_'.$id,'assignment_uid'=>'das_race_'.$id,'latitude'=>$action==='delivery-location-conflict'?$worker:0,'longitude'=>0,'accuracy'=>15,'captured_at_ms'=>$fixture['captured_at_ms']]);
+    }
     elseif (str_starts_with($action,'checkout-')) {
         $quote=(new App\Services\CheckoutSummaryService())->summary();
         (new App\Services\OrderService())->createFromCart((int)session('user_id'),['customer_name'=>'Fixture Shopper','customer_phone'=>'9000000002','address_line'=>'Fixture','city'=>'Fixture','postal_code'=>'700001','quote_token'=>$quote['quote_token']]);
     } else throw new RuntimeException('Unknown fixture action.');
     $result='ok';
 } catch (App\Services\OtpRateLimitException) { $result='limited'; }
+catch (App\Services\DeliveryVerificationException $e) { $result=$e->httpStatus===429?'limited':'incorrect'; }
+catch (OutOfBoundsException) { $result='denied'; }
 catch (App\Services\OrderConflictException|InvalidArgumentException) { $result='conflict'; }
 catch (Throwable $e) { $result='error:'.get_class($e).':'.$e->getMessage().':'.basename($e->getFile()).':'.$e->getLine().':'.json_encode($db->error()); }
 echo json_encode(['result'=>$result,'elapsed_ms'=>(int)round((microtime(true)-$started)*1000)]);

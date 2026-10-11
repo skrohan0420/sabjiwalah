@@ -19,6 +19,13 @@ completeReject(fn()=>(new App\Services\DeliveryOrderService())->changeStatus($ui
 $wrong=$pin==='000000'?'000001':'000000';
 for($i=1;$i<=5;$i++){completeReject(fn()=>$service->complete($uid,$rider,$wrong,true),App\Services\DeliveryVerificationException::class);completeCheck((int)$db->table('order_delivery_pins')->where('order_id',$id)->get()->getRowArray()['failed_attempts']===$i,'Failed attempt rolled back.');}
 completeReject(fn()=>$service->complete($uid,$rider,$pin,true),App\Services\DeliveryVerificationException::class);
+$db->table('order_delivery_pins')->where('order_id',$id)->update(['attempt_window_ends_at'=>date('Y-m-d H:i:s',time()+120)]);
+try {$service->complete($uid,$rider,$pin,true);throw new RuntimeException('Attempt lockout bypassed.');}
+catch(App\Services\DeliveryVerificationException $e){completeCheck($e->reason==='pin_attempt_limit'&&$e->retryAfter>0&&$e->retryAfter<=120,'Retry metadata missing or inaccurate.');}
+session()->set('user_id',$rider);service('validation')->reset();
+$request=new CodeIgniter\HTTP\IncomingRequest(config('App'),new CodeIgniter\HTTP\URI('http://localhost/'),json_encode(['pin'=>$pin,'cash_received'=>true]),new CodeIgniter\HTTP\UserAgent());
+$controller=new App\Controllers\Api\V1\Delivery\OrderController();$controller->initController($request,new CodeIgniter\HTTP\Response(config('App')),service('logger'));$response=$controller->complete($uid);$payload=json_decode($response->getBody(),true);
+completeCheck($response->getStatusCode()===429&&$payload['data']['code']==='pin_attempt_limit'&&(int)$response->getHeaderLine('Retry-After')===$payload['data']['retry_after'],'API lockout status/header metadata failed.');
 $db->table('order_delivery_pins')->where('order_id',$id)->update(['issued_at'=>date('Y-m-d H:i:s',time()-61)]);
 completeReject(fn()=>$pins->issue($uid,$customer),App\Services\DeliveryPinCooldownException::class);
 $db->table('order_delivery_pins')->where('order_id',$id)->update(['attempt_window_ends_at'=>date('Y-m-d H:i:s',time()-1)]);

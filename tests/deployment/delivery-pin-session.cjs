@@ -8,10 +8,11 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=req
   const router=`<?php
 if(PHP_SAPI!=='cli-server'||!in_array($_SERVER['REMOTE_ADDR'],['127.0.0.1','::1'],true))exit;
 header('X-Sabjiwalah-Fixture: ${token}');$path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+if(${preview?'true':'false'} && $path==='/__fixture_reset'){foreach(['pins.json','delivery.json'] as $file)if(is_file(__DIR__.'/'.$file))unlink(__DIR__.'/'.$file);echo 'reset';exit;}
 if(str_starts_with($path,'/assets/'))return false;
 if($path==='/admin'||$path==='/admin/'){header('Location: /admin/cash');exit;}
 if($path==='/account'){header('Location: /orders');exit;}
-if(!preg_match('#^/(?:login|orders|delivery(?:/(?:deliveries|history|profile|orders/[^/]+))?|admin/cash|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|orders/[^/]+/delivery-pin|delivery/(?:dashboard|availability|location)|delivery/orders(?:/[^/]+(?:/complete|/status)?)?|admin/(?:cash(?:/[^/]+/reconcile)?|orders/[^/]+(?:/status)?)|cart))$#D',$path)){http_response_code(404);exit;}
+if(!preg_match('#^/(?:login|orders(?:/[^/]+)?|delivery(?:/(?:deliveries|history|profile|orders/[^/]+))?|admin/cash|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|orders/[^/]+(?:/delivery-pin)?|delivery/(?:dashboard|availability|location|history|profile)|delivery/orders(?:/[^/]+(?:/complete|/status)?)?|admin/(?:cash(?:/[^/]+/reconcile)?|orders/[^/]+(?:/status)?)|cart))$#D',$path)){http_response_code(404);exit;}
 define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);config('Otp')->developmentMode=true;config('App')->baseURL='${base}';
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix');
 foreach(['users','orders','order_items','order_delivery_pins','delivery_assignments','delivery_personnel_profiles','order_status_history','delivery_completions','otp_rate_limits'] as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
@@ -26,7 +27,8 @@ if(is_file($deliveryState)){$state=json_decode(file_get_contents($deliveryState)
 else{$db->table('delivery_assignments')->insert(['id'=>1,'uid'=>'das_pin_fixture','order_id'=>1,'delivery_user_id'=>3,'assigned_by'=>4,'assigned_at'=>date('Y-m-d H:i:s')]);}
 ob_start();$app->run();$fixtureResponse=ob_get_clean();
 if(${mockGps?'true':'false'} && str_starts_with($path,'/delivery/orders/')){$fixtureGps='<script>Object.defineProperty(navigator,"geolocation",{value:{getCurrentPosition(success){setTimeout(()=>success({coords:{latitude:22.51,longitude:88.31,accuracy:15},timestamp:Date.now()}),50);},watchPosition(success){const emit=()=>success({coords:{latitude:22.51,longitude:88.31,accuracy:15},timestamp:Date.now()});setTimeout(emit,50);return setInterval(emit,10000);},clearWatch(id){clearInterval(id);}}});</script>';$fixtureResponse=str_replace('</head>',$fixtureGps.'</head>',$fixtureResponse);$fixtureResponse=str_replace('<main','<p style="padding:12px">QA fixture: synthetic rider GPS; no device location requested.</p><main',$fixtureResponse);}
-echo $fixtureResponse;file_put_contents($stateFile,json_encode($db->table('order_delivery_pins')->get()->getResultArray()));$state=[];foreach($deliveryTables as $table)$state[$table]=$db->table($table)->get()->getResultArray();file_put_contents($deliveryState,json_encode($state));`;
+$persist=static function($file,$value){$pending=$file.'.pending';if(file_put_contents($pending,json_encode($value))===false||!rename($pending,$file))throw new RuntimeException('Fixture persistence failed.');};
+$persist($stateFile,$db->table('order_delivery_pins')->get()->getResultArray());$state=[];foreach($deliveryTables as $table)$state[$table]=$db->table($table)->get()->getResultArray();$persist($deliveryState,$state);echo $fixtureResponse;`;
   await fs.writeFile(path.join(directory,'router.php'),router);
   const server=spawn(process.env.PHP_BINARY||'D:/xampp/php/php.exe',['-S','127.0.0.1:'+port,'-t',root+'/public',path.join(directory,'router.php')],{cwd:root,windowsHide:true,stdio:['ignore','ignore','pipe']});let diagnostics='';server.stderr.on('data',chunk=>diagnostics+=chunk);
   function client(){const cookies=new Map();return async(url,options={})=>{const response=await fetch(base+url,{...options,redirect:'manual',headers:{Accept:'application/json',...options.headers,Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}});assert.equal(response.headers.get('x-sabjiwalah-fixture'),token,'Use the owned fixture only.');for(const cookie of response.headers.getSetCookie()){const pair=cookie.split(';')[0],i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1));}return response;};}
@@ -38,6 +40,20 @@ echo $fixtureResponse;file_put_contents($stateFile,json_encode($db->table('order
     assert.equal((await mutate(guest,endpoint)).status,401);
     for(const [request,phone] of [[owner,'9000000010'],[secondSession,'9000000010'],[other,'9000000011'],[rider,'9000000012'],[admin,'9000000013']])await login(request,phone);
     const locationEndpoint='api/v1/delivery/location';
+    for(const endpoint of ['api/v1/delivery/history','api/v1/delivery/profile']){
+      assert.equal((await guest(endpoint)).status,401);for(const request of [owner,other,admin])assert.equal((await request(endpoint)).status,403);
+      const response=await rider(endpoint);assert.equal(response.status,200);assert.match(response.headers.get('cache-control'),/no-store/);
+      assert.equal((await rider(endpoint+'?rider_id=1')).status,422);
+    }
+    const tracking='api/v1/orders/ord_pin_fixture_0';
+    assert.equal((await guest(tracking)).status,401);
+    for(const request of [rider,admin])assert.equal((await request(tracking)).status,403);
+    assert.equal((await other(tracking)).status,404);assert.equal((await other('orders/ord_pin_fixture_0')).status,404);
+    const tracked=await owner(tracking);assert.equal(tracked.status,200);assert.match(tracked.headers.get('cache-control'),/no-store/);
+    const progress=(await tracked.json()).data;assert.equal(progress.order.order_status,'out_for_delivery');assert.equal(progress.delivery_partner.name,'Sample Person 2');assert.equal(progress.progress.length,5);assert.equal(progress.estimated_delivery_at,null);
+    for(const field of ['latitude','longitude','customer_phone','pin_hash','changed_by'])assert.ok(!JSON.stringify(progress).includes(field));
+    const trackingPage=await owner('orders/ord_pin_fixture_0');assert.equal(trackingPage.status,200);assert.match(trackingPage.headers.get('cache-control'),/no-store/);assert.ok((await trackingPage.text()).includes('customer-progress'));
+    assert.equal((await owner('api/v1/orders/missing')).status,404);
     const locationSample={order_uid:'ord_pin_fixture_0',assignment_uid:'das_pin_fixture',latitude:0,longitude:0,accuracy:15,captured_at_ms:Date.now()};
     assert.equal((await mutate(guest,locationEndpoint,locationSample)).status,401);
     for(const request of [owner,other,admin])assert.equal((await mutate(request,locationEndpoint,locationSample)).status,403);
@@ -51,7 +67,7 @@ echo $fixtureResponse;file_put_contents($stateFile,json_encode($db->table('order
     assert.equal((await mutate(rider,locationEndpoint,{...locationSample,captured_at_ms:Date.now()+1})).status,429);
     assert.equal((await rider(locationEndpoint)).status,404);
     assert.equal((await mutate(rider,locationEndpoint,{},'DELETE')).status,200);
-    await rider('api/v1/csrf'); // Fixture persistence completes after emitting the response body.
+    await rider('api/v1/csrf'); // The owned serial server persists fixture state before sending the body.
     const clearedLocation=JSON.parse(await fs.readFile(path.join(directory,'delivery.json'),'utf8')).delivery_locations[0];assert.equal(clearedLocation.latitude,null);
     console.log('PASS: HTTP rider-location role/CSRF/input/freshness/ownership/privacy, duplicate/rate limit and stop clearing.');
     assert.equal((await mutate(other,endpoint)).status,404);assert.equal((await mutate(rider,endpoint)).status,403);assert.equal((await mutate(admin,endpoint)).status,403);
@@ -76,10 +92,14 @@ echo $fixtureResponse;file_put_contents($stateFile,json_encode($db->table('order
     const reconcile=cash+'/ord_pin_fixture_0/reconcile';assert.equal((await mutate(admin,reconcile,{amount:1})).status,422);
     assert.equal((await mutate(admin,reconcile)).status,200);assert.equal((await mutate(admin,reconcile)).status,200);
     const details=(await(await admin('api/v1/admin/orders/ord_pin_fixture_0')).json()).data;assert.equal(details.history.length,2);assert.equal(details.order.payment_status,'paid');
+    const finished=(await(await owner(tracking)).json()).data;assert.equal(finished.terminal,true);assert.equal(finished.order.order_status,'delivered');assert.equal(finished.delivery_partner,null);assert.ok(finished.progress.find(step=>step.status==='delivered').recorded_at);
+    const riderHistory=(await(await rider('api/v1/delivery/history')).json()).data;assert.equal(riderHistory.pager.total,1);assert.equal(riderHistory.items[0].amount_collected,'120.00');assert.equal(riderHistory.items[0].credited_delivery,true);assert.ok(!JSON.stringify(riderHistory).includes('customer_phone'));
+    const riderProfile=(await(await rider('api/v1/delivery/profile')).json()).data;assert.equal(riderProfile.completed_total,1);assert.equal(riderProfile.completed_today,1);assert.equal(riderProfile.cod.collected,'120.00');assert.equal(riderProfile.cod.reconciled,'120.00');
+    for(const path of ['delivery/history','delivery/profile'])assert.equal((await rider(path)).status,200);
     assert.equal((await admin('admin/cash')).status,200);assert.equal((await rider('delivery')).status,200);
     for(const request of [owner,secondSession,other,rider,admin])await mutate(request,'api/v1/auth/logout');
     console.log('PASS: HTTP PIN issuance/privacy, completion and cash role/CSRF/input restrictions, admin completion bypass rejection, failure reasons, wrong PIN, duplicate completion/reconciliation, ledger and payment/history. Temporary SQL/storage; PHP server serializes HTTP requests.');
-    if(preview){await fs.unlink(path.join(directory,'pins.json'));await fs.unlink(path.join(directory,'delivery.json'));console.log('Sample preview: '+base+'login (customer 9000000010, rider 9000000012, admin 9000000013). Send stop on stdin or Ctrl+C to close.');await new Promise(resolve=>{process.once('SIGINT',resolve);process.stdin.once('data',resolve);});process.stdin.pause();}
+    if(preview){assert.equal(await(await guest('__fixture_reset')).text(),'reset');console.log('Sample preview: '+base+'login (customer 9000000010, rider 9000000012, admin 9000000013). Send stop on stdin or Ctrl+C to close.');await new Promise(resolve=>{process.once('SIGINT',resolve);process.stdin.once('data',resolve);});process.stdin.pause();}
   }finally{
     if(server.exitCode===null){server.kill();await new Promise(resolve=>server.once('exit',resolve));}
     const resolved=path.resolve(directory);assert.ok(resolved.startsWith(path.resolve(os.tmpdir())+path.sep)&&path.basename(resolved).startsWith('sabjiwalah-pin-'));await fs.rm(resolved,{recursive:true,force:true});

@@ -320,8 +320,8 @@ clear them inside the business transaction. Logout clears them when storage is
 available. Departure/offline may leave the last server sample until expiry.
 Samples expire after 55 minutes. **Schedule `php spark delivery:prune-locations`
 every five minutes on the hosting server** to enforce physical retention within
-one hour and clear inactive/reassigned samples. It removes up to 1000 expired
-records per run; increase cadence/capacity if the workload exceeds that. This
+one hour and clear inactive/reassigned samples. It drains the expired backlog
+in batches of 1000 using a fixed cutoff and the expiry index. This
 repository does not install a hosting cron job. Do not promise the one-hour
 physical retention limit until this job is configured and monitored.
 
@@ -366,3 +366,78 @@ Checks: `node --test tests/frontend/page-navigation.test.cjs tests/frontend/them
 and `php tests/deployment/static-assets.php`. On the deployed Apache host, inspect
 the response headers for a versioned CSS/JS URL: `Cache-Control` should contain
 `max-age=604800, immutable`.
+# Admin delivery tracking (Phase 6)
+
+Deploy `admin-dispatch-map.js` together with the updated dispatch view, queue model/service,
+`admin-dispatch.js` and admin stylesheet. No additional migration is required beyond Phase 5's
+`delivery_locations` table. The existing admin-only dispatch response includes validated customer
+destinations and the latest unexpired rider sample for the current assignment while out for delivery.
+Inactive riders, stopped tracking, obsolete assignments and expired samples have no rider position.
+
+The map loads only when staff select **Load delivery map**. Its data follows the existing filtered,
+paginated queue and eight-second polling while visible and online; it does not add a polling loop or
+request routes/ETA. Samples become stale after two minutes. Refresh failures mark retained positions
+stale; hiding the page, going offline or losing authorization clears the map. Names, status and UTC
+update timestamps displayed in IST remain available when Maps fails. Production still requires the
+Phase 5 schema and scheduled pruning, the configured browser Maps key, and HTTPS for rider GPS.
+
+## Customer delivery progress (Phase 7)
+
+Deploy the customer order service/API controller, updated client controller/routes,
+`client/orders/show.php`, order-list link, `customer-order.js`/CSS and updated
+`delivery-pin.js` together. No schema change is required. Customer-only
+`GET /api/v1/orders/{uid}` and `/orders/{uid}` verify active ownership server-side
+and return private, non-cacheable details. Tracking shows only the current active
+partner's name during delivery; it omits coordinates, phone numbers, assignment
+identifiers, staff notes and PINs.
+
+History supplies recorded timestamps; missing history shows **Time not recorded**.
+No reliable ETA source is configured, so arrival estimates remain unavailable.
+Progress refreshes every 15 seconds while visible/online, with no overlapping
+requests and a ten-second timeout. Terminal orders stop automatic polling. Failures
+label progress outdated and suspend PIN issuance; authorization/ownership failures
+erase details. PIN issuance retains CSRF, cooldown and server validation; plaintext
+is cleared when progress becomes unavailable or delivery ends, and late responses
+cannot restore it. Customer progress does not require Google Maps.
+
+## Rider PIN, COD and failure experience (Phase 8)
+
+Deploy the updated delivery completion JavaScript, shared delivery shell, stylesheet,
+completion service, verification exception and delivery API controller together.
+No migration is needed. Completion still verifies current ownership, the customer's
+hashed PIN, server expiry/attempt limits and the server order amount in a transaction.
+Verification errors now identify incorrect/expired PINs and return remaining lockout
+seconds with `Retry-After`. The rider screen masks a six-digit numeric entry, clears it
+on submission, shows verification feedback and pauses completion during that lockout.
+Refreshing preserves the wait in the current page; the backend enforces it across sessions.
+
+COD requires explicit receipt of the full displayed amount; prepaid requires recorded
+payment. Failure reports offer preset reasons or Other with details, show the reason
+in a confirmation dialog and retain existing status/assignment history. Ambiguous writes
+still require a workload refresh before retrying. No offline delivery actions are queued.
+
+## Rider history and profile (Phase 9)
+
+Deploy `DeliveryHistoryModel`, `DeliveryHistoryService`, the delivery history API
+controller, new delivery routes, the updated completion model, history/profile
+views, layout, `delivery-history.js` and delivery stylesheet together. No schema
+change is needed. `/api/v1/delivery/history` and `/api/v1/delivery/profile` require
+an active rider and always use the session identity; arbitrary rider IDs are rejected.
+
+History contains completed/failed orders from the rider's assignments, summarized
+once per order using their most recent assignment. Former assignees retain a marked
+outcome summary without another rider's completion date or cash credit. Verified
+completion and collection records supply amounts; legacy cash without proof is
+unavailable. Dates use verified completion, assignment completion, or an actual
+terminal transition on the current assignment. No timestamp is invented from an
+order's last edit. Date filters use inclusive India calendar days, excluding
+records with unknown dates. Order-number/status filters and 20-row pagination are
+available. History includes no customer address, phone, coordinates, PIN or staff notes.
+
+Profile shows the rider's own name, phone, active account/availability, completed
+totals, India-day deliveries/COD and verified total/pending/reconciled cash. Pages
+refresh on request or return to visibility/connectivity without continuous polling.
+## Delivery installation removed
+
+At the user’s request, PWA installation, the manifest, service worker and offline
+fallback have been removed. Delivery pages operate as ordinary web pages.

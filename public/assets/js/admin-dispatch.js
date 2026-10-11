@@ -6,12 +6,13 @@
   function node(tag,text,cls){const el=document.createElement(tag);if(text!=null)el.textContent=text;if(cls)el.className=cls;return el;}
   function error(el,err){el.textContent=[err.message,...Object.values(err.errors||{})].join(' ');el.hidden=false;}
   function nav(){$('dispatch-prev').disabled=page<=1;$('dispatch-next').disabled=page>=pages;}
-  function schedule(){clearTimeout(timer);if(!stopped&&!document.hidden)timer=setTimeout(loadList,8000);}
+  function schedule(){clearTimeout(timer);if(!stopped&&!document.hidden&&navigator.onLine!==false)timer=setTimeout(loadList,8000);}
   async function loadList(){
-    clearTimeout(timer);if(stopped)return;if(inFlight){pending=true;return;}inFlight=true;const current=revision;listAbort=new AbortController();$('dispatch-error').hidden=true;$('dispatch-list').setAttribute('aria-busy','true');$('dispatch-prev').disabled=$('dispatch-next').disabled=true;
+    clearTimeout(timer);if(stopped||document.hidden||navigator.onLine===false)return;if(inFlight){pending=true;return;}inFlight=true;const current=revision;listAbort=new AbortController();$('dispatch-error').hidden=true;$('dispatch-list').setAttribute('aria-busy','true');$('dispatch-prev').disabled=$('dispatch-next').disabled=true;
     const query=new URLSearchParams(filters);query.set('page',page);query.set('per_page',20);
     try{const {data}=await ui.api('/api/v1/admin/dispatch?'+query,{signal:listAbort.signal});if(current!==revision)return;pages=data.pager.page_count;if(page>Math.max(1,pages)){page=Math.max(1,pages);pending=true;return;}
       $('dispatch-summary').textContent=`${data.pager.total} orders in dispatch · Updated ${new Intl.DateTimeFormat('en-IN',{timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date())} IST`;$('dispatch-page').textContent=`Page ${page} of ${Math.max(1,pages)}`;
+      window.SabjiwalahDispatchMap?.setOrders(data.items, data.tracking_available);
       const list=$('dispatch-list');list.replaceChildren();if(!data.items.length)list.append(node('p','No orders match these filters.','admin-card'));
       for(const order of data.items){const row=node('article',null,'admin-card dispatch-row'),identity=node('div'),link=node('a',order.order_number);link.href=window.Sabjiwalah.url('/admin/orders?search='+encodeURIComponent(order.order_number));identity.append(link,node('p',order.order_status==='ready_for_delivery'?'Awaiting pickup':'Out for delivery','admin-caption'));
         const staff=node('div');staff.append(node('strong',order.rider_name||'Unassigned'),node('p',order.rider_status==='inactive'?'Inactive account — review assignment':'','admin-caption'));
@@ -20,7 +21,7 @@
         // Never replace a selection while staff choose a rider. A changed assignment disables its action.
         if(selected===order.uid&&observed&&(observed.assignment_uid!==order.assignment_uid||order.order_status!=='ready_for_delivery')){uncertain=true;$('dispatch-assign-error').textContent='Order or assignment changed. Reload before assigning.';$('dispatch-assign-error').hidden=false;controls();}
       }nav();
-    }catch(err){if(current===revision&&!stopped){error($('dispatch-error'),err);if(err.status===401||err.status===403)stopped=true;nav();}}
+    }catch(err){if(current===revision&&!stopped){error($('dispatch-error'),err);if(err.status===401||err.status===403){stopped=true;window.SabjiwalahDispatchMap?.clear();}else window.SabjiwalahDispatchMap?.unavailable();nav();}}
     finally{inFlight=false;$('dispatch-list').setAttribute('aria-busy','false');if(pending&&!stopped){pending=false;loadList();}else schedule();}
   }
   function controls(){const blocked=working||loading||uncertain||!observed;$('dispatch-close').disabled=working;$('dispatch-reload').disabled=working||loading;$('dispatch-candidate-search').disabled=$('dispatch-candidate-search-button').disabled=working||loading;$('dispatch-candidate-prev').disabled=working||loading||candidatePage<=1;$('dispatch-candidate-next').disabled=working||loading||candidatePage>=candidatePages;for(const button of $('dispatch-candidates').querySelectorAll('button'))button.disabled=blocked;}
@@ -42,11 +43,11 @@
     catch(err){error($('dispatch-assign-error'),err);if(!err.status||err.status===409||err.status>=500)uncertain=true;}
     finally{working=false;controls();}
   }
-  function changeFilters(){++revision;listAbort?.abort();page=1;loadList();}
+  function changeFilters(){++revision;listAbort?.abort();window.SabjiwalahDispatchMap?.clear();page=1;loadList();}
   form.addEventListener('submit',event=>{event.preventDefault();filters=new URLSearchParams(new FormData(form));changeFilters();});form.addEventListener('reset',()=>{filters=new URLSearchParams();changeFilters();});
-  $('dispatch-refresh').addEventListener('click',loadList);$('dispatch-prev').addEventListener('click',()=>{if(page>1){page--;++revision;listAbort?.abort();loadList();}});$('dispatch-next').addEventListener('click',()=>{if(page<pages){page++;++revision;listAbort?.abort();loadList();}});
+  $('dispatch-refresh').addEventListener('click',loadList);$('dispatch-prev').addEventListener('click',()=>{if(page>1){page--;++revision;listAbort?.abort();window.SabjiwalahDispatchMap?.clear();loadList();}});$('dispatch-next').addEventListener('click',()=>{if(page<pages){page++;++revision;listAbort?.abort();window.SabjiwalahDispatchMap?.clear();loadList();}});
   $('dispatch-close').addEventListener('click',close);dialog.addEventListener('cancel',event=>{event.preventDefault();close();});$('dispatch-reload').addEventListener('click',()=>{if(!working&&!loading){candidatePage=1;loadDetails();}});
   $('dispatch-candidate-filters').addEventListener('submit',event=>{event.preventDefault();if(working||loading)return;candidateSearch=$('dispatch-candidate-search').value.trim();candidatePage=1;loadDetails();});
   $('dispatch-candidate-prev').addEventListener('click',()=>{if(!working&&!loading&&candidatePage>1){candidatePage--;loadDetails();}});$('dispatch-candidate-next').addEventListener('click',()=>{if(!working&&!loading&&candidatePage<candidatePages){candidatePage++;loadDetails();}});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(!stopped)loadList();});window.addEventListener('pagehide',()=>{stopped=true;++revision;++detailRevision;clearTimeout(timer);listAbort?.abort();detailAbort?.abort();});window.addEventListener('beforeunload',event=>{if(working){event.preventDefault();event.returnValue='';}});loadList();
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){++revision;pending=false;clearTimeout(timer);listAbort?.abort();}else if(!stopped)loadList();});window.addEventListener('offline',()=>{++revision;pending=false;clearTimeout(timer);listAbort?.abort();window.SabjiwalahDispatchMap?.clear();});window.addEventListener('online',()=>{if(!stopped)loadList();});window.addEventListener('pagehide',()=>{stopped=true;++revision;++detailRevision;clearTimeout(timer);listAbort?.abort();detailAbort?.abort();});window.addEventListener('beforeunload',event=>{if(working){event.preventDefault();event.returnValue='';}});loadList();
 })();

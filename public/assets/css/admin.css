@@ -46,3 +46,15 @@ html[data-theme="dark"] .admin-body{--admin-bg:var(--theme-bg);--admin-panel:var
 .campaign-editor .admin-field { margin-bottom: 16px; min-width: 0; }
 .campaign-editor input, .campaign-editor select { max-width: 100%; }
 @media (max-width: 600px) { .campaign-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+/* Current-page delivery tracking. No route/ETA polling. */
+.dispatch-tracking { margin-bottom: 20px; }
+.dispatch-tracking-controls { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.dispatch-tracking-controls .admin-field { flex: 1; min-width: 200px; }
+.dispatch-tracking-controls select { width: 100%; min-height: 44px; }
+.dispatch-tracking-map { height: 420px; width: 100%; margin: 16px 0; border-radius: 12px; overflow: hidden; }
+.dispatch-tracking-record { padding: 12px 0; border-bottom: 1px solid var(--admin-border, #dbe4df); }
+.dispatch-map-pin { padding: 6px 10px; border: 2px solid white; border-radius: 16px; color: white; font-weight: 700; box-shadow: 0 2px 6px #0004; white-space: nowrap; }
+.dispatch-map-destination { background: #b91c1c; }
+.dispatch-map-rider { background: #1d4ed8; }
+.dispatch-map-stale { background: #92400e; }
+@media (max-width: 600px) { .dispatch-tracking-map { height: 320px; } .dispatch-tracking-controls .admin-field { min-width: 0; flex-basis: 100%; } }

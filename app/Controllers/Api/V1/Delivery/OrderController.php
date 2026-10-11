@@ -18,7 +18,9 @@ class OrderController extends BaseApiController
             (new \App\Services\DeliveryCompletionService())->complete($uid,(int)session('user_id'),(string)$data['pin'],$data['cash_received']);
             return $this->success(null,'Delivery completed.');
         } catch (\OutOfBoundsException $e) { return $this->error('Order not found.',404);
-        } catch (\App\Services\DeliveryVerificationException $e) { return $this->error($e->getMessage(),$e->httpStatus);
+        } catch (\App\Services\DeliveryVerificationException $e) {
+            if ($e->retryAfter > 0) $this->response->setHeader('Retry-After', (string) $e->retryAfter);
+            return $this->error($e->getMessage(),$e->httpStatus,null,['code'=>$e->reason,'retry_after'=>$e->retryAfter]);
         } catch (\App\Services\OrderConflictException $e) { return $this->error($e->getMessage(),409);
         } catch (\Throwable) { return $this->error('Unable to confirm delivery. Reload the order before trying again.',503); }
     }

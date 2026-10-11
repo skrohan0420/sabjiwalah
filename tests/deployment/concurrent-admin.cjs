@@ -33,6 +33,21 @@ const {spawn}=require('node:child_process'),{randomBytes}=require('node:crypto')
     result=await race('checkout-coupon',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');assert.equal(state.orders.length,before+1);assert.equal(state.offer_redemptions.length,1);checks.push('last coupon use');
     await launch('prepare-availability');result=await race('availability-dispatch',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');const assigned=state.delivery_assignments.some(row=>Number(row.order_id)===100);const profile=state.delivery_personnel_profiles.find(row=>Number(row.user_id)===5);assert.equal(profile.availability,assigned?'available':'offline');checks.push('rider availability versus dispatch');
     result=await race('availability-stale',2);assert.deepEqual(counts(result),{ok:1,conflict:1});checks.push('rider availability compare-and-set');
+    await launch('prepare-delivery-race',200);result=await race('delivery-complete',2);assert.deepEqual(counts(result),{ok:2});state=await launch('state');
+    assert.equal(state.delivery_completions.filter(row=>Number(row.order_id)===200).length,1);assert.equal(state.orders.find(row=>Number(row.id)===200).payment_status,'paid');
+    assert.equal(state.order_status_history.filter(row=>Number(row.order_id)===200&&row.new_status==='delivered').length,1);checks.push('duplicate verified completion/cash atomicity');
+    result=await race('delivery-reconcile',2);assert.deepEqual(counts(result),{ok:2});state=await launch('state');
+    assert.equal(state.order_status_history.filter(row=>Number(row.order_id)===200&&row.old_status===row.new_status).length,1);assert.ok(state.delivery_completions.find(row=>Number(row.order_id)===200).reconciled_at);checks.push('duplicate cash handover');
+    await launch('prepare-delivery-race',201);result=await race('delivery-wrong-pin',8);assert.deepEqual(counts(result),{incorrect:4,limited:4});state=await launch('state');
+    assert.equal(Number(state.pin_attempts.find(row=>Number(row.order_id)===201).failed_attempts),5);assert.equal(state.delivery_completions.filter(row=>Number(row.order_id)===201).length,0);checks.push('cross-connection PIN attempt limit');
+    await launch('prepare-delivery-race',202);result=await race('delivery-location-duplicate',2);assert.deepEqual(counts(result),{ok:2});state=await launch('state');assert.equal(state.delivery_locations.length,1);checks.push('duplicate latest-only location');
+    await launch('prepare-delivery-race',203);result=await race('delivery-location-conflict',2);assert.deepEqual(counts(result),{ok:1,conflict:1});state=await launch('state');assert.equal(state.delivery_locations.length,1);checks.push('conflicting location samples');
+    await launch('prepare-delivery-race',204);result=await race('delivery-terminal-location',2);assert.equal(result[0].result,'ok');assert.ok(['ok','conflict'].includes(result[1].result));state=await launch('state');
+    assert.equal(state.orders.find(row=>Number(row.id)===204).order_status,'delivered');assert.ok(state.delivery_locations.every(row=>row.latitude===null&&row.longitude===null));checks.push('completion versus GPS privacy');
+    await launch('prepare-delivery-race',205);result=await race('delivery-pickup-reassign',2);state=await launch('state');
+    assert.equal(result.filter(row=>row.result==='ok').length,1);const pickedUp=state.orders.find(row=>Number(row.id)===205).order_status==='out_for_delivery';
+    const latest=state.delivery_assignments.filter(row=>Number(row.order_id)===205).sort((a,b)=>Number(b.id)-Number(a.id))[0];
+    assert.equal(Number(latest.delivery_user_id),pickedUp?4:5);assert.equal(result[pickedUp?1:0].result,pickedUp?'conflict':'denied');checks.push('pickup versus reassignment/current ownership');
     result=await race('otp-phone',8);assert.deepEqual(counts(result),{ok:1,limited:7});checks.push('cross-session phone OTP cooldown');
     // One IP send was consumed above; nineteen additional requests may succeed.
     result=await race('otp-ip',26);assert.deepEqual(counts(result),{ok:19,limited:7});checks.push('shared IP OTP limit');

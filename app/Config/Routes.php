@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Client\HomeController::index');
 $routes->get('search', 'Client\ProductController::search');
 $routes->get('orders', 'Client\OrderController::index');
+$routes->get('orders/(:segment)', 'Client\OrderController::show/$1', ['filter' => 'role:customer']);
 $routes->get('products', 'Client\ProductController::index');
 $routes->get('products/(:segment)', 'Client\ProductController::show/$1');
 $routes->get('media/products/(:segment)', 'ProductMediaController::show/$1');
@@ -68,6 +69,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     $routes->get('account/profile', 'AccountController::profile', ['filter' => 'apiRole:customer']);
     $routes->patch('account/profile', 'AccountController::updateProfile', ['filter' => 'apiRole:customer']);
     $routes->post('orders/(:segment)/delivery-pin', 'DeliveryPinController::create/$1', ['filter' => 'apiRole:customer']);
+    $routes->get('orders/(:segment)', 'CustomerOrderController::show/$1', ['filter' => 'apiRole:customer']);
 
     $routes->group('admin', ['namespace' => 'App\Controllers\Api\V1\Admin', 'filter' => 'apiRole:admin'], static function (RouteCollection $routes): void {
         $routes->get('dashboard', 'DashboardController::show');
@@ -113,6 +115,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
         $routes->delete('location', 'LocationController::stop');
         $routes->get('dashboard', 'DashboardController::show');
         $routes->patch('availability', 'DashboardController::updateAvailability');
+        $routes->get('history', 'HistoryController::index');
+        $routes->get('profile', 'HistoryController::profile');
         $routes->post('orders/(:segment)/complete', 'OrderController::complete/$1');
         $routes->get('orders', 'OrderController::index');
         $routes->get('orders/(:segment)', 'OrderController::show/$1');

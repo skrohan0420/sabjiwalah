@@ -45,5 +45,6 @@
     <?php if ($section === 'home'): ?>
         <script defer src="<?= esc(app_static_url('assets/js/delivery-dashboard.js'), 'attr') ?>"></script>
     <?php endif ?>
+    <?php if (in_array($section, ['history','profile'], true)): ?><script defer src="<?= esc(app_static_url('assets/js/delivery-history.js'), 'attr') ?>"></script><?php endif ?>
 </body>
 </html>

@@ -1,0 +1,25 @@
+.customer-order-body { min-width: 0; }
+.customer-order { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.customer-order [hidden] { display: none !important; }
+.customer-order-card { background: var(--surface, #fff); color: inherit; border: 1px solid var(--border, #e1e8e1); border-radius: 20px; padding: 22px; overflow-wrap: anywhere; }
+.customer-order-card h2 { margin: 0 0 12px; font-size: 24px; }
+.customer-order-card h3 { margin-top: 28px; }
+.customer-order-card p, #customer-tracking-message { font-size: 14px; line-height: 1.6; }
+.customer-refresh, .customer-orders-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 12px; margin: 0 0 16px; font: inherit; }
+.customer-refresh { border: 1px solid #187d3c; color: #fff; background: #187d3c; cursor: pointer; }
+.customer-refresh:disabled { opacity: .6; cursor: wait; }
+.customer-orders-link { color: inherit; margin-top: 16px; }
+.customer-progress { list-style: none; padding: 0; margin: 24px 0; }
+.customer-progress li { position: relative; display: grid; gap: 5px; padding: 0 0 24px 32px; border-left: 2px solid #bac8bd; margin-left: 8px; }
+.customer-progress li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.customer-progress li::before { content: ''; width: 14px; height: 14px; background: #bac8bd; border: 3px solid var(--surface, #fff); border-radius: 50%; position: absolute; left: -11px; top: 0; }
+.customer-progress .is-complete::before, .customer-progress .is-current::before { background: #187d3c; }
+.customer-progress .is-current strong { color: #187d3c; }
+.customer-progress span { font-size: 13px; opacity: .8; }
+.customer-items { padding: 0; list-style: none; }
+.customer-items li { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--border, #e1e8e1); }
+.customer-items span { font-size: 14px; }
+html[data-theme="dark"] .customer-order-card { background: var(--theme-panel); border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme="dark"] .customer-progress li::before { border-color: var(--theme-panel); }
+html[data-theme="dark"] .customer-progress .is-current strong { color: #79d995; }
+@media (max-width: 360px) { .customer-order-card { padding: 16px; } }

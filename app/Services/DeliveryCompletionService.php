@@ -22,14 +22,14 @@ class DeliveryCompletionService
             $cod=$order['payment_method']==='cod';
             if (($cod && ($order['payment_status']!=='pending' || !$cashReceived)) || (!$cod && $order['payment_status']!=='paid')) throw new DeliveryVerificationException($cod?'Confirm receipt of the full COD amount before completing delivery.':'This order has not been paid.');
             $record=$pins->locked($id); $zone=new \DateTimeZone(config('App')->appTimezone); $now=time();
-            if (!$record || (new \DateTimeImmutable($record['expires_at'],$zone))->getTimestamp()<=$now) throw new DeliveryVerificationException('PIN missing or expired. Ask the customer to generate a new PIN.',409);
+            if (!$record || (new \DateTimeImmutable($record['expires_at'],$zone))->getTimestamp()<=$now) throw new DeliveryVerificationException('PIN missing or expired. Ask the customer to generate a new PIN.',409,'pin_expired');
             $window=!empty($record['attempt_window_ends_at'])?(new \DateTimeImmutable($record['attempt_window_ends_at'],$zone))->getTimestamp():0;
             $attempts=$window>$now?(int)$record['failed_attempts']:0;
-            if ($attempts>=5) throw new DeliveryVerificationException('Too many incorrect PINs. Wait for the 30-minute attempt window to end.',429);
+            if ($attempts>=5) throw new DeliveryVerificationException('Too many incorrect PINs. Wait for the attempt window to end before trying again.',429,'pin_attempt_limit',max(1,$window-$now));
             if (!password_verify($pin,$record['pin_hash'])) {
                 if (!$pins->update($id,['failed_attempts'=>$attempts+1,'attempt_window_ends_at'=>date('Y-m-d H:i:s',$window>$now?$window:$now+1800)]) || !$db->transStatus() || !$db->transCommit()) throw new \RuntimeException('Unable to record verification attempt.');
                 $committed=true;
-                throw new DeliveryVerificationException($attempts+1>=5?'Too many incorrect PINs. Wait 30 minutes before trying again.':'Incorrect delivery PIN.', $attempts+1>=5?429:422);
+                throw new DeliveryVerificationException($attempts+1>=5?'Too many incorrect PINs. Wait for the attempt window to end before trying again.':'Incorrect delivery PIN. Ask the customer to check their current PIN.', $attempts+1>=5?429:422, $attempts+1>=5?'pin_attempt_limit':'pin_incorrect', $attempts+1>=5?max(1,($window>$now?$window:$now+1800)-$now):0);
             }
             $stamp=date('Y-m-d H:i:s');
             if ($records->insert(['order_id'=>$id,'assignment_id'=>(int)$assignment['id'],'delivery_user_id'=>$riderId,'verified_at'=>$stamp,'cash_amount'=>$cod?$order['total_amount']:null,'collected_at'=>$cod?$stamp:null])===false) throw new \RuntimeException('Unable to save delivery record.');

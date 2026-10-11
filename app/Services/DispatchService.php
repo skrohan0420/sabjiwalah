@@ -16,10 +16,26 @@ class DispatchService
             $order['delayed'] = $order['waiting_minutes'] >= ($order['order_status'] === 'ready_for_delivery' ? 15 : 30);
             $order['status_changed_at'] = $changed->format(DATE_ATOM);
             $order['assigned_at'] = $order['assigned_at'] ? (new \DateTimeImmutable($order['assigned_at'], new \DateTimeZone(config('App')->appTimezone)))->format(DATE_ATOM) : null;
+            $order['destination'] = $this->coordinates($order['delivery_latitude'], $order['delivery_longitude']);
+            $order['rider_location'] = null;
+            $point = $this->coordinates($order['rider_latitude'], $order['rider_longitude']);
+            if ($point && is_numeric($order['rider_accuracy']) && (float) $order['rider_accuracy'] >= 0 && (float) $order['rider_accuracy'] <= 100 && $order['location_recorded_at'] && $order['location_expires_at']) {
+                $recorded = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $order['location_recorded_at'], new \DateTimeZone('UTC'));
+                $expires = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $order['location_expires_at'], new \DateTimeZone('UTC'));
+                $age = $recorded ? time() - $recorded->getTimestamp() : -1;
+                if ($recorded && $expires && $age >= 0 && $expires->getTimestamp() > time()) $order['rider_location'] = $point + ['accuracy' => (float) $order['rider_accuracy'], 'recorded_at' => $recorded->format(DATE_ATOM), 'age_seconds' => $age, 'stale' => $age >= 120];
+            }
+            unset($order['delivery_latitude'], $order['delivery_longitude'], $order['rider_latitude'], $order['rider_longitude'], $order['rider_accuracy'], $order['location_recorded_at'], $order['location_expires_at']);
             unset($order['updated_at']);
         }
         unset($order);
         return $data;
+    }
+
+    private function coordinates(mixed $lat, mixed $lng): ?array
+    {
+        if (!is_numeric($lat) || !is_numeric($lng) || !is_finite((float) $lat) || !is_finite((float) $lng) || abs((float) $lat) > 90 || abs((float) $lng) > 180) return null;
+        return ['latitude' => (float) $lat, 'longitude' => (float) $lng];
     }
 
     public function assign(string $orderUid, string $riderUid, string $expectedAssignment, int $actorId): array

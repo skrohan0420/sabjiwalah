@@ -81,7 +81,7 @@
     clearTimeout(timer); inFlight = true; refreshButton.disabled = true;
     controls();
     content.setAttribute('aria-busy', 'true');
-    try { const payload = await ui.api('api/v1/delivery/dashboard'); if (!stopped) render(payload.data); }
+    try { const payload = await ui.api('api/v1/delivery/dashboard'); if (!stopped && !document.hidden && navigator.onLine !== false) render(payload.data); }
     catch (error) {
       if (stopped) return;
       terminal = [401, 403].includes(error.status);

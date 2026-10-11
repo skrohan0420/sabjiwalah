@@ -11,6 +11,12 @@ class DeliveryCompletionModel extends Model
     {
         return $this->db->query($this->db->table($this->table)->where('order_id',$orderId)->getCompiledSelect().' FOR UPDATE')->getRowArray();
     }
+    public function riderCashTotals(int $riderId): array
+    {
+        $row=$this->db->table($this->table)->where('delivery_user_id',$riderId)
+            ->select('COALESCE(SUM(cash_amount),0) AS collected, COALESCE(SUM(CASE WHEN reconciled_at IS NULL THEN cash_amount ELSE 0 END),0) AS pending, COALESCE(SUM(CASE WHEN reconciled_at IS NOT NULL THEN cash_amount ELSE 0 END),0) AS reconciled',false)->get()->getRowArray();
+        return array_map(static fn($value)=>number_format((float)$value,2,'.',''),$row);
+    }
     public function riderToday(int $riderId, string $start, string $end): array
     {
         $completed = $this->db->table($this->table)->where('delivery_user_id', $riderId)

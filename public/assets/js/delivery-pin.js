@@ -5,7 +5,7 @@
   const states = panels.map(panel => ({
     panel, button: panel.querySelector('[data-pin-generate]'),
     value: panel.querySelector('[data-pin-value]'), message: panel.querySelector('[data-pin-message]'),
-    expires: 0, retry: 0,
+    expires: 0, retry: 0, eligible: !panel.hidden, revision: 0,
   }));
   function clear(state) { state.value.textContent = ''; state.value.hidden = true; state.expires = 0; }
   function refresh() {
@@ -14,12 +14,13 @@
         clear(state);
         state.message.textContent = 'Your PIN expired. Generate a new PIN when your order arrives.';
       }
-      state.button.disabled = busy || Date.now() < state.retry;
+      state.button.disabled = busy || !state.eligible || Date.now() < state.retry;
     }
   }
   for (const state of states) state.button.addEventListener('click', async () => {
-    if (busy || Date.now() < state.retry || !alive) return;
+    if (busy || !state.eligible || Date.now() < state.retry || !alive) return;
     busy = true; clear(state); refresh();
+    const revision = state.revision;
     state.message.textContent = 'Generating your PIN…';
     let mutationStarted = false;
     try {
@@ -28,6 +29,7 @@
       });
       const csrf = await csrfResponse.json();
       if (!csrfResponse.ok || !csrf.success) throw new Error('Unable to start. Refresh this page and try again.');
+      if (!alive || !state.eligible || state.revision !== revision) return;
       mutationStarted = true;
       state.retry = Date.now() + 60000;
       const response = await fetch(window.Sabjiwalah.url('api/v1/orders/' + encodeURIComponent(state.panel.dataset.deliveryPin) + '/delivery-pin'), {
@@ -36,7 +38,7 @@
         body: '{}',
       });
       const result = await response.json();
-      if (!alive) return;
+      if (!alive || !state.eligible || state.revision !== revision) return;
       if (!response.ok || !result.success) {
         if (response.status === 429) state.retry = Date.now() + Math.min(1800, Math.max(1, Number(result.data?.retry_after) || 60)) * 1000;
         throw new Error(response.status === 401 ? 'Your session expired. Sign in again and reload your orders.' : result.message || 'Unable to generate your PIN.');
@@ -49,7 +51,7 @@
       state.button.textContent = 'Generate a new PIN';
       state.message.textContent = 'Valid for 30 minutes. This PIN is shown once and is cleared when you leave this page. Wait one minute before generating another.';
     } catch (error) {
-      if (alive) {
+      if (alive && state.eligible && state.revision === revision) {
         if (mutationStarted && (error instanceof TypeError || error instanceof SyntaxError)) {
           state.retry = Date.now() + 60000;
           state.message.textContent = 'Connection lost. A PIN may have been generated. Wait one minute before trying again.';
@@ -58,6 +60,15 @@
     } finally { busy = false; if (alive) refresh(); }
   });
   const timer = setInterval(refresh, 1000);
+  window.addEventListener('sabjiwalah:order-progress', event => {
+    for (const state of states) if (state.panel.dataset.deliveryPin === event.detail?.uid) {
+      const eligible = event.detail.status === 'out_for_delivery';
+      if (eligible !== state.eligible) ++state.revision;
+      state.eligible = eligible; state.panel.hidden = !state.eligible;
+      if (!state.eligible) clear(state);
+    }
+    refresh();
+  });
   document.addEventListener('visibilitychange', refresh);
   window.addEventListener('pagehide', () => { alive = false; states.forEach(clear); clearInterval(timer); });
   window.addEventListener('pageshow', event => { if (event.persisted) window.location.reload(); });

@@ -51,6 +51,7 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
                                 <span><?= esc($statusLabel((string) $order['order_status'])) ?></span>
                             </div>
                             <p><?= esc((string) ((int) ($order['item_count'] ?? 0))) ?> items</p>
+                            <p><a href="<?= esc(base_url('orders/' . rawurlencode($order['uid'])), 'attr') ?>">Track order and view details</a></p>
                             <dl>
                                 <div>
                                     <dt>Total</dt>

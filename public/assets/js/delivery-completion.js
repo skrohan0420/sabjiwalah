@@ -10,6 +10,7 @@
   const statusName = value => String(value || '').replaceAll('_', ' ');
   function link(label, href) { const node = el('a', label, 'delivery-button'); node.href = href; return node; }
   let busy = false, uncertain = false, alive = true;
+  const cooldowns = new Map(), cooldownTimers = new Set();
   function el(tag, text, cls) {
     const node = document.createElement(tag);
     node.textContent = text;
@@ -21,7 +22,8 @@
     ui.setBusy(value, text);
     refresh.disabled = value;
     list.setAttribute('aria-busy', String(value));
-    list.querySelectorAll('button').forEach(button => { button.disabled = value || uncertain; });
+    list.querySelectorAll('button').forEach(button => { button.disabled = value || uncertain || (button.deliveryRetryUntil || 0) > Date.now(); });
+    for (const tag of ['input','textarea','select']) list.querySelectorAll(tag).forEach(input => { input.disabled = value || uncertain; });
   }
   function showError(error) {
     if (!alive) return;
@@ -29,7 +31,7 @@
     message.textContent = ui.errorText(error) + (uncertain && ![401, 403].includes(error.status) ? ' Refresh orders before trying again.' : '');
     message.hidden = false;
   }
-  async function run(body, path, method, successText) {
+  async function run(body, path, method, successText, feedback) {
     if (busy || ui.isBusy() || uncertain || !alive) return;
     setBusy(true, 'Saving delivery action…');
     message.hidden = true;
@@ -42,7 +44,8 @@
       uncertain = true;
       await loadOrders();
     } catch (error) {
-      uncertain = uncertain || !error.status || error.status >= 500 || [401, 403, 409].includes(error.status);
+      uncertain = uncertain || !error.status || error.status >= 500 || [401, 403].includes(error.status) || (error.status === 409 && error.code !== 'pin_expired');
+      feedback?.(error);
       showError(error);
     } finally { setBusy(false); }
   }
@@ -100,28 +103,59 @@
         card.append(pickup);
       } else if (order.order_status === 'out_for_delivery') {
         const form = el('form', '', 'delivery-form'), label = el('label', 'Customer delivery PIN', 'delivery-field');
+        form.append(el('h3', 'Complete this delivery'), el('p', 'Ask the customer for their current six-digit PIN after handing over the groceries. Their PIN is never shown to you.', 'delivery-note'));
         const pin = el('input', '');
-        pin.inputMode = 'numeric'; pin.autocomplete = 'off'; pin.type = 'password'; pin.pattern = '[0-9]{6}'; pin.maxLength = 6; pin.required = true;
+        pin.inputMode = 'numeric'; pin.autocomplete = 'off'; pin.type = 'password'; pin.pattern = '[0-9]{6}'; pin.maxLength = 6; pin.minLength = 6; pin.required = true;
+        pin.setAttribute('aria-label', 'Six-digit customer delivery PIN');
+        const feedback = el('p', '', 'delivery-note delivery-verification-message'); feedback.setAttribute('role','status'); feedback.setAttribute('aria-live','polite');
+        pin.addEventListener('input', () => { pin.value = pin.value.replace(/[^0-9]/g,'').slice(0,6); });
         label.append(pin);
         const cashLabel = el('label', ' I received the full COD amount of Rs ' + order.total_amount, 'delivery-cash');
         const cash = el('input', ''); cash.type = 'checkbox'; cash.required = order.payment_method === 'cod'; cashLabel.prepend(cash);
         const submit = el('button', 'Verify and complete delivery', 'delivery-button delivery-primary'); submit.type = 'submit';
-        form.append(label); if (order.payment_method === 'cod') form.append(cashLabel); form.append(submit);
+        submit.deliveryRetryUntil = cooldowns.get(order.uid) || 0;
+        if (submit.deliveryRetryUntil > Date.now()) feedback.textContent = 'PIN attempts are paused until ' + stamp(new Date(submit.deliveryRetryUntil).toISOString()) + '. Refresh after that time to retry.';
+        const amount = Number(order.total_amount), payable = Number.isFinite(amount) && amount >= 0;
+        if (order.payment_method === 'cod') form.append(el('p', 'Cash to collect: ' + (payable ? money.format(amount) : 'Amount unavailable — refresh this order.'), 'delivery-amount-due'));
+        else form.append(el('p', order.payment_status === 'paid' ? 'Payment already received. No cash collection is required.' : 'Payment is not confirmed. Delivery cannot be completed until payment is recorded.', 'delivery-note'));
+        form.append(label); if (order.payment_method === 'cod') form.append(cashLabel); form.append(feedback, submit);
         form.addEventListener('submit', event => {
           event.preventDefault();
           if (busy || ui.isBusy() || uncertain) return;
+          if ((cooldowns.get(order.uid) || 0) > Date.now()) return;
+          if (!/^[0-9]{6}$/.test(pin.value)) { feedback.textContent = 'Enter exactly six numeric digits from the customer’s current PIN.'; pin.setAttribute('aria-invalid','true'); return; }
+          if (!payable || (order.payment_method === 'cod' && !cash.checked)) { feedback.textContent = 'Confirm that you received the full displayed COD amount.'; return; }
+          if (order.payment_method !== 'cod' && order.payment_status !== 'paid') { feedback.textContent = 'Payment is not confirmed. Refresh the order after payment is recorded.'; return; }
           const entered = pin.value; pin.value = '';
-          run({ pin: entered, cash_received: cash.checked }, 'api/v1/delivery/orders/' + encodeURIComponent(order.uid) + '/complete', 'POST', 'Delivery completed.');
+          pin.setAttribute('aria-invalid','false'); feedback.textContent = 'Verifying the PIN and saving delivery…';
+          run({ pin: entered, cash_received: order.payment_method === 'cod' && cash.checked }, 'api/v1/delivery/orders/' + encodeURIComponent(order.uid) + '/complete', 'POST', 'Delivery completed.', error => {
+            feedback.textContent = ui.errorText(error);
+            if (error.code === 'pin_incorrect' || error.status === 422) pin.setAttribute('aria-invalid','true');
+            if (error.status === 429) {
+              const wait = Math.min(1800, Math.max(1, Number(error.retryAfter) || 1800));
+              const until = Date.now() + wait * 1000; cooldowns.set(order.uid, until); submit.deliveryRetryUntil = until;
+              feedback.textContent += ' Retry after ' + stamp(new Date(until).toISOString()) + '. You can still report a failed delivery.';
+              const timer = setTimeout(() => { cooldownTimers.delete(timer); if (alive) setBusy(busy); }, wait * 1000); cooldownTimers.add(timer);
+            }
+          });
         });
         card.append(form);
         const failure = el('form', '', 'delivery-form delivery-failure'), reasonLabel = el('label', 'Failed delivery reason', 'delivery-field');
-        const reason = el('textarea', ''); reason.required = true; reason.maxLength = 1000; reasonLabel.append(reason);
-        const fail = el('button', 'Report failed delivery', 'delivery-button delivery-danger'); fail.type = 'submit'; failure.append(reasonLabel, fail);
+        const choiceLabel = el('label','Choose a reason','delivery-field'), choice = el('select','');
+        const reasons = ['', 'Customer unavailable', 'Customer refused delivery', 'Address could not be found', 'Unable to contact customer', 'Other'];
+        for (const value of reasons) { const option=el('option',value || 'Select a reason'); option.value=value; choice.append(option); } choice.required=true; choiceLabel.append(choice);
+        const reason = el('textarea', ''); reason.maxLength = 900; reasonLabel.textContent='Additional details (required for Other)'; reasonLabel.append(reason);
+        choice.addEventListener('change',()=>{reason.required=choice.value==='Other';});
+        const failureMessage=el('p','','delivery-note');failureMessage.setAttribute('role','status');
+        const fail = el('button', 'Report failed delivery', 'delivery-button delivery-danger'); fail.type = 'submit'; failure.append(choiceLabel,reasonLabel,failureMessage,fail);
         failure.addEventListener('submit', async event => {
           event.preventDefault();
           if (busy || ui.isBusy() || uncertain) return;
-          const notes = reason.value.trim();
-          if (await ui.confirm('Mark ' + order.order_number + ' as a failed delivery?', 'Report failed delivery')) {
+          const details=reason.value.trim();
+          if (!reasons.includes(choice.value) || !choice.value || (choice.value==='Other' && !details)) { failureMessage.textContent='Select a reason and provide details when choosing Other.'; return; }
+          const notes = choice.value + (details ? ': ' + details : '');
+          if (notes.length > 1000) { failureMessage.textContent='Keep the failure reason within 1,000 characters.'; return; }
+          if (await ui.confirm('Mark ' + order.order_number + ' as a failed delivery? Reason: ' + notes + '. This ends the current delivery.', 'Report failed delivery')) {
             run({ status: 'delivery_failed', notes, expected_status: 'out_for_delivery' }, statusPath, 'PATCH', 'Failed delivery recorded.');
           }
         });
@@ -144,6 +178,7 @@
   });
   window.addEventListener('pagehide', () => {
     alive = false;
+    cooldownTimers.forEach(clearTimeout); cooldownTimers.clear();
     window.SabjiwalahDeliveryMap?.clear();
     list.querySelectorAll('input').forEach(input => { input.value = ''; });
     list.querySelectorAll('textarea').forEach(input => { input.value = ''; });

@@ -73,6 +73,23 @@ try { $competing=dispatchAction('assign',['rider_uid'=>$twoUid,'expected_assignm
 finally { CodeIgniter\Events\Events::removeListener('DBQuery',$listener); }
 dispatchCheck(!$interleave,'Interleaving test did not execute.');
 (new App\Models\DeliveryAssignmentModel())->insert(['order_id'=>$orderIds[1],'delivery_user_id'=>$one,'assigned_by'=>$manager,'assigned_at'=>date('Y-m-d H:i:s')]);
+// Admin tracking must use the latest active assignment and unexpired UTC sample.
+$trackingOrder=$orderIds[1];
+$trackingAssignment=$db->table('delivery_assignments')->where('order_id',$trackingOrder)->orderBy('id','DESC')->get()->getRowArray();
+$db->table('orders')->where('id',$trackingOrder)->update(['order_status'=>'out_for_delivery','delivery_latitude'=>0,'delivery_longitude'=>0]);
+$sample=['delivery_user_id'=>$one,'order_id'=>$trackingOrder,'assignment_id'=>$trackingAssignment['id'],'latitude'=>22.51,'longitude'=>88.31,'accuracy'=>15,'captured_at_ms'=>(int)(microtime(true)*1000),'recorded_at'=>gmdate('Y-m-d H:i:s'),'expires_at'=>gmdate('Y-m-d H:i:s',time()+3300)];
+$db->table('delivery_locations')->insert($sample);
+$tracked=static fn()=>dispatchAction('index',[],null,['search'=>'DISPATCH_1'])[1]['data'];
+$result=$tracked();dispatchCheck($result['tracking_available']&&$result['items'][0]['destination']['latitude']==0.0&&$result['items'][0]['rider_location']['latitude']===22.51&&!$result['items'][0]['rider_location']['stale'],'Fresh location or zero destination missing.');
+dispatchCheck(!array_key_exists('rider_latitude',$result['items'][0])&&!array_key_exists('location_expires_at',$result['items'][0]),'Internal tracking columns leaked.');
+$db->table('delivery_locations')->where('delivery_user_id',$one)->update(['recorded_at'=>gmdate('Y-m-d H:i:s',time()-180)]);dispatchCheck($tracked()['items'][0]['rider_location']['stale'],'Stale location warning missing.');
+foreach ([['expires_at'=>gmdate('Y-m-d H:i:s',time()-1)],['recorded_at'=>gmdate('Y-m-d H:i:s',time()+60)],['accuracy'=>101],['assignment_id'=>$trackingAssignment['id']-1],['latitude'=>null,'longitude'=>null]] as $invalid) {
+    $db->table('delivery_locations')->where('delivery_user_id',$one)->update(array_merge($sample,$invalid));dispatchCheck($tracked()['items'][0]['rider_location']===null,'Invalid/expired/obsolete sample exposed.');
+}
+$db->table('delivery_locations')->where('delivery_user_id',$one)->update($sample);
+$db->table('users')->where('id',$one)->update(['status'=>'inactive']);dispatchCheck($tracked()['items'][0]['rider_location']===null,'Inactive rider location exposed.');$db->table('users')->where('id',$one)->update(['status'=>'active']);
+$db->table('orders')->where('id',$trackingOrder)->update(['order_status'=>'ready_for_delivery']);dispatchCheck($tracked()['items'][0]['rider_location']===null,'Pre-pickup rider location exposed.');
+$db->table('delivery_locations')->where('delivery_user_id',$one)->delete();
 // Inject history failure and require both nested transactions to roll back the order.
 $db->query('ALTER TABLE order_status_history CHANGE notes fixture_notes TEXT NULL');
 try {dispatchCheck(deliveryAction('updateStatus',$one,$secondUid,['status'=>'out_for_delivery'])[0]===503,'History failure not reported.');dispatchCheck($orders->find($orderIds[1])['order_status']==='ready_for_delivery','Delivery status partially committed.');}

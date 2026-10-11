@@ -20,9 +20,16 @@ class DispatchModel extends Model
     public function queue(array $filters): array
     {
         $query = $this->queueQuery($filters); $total = $query->countAllResults(false);
-        $items = $query->select('o.uid, o.order_number, o.order_status, o.updated_at, a.uid AS assignment_uid, a.assigned_at, u.uid AS rider_uid, u.name AS rider_name, u.status AS rider_status')
+        $trackingAvailable = $this->db->tableExists('delivery_locations');
+        if ($trackingAvailable) {
+            $query->join('delivery_locations l', "l.delivery_user_id = a.delivery_user_id AND l.assignment_id = a.id AND l.order_id = o.id AND o.order_status = 'out_for_delivery' AND u.role = 'delivery' AND u.status = 'active'", 'left', false)
+                ->select('l.latitude AS rider_latitude, l.longitude AS rider_longitude, l.accuracy AS rider_accuracy, l.recorded_at AS location_recorded_at, l.expires_at AS location_expires_at');
+        } else {
+            $query->select('NULL AS rider_latitude, NULL AS rider_longitude, NULL AS rider_accuracy, NULL AS location_recorded_at, NULL AS location_expires_at', false);
+        }
+        $items = $query->select('o.uid, o.order_number, o.order_status, o.updated_at, o.delivery_latitude, o.delivery_longitude, a.uid AS assignment_uid, a.assigned_at, u.uid AS rider_uid, u.name AS rider_name, u.status AS rider_status')
             ->orderBy('o.updated_at', 'ASC')->orderBy('o.id', 'ASC')->limit($filters['per_page'], ($filters['page'] - 1) * $filters['per_page'])->get()->getResultArray();
-        return ['items' => $items, 'pager' => $this->pager($filters['page'], $filters['per_page'], $total)];
+        return ['items' => $items, 'tracking_available' => $trackingAvailable, 'pager' => $this->pager($filters['page'], $filters['per_page'], $total)];
     }
 
     public function candidates(array $filters): array

@@ -15,6 +15,15 @@ function setup(count = 1) {
   return {panels, calls, events, docEvents, advance(ms) { now += ms; tick(); }, now: () => now};
 }
 const flush = () => new Promise(resolve => setImmediate(resolve));
+test('progress changes clear PINs and prevent late issuance responses from restoring them', async()=>{
+  const s=setup(),pending=await start(s);
+  s.events['sabjiwalah:order-progress']({detail:{uid:'ord_0',status:'delivered'}});
+  s.events['sabjiwalah:order-progress']({detail:{uid:'ord_0',status:'out_for_delivery'}});
+  reply(s.calls[1],200,issued(s));await pending.promise;
+  assert.equal(s.panels[0].nodes.value.textContent,'');
+  s.events['sabjiwalah:order-progress']({detail:{uid:'ord_0',status:null}});
+  assert.equal(s.panels[0].hidden,true);assert.equal(s.panels[0].nodes.generate.disabled,true);
+});
 const reply = (call, status, data) => call.resolve({ok: status === 200, status, json: async () => data});
 async function start(s, index = 0) {
   const promise = s.panels[index].nodes.generate.click();

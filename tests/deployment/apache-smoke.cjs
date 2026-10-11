@@ -26,5 +26,5 @@ assert.ok(base && base.endsWith('/'), 'Supply the configured base URL with a tra
   const legacy = await fetch(base + 'index.php/products?check=1', { redirect: 'manual' });
   assert.equal(legacy.status, 301);
   assert.equal(new URL(legacy.headers.get('location'), base).href, base + 'products?check=1');
-  console.log('Apache smoke checks passed: pages, assets, API, private paths, and legacy redirect.');
+  console.log('Apache smoke checks passed: pages, assets, API, private paths, legacy redirect.');
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

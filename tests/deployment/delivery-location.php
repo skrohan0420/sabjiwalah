@@ -48,6 +48,8 @@ $assignments->insert(['order_id' => $id, 'delivery_user_id' => $other, 'assigned
 locationReject(fn () => $service->record($rider, $later, $now + 16000), OutOfBoundsException::class);
 locationReject(fn () => $service->record($other, $later, $now + 16000), App\Services\OrderConflictException::class);
 $db->table('delivery_locations')->update(['expires_at' => gmdate('Y-m-d H:i:s', time() - 1)]);
+$expired=[];for($i=0;$i<1001;$i++)$expired[]=['delivery_user_id'=>10000+$i,'order_id'=>$id,'assignment_id'=>$aid,'latitude'=>1,'longitude'=>1,'accuracy'=>15,'captured_at_ms'=>$now,'recorded_at'=>gmdate('Y-m-d H:i:s',time()-3600),'expires_at'=>gmdate('Y-m-d H:i:s',time()-1)];
+$db->table('delivery_locations')->insertBatch($expired);
 (new App\Commands\PruneDeliveryLocations(service('logger'), service('commands')))->run([]);
-locationCheck($db->table('delivery_locations')->countAllResults() === 0, 'Expiration pruning failed.');
+locationCheck($db->table('delivery_locations')->countAllResults() === 0, 'Expiration pruning left a backlog larger than one deletion batch.');
 echo "PASS: location validation/freshness, actor/current-assignment authorization, duplicate conflicts, rate limiting including stop/restart, latest-only storage, terminal cleanup, reassignment and retention pruning. Temporary SQL only.\n";

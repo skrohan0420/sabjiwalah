@@ -18,14 +18,14 @@ class LocationController extends BaseApiController
             'accuracy' => 'required|decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
             'captured_at_ms' => 'required|integer',
         ])) return $this->validationError(['location' => 'Supply fresh numeric coordinates and accuracy within 100 metres for this assignment.']);
-        return $this->perform(fn () => (new DeliveryLocationService())->record((int) session('user_id'), $data));
+        return $this->perform(fn () => (new DeliveryLocationService())->record((int) \App\Services\AuthService::id('delivery'), $data));
     }
 
     public function stop()
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
         if ($this->requestData() !== []) return $this->validationError(['location' => 'No rider identifier may be supplied.']);
-        return $this->perform(function () { (new DeliveryLocationService())->stop((int) session('user_id')); return null; });
+        return $this->perform(function () { (new DeliveryLocationService())->stop((int) \App\Services\AuthService::id('delivery')); return null; });
     }
 
     private function perform(callable $action)

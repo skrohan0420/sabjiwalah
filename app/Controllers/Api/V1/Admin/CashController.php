@@ -21,7 +21,7 @@ class CashController extends BaseApiController
     {
         $this->response->setHeader('Cache-Control','private, no-store');
         if ($this->requestData()!==[]) return $this->validationError(['payload'=>'No amount or actor fields are accepted.']);
-        try { (new DeliveryCompletionService())->reconcile($uid,(int)session('user_id')); return $this->success(null,'Cash reconciled.');
+        try { (new DeliveryCompletionService())->reconcile($uid,(int)\App\Services\AuthService::id('admin')); return $this->success(null,'Cash reconciled.');
         } catch (\OutOfBoundsException $e) { return $this->error($e->getMessage(),404);
         } catch (\Throwable) { return $this->error('Unable to reconcile cash. Reload before trying again.',503); }
     }

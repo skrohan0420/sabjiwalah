@@ -17,7 +17,7 @@ class DevelopmentSeeder extends Seeder
     private function seedUsers(): void
     {
         $users = new UserModel();
-        $password = password_hash('Password@123', PASSWORD_DEFAULT);
+        $password = null;
 
         $records = [
             [
@@ -47,9 +47,10 @@ class DevelopmentSeeder extends Seeder
         ];
 
         foreach ($records as $record) {
-            $existing = $users->where('email', $record['email'])->first();
+            $existing = $users->where('role', $record['role'])->where('phone', $record['phone'])->first();
 
             if ($existing) {
+                unset($record['password_hash']); // Preserve legacy hashes; they no longer authenticate.
                 $users->update($existing['id'], $record);
                 continue;
             }

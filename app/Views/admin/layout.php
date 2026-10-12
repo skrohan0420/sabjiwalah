@@ -7,7 +7,7 @@
 <?= view('shared/theme') ?>
 <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/admin.css'), 'attr') ?>">
 <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
-<script defer src="<?= esc(app_static_url('assets/js/admin.js'), 'attr') ?>" data-login-url="<?= esc(site_url('login'), 'attr') ?>"></script>
+<script defer src="<?= esc(app_static_url('assets/js/admin.js'), 'attr') ?>" data-login-url="<?= esc(site_url('admin/login'), 'attr') ?>"></script>
 </head>
 <body class="admin-body">
 <a class="admin-skip" href="#admin-main">Skip to content</a>
@@ -31,7 +31,7 @@
 <button class="admin-backdrop" type="button" data-admin-close aria-label="Close navigation" hidden></button>
 <div class="admin-workspace">
 <header class="admin-topbar"><div class="admin-topbar-title"><button class="admin-icon-button admin-mobile-only" type="button" data-admin-menu aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open navigation">☰</button><span>Store administration</span></div>
-<div class="admin-topbar-actions"><button class="admin-button admin-button-secondary" type="button" data-theme-toggle aria-pressed="false">Appearance</button><details class="admin-account"><summary><span class="admin-avatar" aria-hidden="true">A</span><span class="admin-account-name"><?= esc(session('user_name') ?: 'Administrator') ?></span><span aria-hidden="true">⌄</span></summary><div class="admin-account-menu"><p class="admin-caption">Signed in as admin</p><a href="<?= esc(site_url(), 'attr') ?>">View storefront</a><button type="button" data-admin-logout>Sign out</button></div></details></div>
+<div class="admin-topbar-actions"><button class="admin-button admin-button-secondary" type="button" data-theme-toggle aria-pressed="false">Appearance</button><details class="admin-account"><summary><span class="admin-avatar" aria-hidden="true">A</span><span class="admin-account-name"><?= esc((\App\Services\AuthService::identity('admin')['name'] ?? null) ?: 'Administrator') ?></span><span aria-hidden="true">⌄</span></summary><div class="admin-account-menu"><p class="admin-caption">Signed in as admin</p><a href="<?= esc(site_url(), 'attr') ?>">View storefront</a><button type="button" data-admin-logout>Sign out</button></div></details></div>
 </header>
 <main id="admin-main" class="admin-main" tabindex="-1">
 <div id="admin-feedback" class="admin-alert" role="status" aria-live="polite" hidden></div>

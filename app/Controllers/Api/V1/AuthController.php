@@ -7,11 +7,12 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class AuthController extends BaseApiController
 {
+    protected string $authRole = 'customer';
     public function startOtp()
     {
         return $this->otpResponse(function () {
             $data = $this->otpInput(false);
-            return $this->success((new AuthService())->startPhoneOtp($data['phone']), 'OTP generated for local development testing.');
+            return $this->success(AuthService::forRole($this->authRole)->startPhoneOtp($data['phone']), 'OTP generated for local development testing.');
         });
     }
 
@@ -34,7 +35,7 @@ class AuthController extends BaseApiController
     {
         return $this->otpResponse(function () use ($status) {
             $data = $this->otpInput(true);
-            $auth = new AuthService();
+            $auth = AuthService::forRole($this->authRole);
             if (! $auth->verifyPhoneOtp($data['phone'], $data['otp'])) {
                 return $this->error('Invalid or expired OTP.', ResponseInterface::HTTP_UNAUTHORIZED);
             }
@@ -57,11 +58,7 @@ class AuthController extends BaseApiController
     public function logout()
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
-        if (session('user_role') === 'delivery' && db_connect()->tableExists('delivery_locations')) {
-            try { (new \App\Services\DeliveryLocationService())->stop((int) session('user_id')); }
-            catch (\Throwable) { /* Always allow logout; expiration/pruning handles unavailable storage. */ }
-        }
-        (new AuthService())->logout();
+        AuthService::forRole($this->authRole)->logout();
 
         return $this->success(null, 'Logout successful');
     }
@@ -69,7 +66,7 @@ class AuthController extends BaseApiController
     public function me()
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
-        $auth = new AuthService();
+        $auth = AuthService::forRole($this->authRole);
 
         if (! $auth->check()) {
             return $this->error('Unauthenticated', ResponseInterface::HTTP_UNAUTHORIZED);

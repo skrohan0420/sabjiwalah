@@ -10,8 +10,8 @@ const {spawn}=require('node:child_process'),{randomUUID}=require('node:crypto');
 if(PHP_SAPI!=='cli-server'||!in_array($_SERVER['REMOTE_ADDR'],['127.0.0.1','::1'],true))exit;
 header('X-Sabjiwalah-Fixture: ${token}');$path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 if($path==='/admin'){header('Location: /admin/settings');exit;}if(str_starts_with($path,'/assets/'))return false;
-if(!preg_match('#^/(?:_fixture/session|login|admin/settings|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|login|register|logout|me)|checkout/(?:otp/start|otp/verify|place)|admin/settings))$#D',$path)){http_response_code(404);exit;}
-define('ENVIRONMENT','${production?'production':'development'}');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);config('App')->baseURL='${base}';config('Otp')->developmentMode=true;
+if(!preg_match('#^/(?:_fixture/session|login|admin/settings|api/v1/(?:csrf|(?:(?:admin|delivery|customer)/)?auth/(?:otp/start|otp/verify|login|register|logout|me)|checkout/(?:otp/start|otp/verify|place)|admin/settings))$#D',$path)){http_response_code(404);exit;}
+define('ENVIRONMENT','${production?'production':'development'}');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);require '${root}/tests/_support/fixture-database.php';config('App')->baseURL='${base}';config('Otp')->developmentMode=true;
 // Production normally selects the hosted DB and HTTPS. This loopback fixture uses the local DB/HTTP;
 // it verifies production OTP behavior, not TLS transport. Application deployment settings are untouched.
 if(ENVIRONMENT==='production'){if(!in_array(config('Database')->local['hostname'],['localhost','127.0.0.1','::1'],true))throw new RuntimeException('A local fixture database is required.');config('Database')->default=config('Database')->local;config('App')->forceGlobalSecureRequests=false;$_SERVER['HTTPS']='on';}
@@ -26,14 +26,14 @@ else{$db->table('users')->insertBatch([
 $db->table('operational_settings')->insert(['id'=>1,'shop_open'=>1,'orders_paused'=>0,'delivery_charge'=>40,'free_delivery_minimum'=>499,'minimum_order_amount'=>0,'revision'=>1,'updated_at'=>date('Y-m-d H:i:s')]);}
 if($path==='/_fixture/session'){
 if(($_SERVER['HTTP_X_FIXTURE_SESSION']??'')!=='${token}'){http_response_code(404);exit;}
-$proof=json_decode(file_get_contents('php://input'),true);service('session')->set(['user_id'=>1,'user_uid'=>'usr_sample_admin','user_role'=>'admin','is_logged_in'=>true]+$proof);header('Content-Type: application/json');echo json_encode(['seeded'=>true]);exit;
+$proof=json_decode(file_get_contents('php://input'),true);service('session')->set(isset($proof['admin_auth'])?$proof:['user_id'=>1,'user_uid'=>'usr_sample_admin','user_role'=>'admin','is_logged_in'=>true]+$proof);header('Content-Type: application/json');echo json_encode(['seeded'=>true]);exit;
 }
 $app->run();$state=[];foreach($tables as$table)$state[$table]=$db->table($table)->get()->getResultArray();file_put_contents($file,json_encode($state));`;
   await fs.writeFile(path.join(directory,'router.php'),router);
   const server=spawn(process.env.PHP_BINARY||'D:/xampp/php/php.exe',['-S','127.0.0.1:'+port,'-t',root+'/public',path.join(directory,'router.php')],{cwd:root,windowsHide:true,stdio:['ignore','ignore','pipe']});let diagnostics='';server.stderr.on('data',c=>diagnostics+=c);
   function client(){const cookies=new Map();const request=async(url,options={})=>{const r=await fetch(base+url,{...options,redirect:'manual',headers:{Accept:'application/json',...options.headers,Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}});assert.equal(r.headers.get('x-sabjiwalah-fixture'),token);for(const cookie of r.headers.getSetCookie()){const pair=cookie.split(';')[0],i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1));}return r;};request.cookies=cookies;return request;}
-  async function mutate(request,url,body){const r=await request('api/v1/csrf');assert.equal(r.status,200,diagnostics);assert.match(r.headers.get('cache-control'),/no-store/);const token=(await r.json()).data;return request(url,{method:'POST',headers:{'Content-Type':'application/json',[token.header_name]:token.token_value},body:JSON.stringify(body)});}
-  async function issue(request,phone){const r=await mutate(request,'api/v1/auth/otp/start',{phone});assert.equal(r.status,200,await r.clone().text());assert.match(r.headers.get('cache-control'),/no-store/);return(await r.json()).data.dev_otp;}
+  async function mutate(request,url,body){if(request.authRole)url=url.replace('api/v1/auth/','api/v1/'+request.authRole+'/auth/');const r=await request('api/v1/csrf');assert.equal(r.status,200,diagnostics);assert.match(r.headers.get('cache-control'),/no-store/);const token=(await r.json()).data;return request(url,{method:'POST',headers:{'Content-Type':'application/json',[token.header_name]:token.token_value},body:JSON.stringify(body)});}
+  async function issue(request,phone){request.authRole=phone==='9000000001'||phone==='9000000002'?'admin':'customer';const r=await mutate(request,'api/v1/auth/otp/start',{phone});assert.equal(r.status,200,await r.clone().text());assert.match(r.headers.get('cache-control'),/no-store/);return(await r.json()).data.dev_otp;}
   async function ageSendCooldowns(){const file=path.join(directory,'state.json'),state=JSON.parse(await fs.readFile(file,'utf8'));for(const row of state.otp_rate_limits)row.last_used_at=Number(row.last_used_at)-60;await fs.writeFile(file,JSON.stringify(state));}
   try{
     let ready=false;for(let i=0;i<40;i++){try{if((await fetch(base+'api/v1/csrf',{redirect:'manual'})).headers.get('x-sabjiwalah-fixture')===token){ready=true;break;}}catch{}if(server.exitCode!==null)break;await new Promise(r=>setTimeout(r,100));}assert.ok(ready,diagnostics);
@@ -46,10 +46,10 @@ $app->run();$state=[];foreach($tables as$table)$state[$table]=$db->table($table)
     if(production){
       const cookieResponse=await client()('api/v1/csrf');
       assert.ok(cookieResponse.headers.getSetCookie().some(cookie=>cookie.startsWith('csrf_cookie_name=')&&/;\s*Secure/i.test(cookie)&&/;\s*HttpOnly/i.test(cookie)&&/;\s*SameSite=Lax/i.test(cookie)), 'Production CSRF cookie attributes are unsafe.');
-      for(const endpoint of ['auth/otp/start','auth/otp/verify','auth/login','auth/register']){
-        const r=await mutate(guest,'api/v1/'+endpoint,{phone:'9000000001',...(endpoint==='auth/otp/start'?{}:{otp:'123456'})});assert.equal(r.status,503);assert.match(r.headers.get('cache-control'),/no-store/);assert.ok(!JSON.stringify(await r.json()).includes('dev_otp'));
+      for(const endpoint of ['auth/otp/start','auth/otp/verify','auth/login','auth/register',...['customer','admin','delivery'].flatMap(role=>[role+'/auth/otp/start',role+'/auth/otp/verify'])]){
+        const r=await mutate(guest,'api/v1/'+endpoint,{phone:'9000000001',...(endpoint.endsWith('otp/start')?{}:{otp:'123456'})});assert.equal(r.status,503);assert.match(r.headers.get('cache-control'),/no-store/);assert.ok(!JSON.stringify(await r.json()).includes('dev_otp'));
       }
-      assert.equal((await guest('api/v1/auth/me')).status,401);
+      assert.equal((await guest('api/v1/admin/auth/me')).status,401);
       for(const proof of [{},{auth_proof_version:1,auth_method:'local_development'}]){
         const old=client(),seeded=await old('_fixture/session',{method:'POST',headers:{'Content-Type':'application/json','X-Fixture-Session':token},body:JSON.stringify(proof)});assert.equal(seeded.status,200);
         assert.ok(seeded.headers.getSetCookie().some(cookie=>cookie.startsWith('ci_session=')&&/;\s*Secure/i.test(cookie)&&/;\s*HttpOnly/i.test(cookie)&&/;\s*SameSite=Lax/i.test(cookie)), 'Production session cookies must be Secure/HttpOnly/SameSite.');
@@ -57,7 +57,7 @@ $app->run();$state=[];foreach($tables as$table)$state[$table]=$db->table($table)
         assert.equal((await old('api/v1/auth/me')).status,401);
       }
       // Simulate an already authenticated server session to test scheduled rotation, independent of SMS.
-      const rotating=client();assert.equal((await rotating('_fixture/session',{method:'POST',headers:{'Content-Type':'application/json','X-Fixture-Session':token},body:JSON.stringify({auth_proof_version:1,auth_method:'password',__ci_last_regenerate:Math.floor(Date.now()/1000)-301})})).status,200);
+      const rotating=client();assert.equal((await rotating('_fixture/session',{method:'POST',headers:{'Content-Type':'application/json','X-Fixture-Session':token},body:JSON.stringify({admin_auth:{id:1,uid:'usr_sample_admin',role:'admin',phone:'9000000001',proof_version:2,method:'sms',purpose:'admin_login',authenticated_at:Math.floor(Date.now()/1000)},__ci_last_regenerate:Math.floor(Date.now()/1000)-301})})).status,200);
       const priorId=rotating.cookies.get('ci_session');assert.equal((await rotating('api/v1/admin/settings')).status,200);assert.notEqual(rotating.cookies.get('ci_session'),priorId,'Periodic regeneration did not rotate the cookie.');
       const replay=client();replay.cookies.set('ci_session',priorId);assert.equal((await replay('api/v1/admin/settings')).status,401,'A destroyed periodic session ID retained admin access.');
       console.log('PASS: production HTTP fails closed for all login/register aliases; no testing codes, no session privilege, CSRF/private responses. Disposable SQL/storage.');
@@ -73,17 +73,17 @@ $app->run();$state=[];foreach($tables as$table)$state[$table]=$db->table($table)
       assert.equal(hostDenied.fixture,token);assert.equal(hostDenied.status,503,'Public Host obtained a testing OTP.');assert.ok(!hostDenied.body.includes('dev_otp'));
       const code=await issue(guest,'9000000001');const oldSession=guest.cookies.get('ci_session');
       let r=await mutate(guest,'api/v1/auth/otp/start',{phone:'9000000001'});assert.equal(r.status,429);assert.ok(Number(r.headers.get('retry-after'))>0);assert.match(r.headers.get('cache-control'),/no-store/);
-      const stranger=client();r=await mutate(stranger,'api/v1/auth/otp/start',{phone:'9000000001'});assert.equal(r.status,429,'A new session bypassed the resend limit.');
+      const stranger=client();stranger.authRole='admin';r=await mutate(stranger,'api/v1/auth/otp/start',{phone:'9000000001'});assert.equal(r.status,429,'A new session bypassed the resend limit.');
       assert.equal((await mutate(stranger,'api/v1/auth/otp/verify',{phone:'9000000001',otp:code})).status,401,'A different session replayed a code.');
       assert.equal((await mutate(guest,'api/v1/auth/otp/verify',{phone:'9000000001',otp:code})).status,200);assert.notEqual(guest.cookies.get('ci_session'),oldSession);
       assert.equal((await guest('api/v1/admin/settings')).status,200);assert.match((await guest('api/v1/auth/me')).headers.get('cache-control'),/no-store/);
-      assert.equal((await mutate(guest,'api/v1/auth/login',{phone:'9000000001',otp:code})).status,401);await mutate(guest,'api/v1/auth/logout',{});assert.equal((await guest('api/v1/admin/settings')).status,401);
+      assert.equal((await mutate(guest,'api/v1/auth/otp/verify',{phone:'9000000001',otp:code})).status,401);await mutate(guest,'api/v1/auth/logout',{});assert.equal((await guest('api/v1/admin/settings')).status,401);
       const shopper=client(),shopCode=await issue(shopper,'9000000003');assert.equal((await mutate(shopper,'api/v1/auth/otp/verify',{phone:'9000000003',otp:shopCode})).status,200);assert.equal((await shopper('api/v1/admin/settings')).status,403);
       let checkoutResponse=await mutate(shopper,'api/v1/checkout/otp/start',{customer_phone:'9000000003'});assert.equal(checkoutResponse.status,200);const checkoutCode=(await checkoutResponse.json()).data.dev_otp;
       assert.equal((await mutate(shopper,'api/v1/checkout/otp/start',{customer_phone:'9000000003'})).status,429);
       assert.equal((await mutate(shopper,'api/v1/checkout/otp/verify',{customer_phone:'9000000003',otp:checkoutCode})).status,200);
       assert.equal((await mutate(shopper,'api/v1/checkout/otp/verify',{customer_phone:'9000000003',otp:checkoutCode})).status,400);
-      const inactive=client(),inactiveCode=await issue(inactive,'9000000002');assert.equal((await mutate(inactive,'api/v1/auth/otp/verify',{phone:'9000000002',otp:inactiveCode})).status,401);
+      const inactive=client();assert.equal((await mutate(inactive,'api/v1/admin/auth/otp/start',{phone:'9000000002'})).status,422);
       const target='9000000004',guesser=client(),targetCode=await issue(guesser,target),bad=targetCode==='111111'?'222222':'111111';
       for(let i=0;i<5;i++)assert.equal((await mutate(guesser,'api/v1/auth/otp/verify',{phone:target,otp:bad})).status,401);
       r=await mutate(client(),'api/v1/auth/otp/verify',{phone:target,otp:targetCode});assert.equal(r.status,429);assert.ok(Number(r.headers.get('retry-after'))>0);

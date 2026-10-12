@@ -15,7 +15,7 @@ class DashboardController extends BaseController
     public function deliveries(): string
     {
         return $this->page('deliveries', 'My deliveries', [
-            'assignmentCount' => (new DispatchModel())->workload((int) session('user_id')),
+            'assignmentCount' => (new DispatchModel())->workload((int) \App\Services\AuthService::id('delivery')),
         ]);
     }
 
@@ -27,7 +27,7 @@ class DashboardController extends BaseController
     public function order(string $uid)
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
-        if (! (new \App\Models\DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)) return $this->response->setStatusCode(404)->setBody('Assigned order not found.');
+        if (! (new \App\Models\DeliveryOrderModel())->currentForRider((int) \App\Services\AuthService::id('delivery'), $uid)) return $this->response->setStatusCode(404)->setBody('Assigned order not found.');
         return $this->page('deliveries', 'Delivery details', ['orderUid' => $uid, 'assignmentCount' => 1, 'detailView' => true]);
     }
 
@@ -40,8 +40,8 @@ class DashboardController extends BaseController
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
         return view('delivery/' . (! empty($data['detailView']) ? 'order' : ($section === 'deliveries' ? 'dashboard' : $section)), $data + [
-            'section' => $section, 'title' => $title, 'riderName' => (string) session('user_name'),
-            'availability' => (new \App\Services\AdminDeliveryPersonnelService())->availabilityFor((string) session('user_uid')),
+            'section' => $section, 'title' => $title, 'riderName' => (string) (\App\Services\AuthService::identity('delivery')['name'] ?? null),
+            'availability' => (new \App\Services\AdminDeliveryPersonnelService())->availabilityFor((string) (\App\Services\AuthService::identity('delivery')['uid'] ?? null)),
         ]);
     }
 }

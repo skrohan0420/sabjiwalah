@@ -20,12 +20,12 @@ async function post(request, path, body) {
   return request(path, { method: 'POST', headers: { 'Content-Type': 'application/json', [csrf.header_name]: csrf.token_value }, body: JSON.stringify(body) });
 }
 async function login(phone) {
-  const request = client();
-  const start = await post(request, 'api/v1/auth/otp/start', { phone });
+  const request = client();request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';
+  const start = await post(request, 'api/v1/'+request.authRole+'/auth/otp/start', { phone });
   assert.equal(start.status, 200);
   const otp = (await start.json()).data;
   assert.equal(otp.user_exists, true, 'Seeded test account must already exist.');
-  const verify = await post(request, 'api/v1/auth/otp/verify', { phone, otp: otp.dev_otp });
+  const verify = await post(request, 'api/v1/'+request.authRole+'/auth/otp/verify', { phone, otp: otp.dev_otp });
   assert.equal(verify.status, 200);
   return request;
 }
@@ -37,7 +37,7 @@ async function login(phone) {
     const request = await login(phone);
     assert.equal((await request('api/v1/admin/dashboard')).status, 403);
     assert.equal((await request('admin')).status, 302);
-    assert.equal((await post(request, 'api/v1/auth/logout', {})).status, 200);
+    assert.equal((await post(request,'api/v1/'+request.authRole+'/auth/logout', {})).status, 200);
   }
   const admin = await login('9000000001');
   const response = await admin('api/v1/admin/dashboard');
@@ -54,7 +54,7 @@ async function login(phone) {
   assert.match(await page.text(), /admin-dashboard\.js/);
   assert.equal((await admin('api/v1/admin/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 403);
   assert.equal((await post(admin, 'api/v1/admin/products', {})).status, 422);
-  assert.equal((await post(admin, 'api/v1/auth/logout', {})).status, 200);
+  assert.equal((await post(admin,'api/v1/'+admin.authRole+'/auth/logout', {})).status, 200);
   assert.equal((await admin('api/v1/admin/dashboard')).status, 401);
   console.log('PASS: live guest/customer/delivery/admin access, dashboard JSON and privacy, protected page, CSRF rejection, validation rejection, and logout.');
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

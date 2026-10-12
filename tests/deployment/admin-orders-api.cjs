@@ -20,12 +20,12 @@ async function post(request, path, body) {
   return request(path, { method: 'POST', headers: { 'Content-Type': 'application/json', [csrf.header_name]: csrf.token_value }, body: JSON.stringify(body) });
 }
 async function login(phone) {
-  const request = client();
-  const start = await post(request, 'api/v1/auth/otp/start', { phone });
+  const request = client();request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';
+  const start = await post(request, 'api/v1/'+request.authRole+'/auth/otp/start', { phone });
   assert.equal(start.status, 200);
   const otp = (await start.json()).data;
   assert.equal(otp.user_exists, true, 'Seeded test account must already exist.');
-  const verify = await post(request, 'api/v1/auth/otp/verify', { phone, otp: otp.dev_otp });
+  const verify = await post(request, 'api/v1/'+request.authRole+'/auth/otp/verify', { phone, otp: otp.dev_otp });
   assert.equal(verify.status, 200);
   return request;
 }
@@ -42,7 +42,7 @@ async function login(phone) {
     assert.equal((await request('admin/orders')).status,302);
     if (phone === '9000000003') assert.equal((await request('api/v1/checkout/summary')).status, 200);
     if (phone === '9000000002') assert.equal((await request('api/v1/delivery/orders')).status, 200);
-    await post(request,'api/v1/auth/logout',{});
+    await post(request,'api/v1/'+request.authRole+'/auth/logout',{});
   }
   const admin=await login('9000000001');
   const response=await admin('api/v1/admin/orders?per_page=1&sort=order_number&dir=asc');
@@ -69,6 +69,6 @@ async function login(phone) {
     assert.equal((await patch({status:'confirmed',notes:'x'.repeat(1001)})).status,422);
   }
   const page=await admin('admin/orders');assert.equal(page.status,200);assert.match(await page.text(),/admin-orders\.js/);
-  await post(admin,'api/v1/auth/logout',{});
+  await post(admin,'api/v1/'+admin.authRole+'/auth/logout',{});
   console.log('PASS: live order role authorization, list/detail contracts, filters, missing orders, invalid transitions, stale status, CSRF and notes validation. No orders changed.');
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

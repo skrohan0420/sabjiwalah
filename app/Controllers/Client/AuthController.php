@@ -7,10 +7,13 @@ use App\Services\AuthService;
 
 class AuthController extends BaseController
 {
+    protected string $authRole = 'customer';
+    protected function loginPath(): string { return $this->authRole === 'customer' ? 'login' : $this->authRole . '/login'; }
     public function login(): string
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
         return view('client/auth/login', [
+            'authRole' => $this->authRole, 'loginPath' => $this->loginPath(),
             'redirect' => $this->safeRedirect((string) $this->request->getGet('redirect')),
         ]);
     }
@@ -23,24 +26,24 @@ class AuthController extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            return redirect()->back()->with('errors', $this->validator->getErrors());
+            return redirect()->to(site_url($this->loginPath()))->with('errors', $this->validator->getErrors());
         }
 
-        $auth = new AuthService();
+        $auth = AuthService::forRole($this->authRole);
 
         try { if (! $auth->verifyPhoneOtp(
             (string) $this->request->getPost('phone'),
             (string) $this->request->getPost('otp')
         )) {
-            return redirect()->back()->with('error', 'Invalid or expired OTP.');
+            return redirect()->to(site_url($this->loginPath()))->with('error', 'Invalid or expired OTP.');
         } } catch (\App\Services\OtpRateLimitException $e) {
-            return redirect()->to(site_url('login'))->with('error', 'Wait ' . $e->retryAfter . ' seconds before trying another OTP.');
+            return redirect()->to(site_url($this->loginPath()))->with('error', 'Wait ' . $e->retryAfter . ' seconds before trying another OTP.');
         } catch (\App\Services\OtpUnavailableException $e) {
-            return redirect()->to(site_url('login'))->with('error', $e->getMessage());
+            return redirect()->to(site_url($this->loginPath()))->with('error', $e->getMessage());
         } catch (\InvalidArgumentException $e) {
-            return redirect()->to(site_url('login'))->with('error', $e->getMessage());
+            return redirect()->to(site_url($this->loginPath()))->with('error', $e->getMessage());
         } catch (\Throwable) {
-            return redirect()->to(site_url('login'))->with('error', 'Unable to complete phone verification. Please try again later.');
+            return redirect()->to(site_url($this->loginPath()))->with('error', 'Unable to complete phone verification. Please try again later.');
         }
 
         return $this->redirectByRole($this->safeRedirect((string) $this->request->getPost('redirect')));
@@ -50,7 +53,7 @@ class AuthController extends BaseController
     {
         $redirect = $this->safeRedirect((string) $this->request->getGet('redirect'));
 
-        return redirect()->to(site_url('login') . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
+        return redirect()->to(site_url($this->loginPath()) . ($redirect ? '?redirect=' . rawurlencode($redirect) : ''));
     }
 
     public function storeRegistration()
@@ -60,33 +63,33 @@ class AuthController extends BaseController
 
     public function logout()
     {
-        (new AuthService())->logout();
+        AuthService::forRole($this->authRole)->logout();
 
-        return redirect()->to(site_url(''))->with('message', 'Logged out successfully.');
+        return redirect()->to(site_url($this->loginPath()))->with('message', 'Logged out successfully.');
     }
 
     public function account(): string
     {
         $this->response->setHeader('Cache-Control', 'private, no-store');
-        if (! session('is_logged_in')) {
+        if (! AuthService::forRole($this->authRole)->check()) {
             return view('client/account_guest');
         }
 
         return view('client/account', [
-            'user' => (new AuthService())->user(),
+            'user' => AuthService::forRole($this->authRole)->user(),
         ]);
     }
 
     private function redirectByRole(?string $redirect = null)
     {
-        if (! \App\Services\CustomerSetup::complete((new AuthService())->user())) {
+        if (! \App\Services\CustomerSetup::complete(AuthService::forRole($this->authRole)->user())) {
             return redirect()->to(site_url('account'));
         }
-        if (session('user_role') === 'customer' && $redirect !== null && $redirect !== '') {
+        if ($this->authRole === 'customer' && $redirect !== null && $redirect !== '') {
             return redirect()->to(app_asset_url($redirect));
         }
 
-        return match (session('user_role')) {
+        return match ($this->authRole) {
             'admin' => redirect()->to(site_url('admin')),
             'delivery' => redirect()->to(site_url('delivery')),
             default => redirect()->to(site_url('account')),
@@ -102,6 +105,10 @@ class AuthController extends BaseController
             return null;
         }
 
+        $path = rawurldecode((string) parse_url($redirect, PHP_URL_PATH));
+        if (str_contains($path, '..')) return null;
+        if ($this->authRole === 'customer' && !preg_match('#^/(?:account|checkout|search|(?:products|orders)(?:/[^/]+)?)?/?$#D', $path)) return null;
+        if ($this->authRole !== 'customer' && !str_starts_with($path, '/' . $this->authRole . '/')) return null;
         return $redirect;
     }
 }

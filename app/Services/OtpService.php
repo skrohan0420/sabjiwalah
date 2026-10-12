@@ -63,12 +63,14 @@ class OtpService
         $key = $this->sessionKey($purpose);
         $this->consume([
             ['key' => $purpose . ':send:phone:' . $phone, 'limit' => self::PHONE_SEND_LIMIT, 'cooldown' => self::RESEND_SECONDS],
+            ['key' => 'send:phone:' . $phone, 'limit' => self::PHONE_SEND_LIMIT, 'cooldown' => 0],
             ['key' => 'send:ip:' . $ip, 'limit' => self::IP_SEND_LIMIT, 'cooldown' => 0],
         ]);
         $code = (string) random_int(100000, 999999);
         $expiresAt = time() + self::TTL_SECONDS;
         session()->set($key, [
             'version' => 1,
+            'purpose' => $purpose,
             'phone' => $phone,
             'code_hash' => password_hash($code, PASSWORD_DEFAULT),
             'expires_at' => $expiresAt,
@@ -84,10 +86,11 @@ class OtpService
         $key = $this->sessionKey($purpose);
         $this->consume([
             ['key' => $purpose . ':verify:phone:' . $phone, 'limit' => self::PHONE_VERIFY_LIMIT, 'cooldown' => 0],
+            ['key' => 'verify:phone:' . $phone, 'limit' => self::PHONE_VERIFY_LIMIT, 'cooldown' => 0],
             ['key' => 'verify:ip:' . $ip, 'limit' => self::IP_VERIFY_LIMIT, 'cooldown' => 0],
         ]);
         $otp = session($key);
-        if (! is_array($otp) || ($otp['version'] ?? null) !== 1 || time() >= (int) ($otp['expires_at'] ?? 0)) {
+        if (! is_array($otp) || ($otp['version'] ?? null) !== 1 || ($otp['purpose'] ?? null) !== $purpose || time() >= (int) ($otp['expires_at'] ?? 0)) {
             session()->remove($key);
             return false;
         }
@@ -95,7 +98,7 @@ class OtpService
             || ! is_string($otp['code_hash'] ?? null) || ! password_verify($code, $otp['code_hash'])) {
             return false;
         }
-        if ($purpose === 'auth') session()->remove($key);
+        if ($purpose !== 'checkout') session()->remove($key);
         else {
             unset($otp['code_hash']);
             $otp['verified'] = true;
@@ -110,13 +113,14 @@ class OtpService
         $phone = self::normalizePhone($phone);
         $otp = session('checkout_otp');
         return is_array($otp) && ($otp['version'] ?? null) === 1 && ($otp['verified'] ?? false) === true
+            && ($otp['purpose'] ?? null) === 'checkout'
             && time() < (int) ($otp['expires_at'] ?? 0)
             && hash_equals((string) ($otp['phone'] ?? ''), $phone);
     }
 
     private function sessionKey(string $purpose): string
     {
-        if (! in_array($purpose, ['auth', 'checkout'], true)) throw new \LogicException('Unknown OTP purpose.');
+        if (! in_array($purpose, ['customer_login', 'admin_login', 'delivery_login', 'checkout'], true)) throw new \LogicException('Unknown OTP purpose.');
         return $purpose . '_otp';
     }
 
@@ -137,12 +141,15 @@ class OtpService
                     throw new \RuntimeException('Unable to check OTP limits.');
                 }
                 $row = $db->query('SELECT * FROM ' . $table . ' WHERE bucket_key=? FOR UPDATE', [$budget['key']])->getRowArray();
+                // A contending request may have waited across a second boundary for this lock.
+                // Compare against the current clock, not the time before acquiring the row.
+                $now = time();
                 $expired = (int) $row['expires_at'] <= $now;
                 $count = $expired ? 0 : (int) $row['attempts'];
                 $expires = $expired ? $now + self::WINDOW_SECONDS : (int) $row['expires_at'];
                 if ($count >= $budget['limit']) throw new OtpRateLimitException(max(1, $expires - $now));
                 $remaining = (int) $row['last_used_at'] + $budget['cooldown'] - $now;
-                if ($remaining > 0) throw new OtpRateLimitException($remaining);
+                if ($budget['cooldown'] > 0 && $remaining > 0) throw new OtpRateLimitException($remaining);
                 if (! $db->table('otp_rate_limits')->where('bucket_key', $budget['key'])->update([
                     'attempts' => $count + 1, 'expires_at' => $expires, 'last_used_at' => $now,
                 ])) throw new \RuntimeException('Unable to check OTP limits.');

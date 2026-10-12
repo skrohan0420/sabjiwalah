@@ -20,12 +20,12 @@ async function post(request, path, body) {
   return request(path, { method: 'POST', headers: { 'Content-Type': 'application/json', [csrf.header_name]: csrf.token_value }, body: JSON.stringify(body) });
 }
 async function login(phone) {
-  const request = client();
-  const start = await post(request, 'api/v1/auth/otp/start', { phone });
+  const request = client();request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';
+  const start = await post(request, 'api/v1/'+request.authRole+'/auth/otp/start', { phone });
   assert.equal(start.status, 200);
   const otp = (await start.json()).data;
   assert.equal(otp.user_exists, true, 'Seeded test account must already exist.');
-  const verify = await post(request, 'api/v1/auth/otp/verify', { phone, otp: otp.dev_otp });
+  const verify = await post(request, 'api/v1/'+request.authRole+'/auth/otp/verify', { phone, otp: otp.dev_otp });
   assert.equal(verify.status, 200);
   return request;
 }
@@ -41,7 +41,7 @@ async function login(phone) {
     const csrf=await token(request);
     const body=new FormData(); body.append('image',new Blob(['fake'],{type:'image/png'}),'fake.png');
     assert.equal((await request('api/v1/admin/products/prd_missing/image',{method:'POST',headers:{[csrf.header_name]:csrf.token_value},body})).status,403);
-    await post(request,'api/v1/auth/logout',{});
+    await post(request,'api/v1/'+request.authRole+'/auth/logout',{});
   }
   const admin=await login('9000000001');
   const response=await admin('api/v1/admin/products?per_page=1&sort=name&dir=asc');
@@ -63,7 +63,7 @@ async function login(phone) {
   }
   assert.equal((await admin('media/products/invalid.php')).status,404);
   const page=await admin('admin/products');assert.equal(page.status,200);assert.match(await page.text(),/admin-products\.js/);
-  await post(admin,'api/v1/auth/logout',{});
+  await post(admin,'api/v1/'+admin.authRole+'/auth/logout',{});
   console.log('PASS: live product authorization, filters, read contracts, CSRF and rejected price/stock/file mutations. No catalogue records changed.');
 })().catch(error=>{console.error(error.message);process.exitCode=1;});
 

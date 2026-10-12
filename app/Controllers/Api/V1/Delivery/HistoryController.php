@@ -14,7 +14,7 @@ class HistoryController extends \App\Controllers\Api\V1\BaseApiController
         if(!$this->validateData($query,$rules))return $this->validationError($this->validator->getErrors());
         if(!empty($query['from'])&&!empty($query['to'])&&$query['from']>$query['to'])return $this->validationError(['to'=>'End date must be on or after start date.']);
         $query['page']=(int)($query['page']??1)?:1;$query['per_page']=(int)($query['per_page']??20)?:20;
-        try{return $this->success((new \App\Services\DeliveryHistoryService())->history((int)session('user_id'),$query));}
+        try{return $this->success((new \App\Services\DeliveryHistoryService())->history((int)\App\Services\AuthService::id('delivery'),$query));}
         catch(\OutOfBoundsException){return $this->error('Active delivery account required.',403);}
         catch(\Throwable){return $this->error('Unable to load delivery history. Please try again.',503);}
     }
@@ -22,7 +22,7 @@ class HistoryController extends \App\Controllers\Api\V1\BaseApiController
     {
         $this->response->setHeader('Cache-Control','private, no-store');
         if($this->request->getGet()!==[])return $this->validationError(['query'=>'Profile uses your signed-in account.']);
-        try{return $this->success((new \App\Services\DeliveryHistoryService())->profile((int)session('user_id')));}
+        try{return $this->success((new \App\Services\DeliveryHistoryService())->profile((int)\App\Services\AuthService::id('delivery')));}
         catch(\OutOfBoundsException){return $this->error('Active delivery account required.',403);}
         catch(\Throwable){return $this->error('Unable to load your profile. Please try again.',503);}
     }

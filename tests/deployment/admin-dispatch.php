@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Connection-local temporary SQL only. No persistent orders/accounts are changed.
 define('ENVIRONMENT', 'development'); define('FCPATH', dirname(__DIR__, 2) . '/public/');
 require dirname(__DIR__, 2) . '/app/Config/Paths.php'; $paths = new Config\Paths(); require $paths->systemDirectory . '/Boot.php';
@@ -15,7 +16,7 @@ function dispatchAction(string $method, array $body=[], ?string $uid=null, array
     return [$response->getStatusCode(),json_decode($response->getBody(),true)];
 }
 function deliveryAction(string $method, int $actor, string $uid, array $body=[]): array {
-    session()->set('user_id',$actor);service('validation')->reset();$request=new CodeIgniter\HTTP\IncomingRequest(config('App'),new CodeIgniter\HTTP\URI('http://localhost/'),json_encode($body),new CodeIgniter\HTTP\UserAgent());
+    fixtureIdentity($actor);service('validation')->reset();$request=new CodeIgniter\HTTP\IncomingRequest(config('App'),new CodeIgniter\HTTP\URI('http://localhost/'),json_encode($body),new CodeIgniter\HTTP\UserAgent());
     $controller=new App\Controllers\Api\V1\Delivery\OrderController();$controller->initController($request,new CodeIgniter\HTTP\Response(config('App')),service('logger'));$response=$method==='index'?$controller->$method():$controller->$method($uid);
     return [$response->getStatusCode(),json_decode($response->getBody(),true)];
 }
@@ -27,7 +28,7 @@ $orders=new App\Models\OrderModel(); $orderIds=[];
 foreach (['ready_for_delivery','ready_for_delivery','pending','delivered','cancelled','delivery_failed','out_for_delivery'] as $i=>$status) {
     $orderIds[]=$orders->skipValidation(true)->insert(['order_number'=>'DISPATCH_'.$i,'user_id'=>$customer,'subtotal'=>100,'total_amount'=>100,'payment_method'=>'cod','payment_status'=>'pending','order_status'=>$status,'customer_name'=>'PRIVATE_CONTACT','customer_phone'=>'9999999999','address_line'=>'PRIVATE_ADDRESS','city'=>'Fixture','postal_code'=>'700001']);
 }
-$uid=$orders->find($orderIds[0])['uid']; $secondUid=$orders->find($orderIds[1])['uid']; $riderUid=$users->find($one)['uid']; $twoUid=$users->find($two)['uid']; session()->set('user_id',$manager);
+$uid=$orders->find($orderIds[0])['uid']; $secondUid=$orders->find($orderIds[1])['uid']; $riderUid=$users->find($one)['uid']; $twoUid=$users->find($two)['uid']; fixtureIdentity($manager);
 $availability = new App\Services\AdminDeliveryPersonnelService();
 dispatchCheck($availability->availabilityFor($riderUid)==='available' && $availability->availabilityFor('usr_missing')==='offline','Layout base availability/fallback failed.');
 [$status,$data]=dispatchAction('index',[],null,['per_page'=>1]);dispatchCheck($status===200&&$data['data']['pager']['total']===3&&count($data['data']['items'])===1,'Queue/status pagination failed.');
@@ -55,13 +56,13 @@ dispatchCheck(deliveryAction('show',$two,$uid)[0]===200,'Current rider lost deta
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivered'])[0]===400,'Pickup transition bypassed.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'out_for_delivery','expected_status'=>'ready_for_delivery'])[0]===200,'Pickup failed.');
 dispatchCheck($availability->availabilityFor($twoUid)==='busy' && $availability->availabilityFor($riderUid)==='available','Layout busy/former-rider state failed.');
-session()->set('user_id',$manager);dispatchCheck(dispatchAction('assign',['rider_uid'=>$riderUid,'expected_assignment_uid'=>$secondAssignment],$uid)[0]===409,'In-transit reassignment accepted.');
+fixtureIdentity($manager);dispatchCheck(dispatchAction('assign',['rider_uid'=>$riderUid,'expected_assignment_uid'=>$secondAssignment],$uid)[0]===409,'In-transit reassignment accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'out_for_delivery','expected_status'=>'ready_for_delivery'])[0]===409,'Duplicate pickup accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivered','expected_status'=>'out_for_delivery'])[0]===400,'Unverified delivery accepted.');
 dispatchCheck(deliveryAction('updateStatus',$two,$uid,['status'=>'delivery_failed','expected_status'=>'out_for_delivery','notes'=>'Customer unavailable.'])[0]===200,'Failed delivery transition failed.');
 dispatchCheck($availability->availabilityFor($twoUid)==='available','Layout retained busy state after failed delivery.');
 dispatchCheck($db->table('order_status_history')->where('order_id',$orderIds[0])->countAllResults()===2,'Status history missing/duplicated.');
-session()->set('user_id',$manager);
+fixtureIdentity($manager);
 foreach (array_slice($orderIds,2) as $id) dispatchCheck(dispatchAction('assign',$payload,$orders->find($id)['uid'])[0]===409,'Terminal/non-ready assignment accepted.');
 $db->table('users')->where('id',$one)->update(['status'=>'inactive']);dispatchCheck(dispatchAction('assign',$payload,$secondUid)[0]===409,'Inactive rider accepted.');$db->table('users')->where('id',$one)->update(['status'=>'active']);
 $db->table('orders')->where('id',$orderIds[1])->update(['updated_at'=>date('Y-m-d H:i:s',time()-16*60)]);
@@ -94,7 +95,7 @@ $db->table('delivery_locations')->where('delivery_user_id',$one)->delete();
 $db->query('ALTER TABLE order_status_history CHANGE notes fixture_notes TEXT NULL');
 try {dispatchCheck(deliveryAction('updateStatus',$one,$secondUid,['status'=>'out_for_delivery'])[0]===503,'History failure not reported.');dispatchCheck($orders->find($orderIds[1])['order_status']==='ready_for_delivery','Delivery status partially committed.');}
 finally {$db->resetTransStatus();$db->query('ALTER TABLE order_status_history CHANGE fixture_notes notes TEXT NULL');}
-session()->set('user_id',$manager);
+fixtureIdentity($manager);
 $db->table('delivery_assignments')->where('order_id',$orderIds[1])->delete();
 $db->query('ALTER TABLE delivery_assignments CHANGE assigned_by fixture_assigned_by INT UNSIGNED NOT NULL');
 try {dispatchCheck(dispatchAction('assign',['rider_uid'=>$twoUid,'expected_assignment_uid'=>'none'],$secondUid)[0]===503,'Assignment insert failure not reported.');dispatchCheck($db->table('delivery_assignments')->where('order_id',$orderIds[1])->countAllResults()===0,'Failed assignment partially committed.');}

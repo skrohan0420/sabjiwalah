@@ -20,12 +20,12 @@ async function post(request, path, body) {
   return request(path, { method: 'POST', headers: { 'Content-Type': 'application/json', [csrf.header_name]: csrf.token_value }, body: JSON.stringify(body) });
 }
 async function login(phone) {
-  const request = client();
-  const start = await post(request, 'api/v1/auth/otp/start', { phone });
+  const request = client();request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';
+  const start = await post(request, 'api/v1/'+request.authRole+'/auth/otp/start', { phone });
   assert.equal(start.status, 200);
   const otp = (await start.json()).data;
   assert.equal(otp.user_exists, true, 'Seeded test account must already exist.');
-  const verify = await post(request, 'api/v1/auth/otp/verify', { phone, otp: otp.dev_otp });
+  const verify = await post(request, 'api/v1/'+request.authRole+'/auth/otp/verify', { phone, otp: otp.dev_otp });
   assert.equal(verify.status, 200);
   return request;
 }
@@ -41,10 +41,10 @@ async function login(phone) {
     assert.equal((await request('admin/customers')).status,302);
     const csrf=await token(request);
     assert.equal((await request('api/v1/admin/customers/usr_missing/status',{method:'PATCH',headers:{'Content-Type':'application/json',[csrf.header_name]:csrf.token_value},body:'{"status":"inactive","expected_status":"active"}'})).status,403);
-    assert.equal((await request('api/v1/auth/me')).status,200);
+    assert.equal((await request('api/v1/'+request.authRole+'/auth/me')).status,200);
     if(phone==='9000000003')assert.equal((await request('api/v1/checkout/summary')).status,200);
     if(phone==='9000000002')assert.equal((await request('api/v1/delivery/orders')).status,200);
-    await post(request,'api/v1/auth/logout',{});
+    await post(request,'api/v1/'+request.authRole+'/auth/logout',{});
   }
   const admin=await login('9000000001');
   const page=await admin('admin/customers');assert.equal(page.status,200);assert.match(await page.text(),/admin-customers\.js/);
@@ -53,7 +53,7 @@ async function login(phone) {
   for(const row of data.items){assert.ok(!('phone' in row)&&!('email' in row)&&!('password_hash' in row)&&!('id' in row));assert.equal(typeof row.order_count,'number');}
   for(const query of ['page=0','page=1000001','per_page=101','status=invalid','sort=password_hash','dir=invalid'])assert.equal((await admin('api/v1/admin/customers?'+query)).status,422,query);
   assert.equal((await admin('api/v1/admin/customers/usr_missing')).status,404);
-  const me=(await(await admin('api/v1/auth/me')).json()).data.user;
+  const me=(await(await admin('api/v1/'+admin.authRole+'/auth/me')).json()).data.user;
   assert.equal((await admin('api/v1/admin/customers/'+me.uid)).status,404,'Admin account must not appear as customer.');
   async function patch(uid,body){const csrf=await token(admin);return admin('api/v1/admin/customers/'+uid+'/status',{method:'PATCH',headers:{'Content-Type':'application/json',[csrf.header_name]:csrf.token_value},body:JSON.stringify(body)});}
   assert.equal((await patch(me.uid,{status:'inactive',expected_status:'active'})).status,404);
@@ -71,7 +71,7 @@ async function login(phone) {
     assert.equal((await patch(customer.uid,{status:customer.status,expected_status:customer.status==='active'?'inactive':'active'})).status,409);
     assert.equal((await admin('api/v1/admin/customers/'+customer.uid+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:'{"status":"inactive","expected_status":"active"}'})).status,403);
   }
-  await post(admin,'api/v1/auth/logout',{});
+  await post(admin,'api/v1/'+admin.authRole+'/auth/logout',{});
   console.log('PASS: live guest/customer/rider/admin authorization, contact privacy, history pagination, input/CSRF rejection, privileged account protection and storefront/checkout/delivery access. No account status changed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
 

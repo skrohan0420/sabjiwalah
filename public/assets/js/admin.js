@@ -126,7 +126,7 @@
   document.querySelector('[data-admin-logout]').addEventListener('click', async event => {
     const button = event.currentTarget;
     busy(button, true);
-    try { await api('/api/v1/auth/logout', { method: 'POST' }); location.assign(loginUrl); }
+    try { await api('/api/v1/admin/auth/logout', { method: 'POST' }); location.assign(loginUrl); }
     catch (error) { notify(error.message, true); busy(button, false); }
   });
 })();

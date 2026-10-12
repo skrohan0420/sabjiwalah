@@ -15,7 +15,7 @@ class OrderController extends BaseApiController
         $data=$this->requestData();
         if (array_diff(array_keys($data),['pin','cash_received']) || !$this->validateData($data,['pin'=>'required|regex_match[/^[0-9]{6}$/]']) || !isset($data['cash_received']) || !is_bool($data['cash_received'])) return $this->validationError(['completion'=>'Enter the six-digit customer PIN and a boolean cash confirmation.']);
         try {
-            (new \App\Services\DeliveryCompletionService())->complete($uid,(int)session('user_id'),(string)$data['pin'],$data['cash_received']);
+            (new \App\Services\DeliveryCompletionService())->complete($uid,(int)\App\Services\AuthService::id('delivery'),(string)$data['pin'],$data['cash_received']);
             return $this->success(null,'Delivery completed.');
         } catch (\OutOfBoundsException $e) { return $this->error('Order not found.',404);
         } catch (\App\Services\DeliveryVerificationException $e) {
@@ -27,7 +27,7 @@ class OrderController extends BaseApiController
     public function index()
     {
         $this->response->setHeader('Cache-Control', 'no-store, private');
-        $orders = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), null, true);
+        $orders = (new DeliveryOrderModel())->currentForRider((int) \App\Services\AuthService::id('delivery'), null, true);
 
         return $this->success([
             'items' => array_map(fn (array $order): array => $this->riderOrder($order), $orders),
@@ -37,7 +37,7 @@ class OrderController extends BaseApiController
     public function show(string $uid)
     {
         $this->response->setHeader('Cache-Control', 'no-store, private');
-        $order = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
+        $order = (new DeliveryOrderModel())->currentForRider((int) \App\Services\AuthService::id('delivery'), $uid)[0] ?? null;
 
         if (! $order) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
@@ -53,7 +53,7 @@ class OrderController extends BaseApiController
     public function updateStatus(string $uid)
     {
         $this->response->setHeader('Cache-Control', 'no-store, private');
-        $order = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
+        $order = (new DeliveryOrderModel())->currentForRider((int) \App\Services\AuthService::id('delivery'), $uid)[0] ?? null;
 
         if (! $order) {
             return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
@@ -76,7 +76,7 @@ class OrderController extends BaseApiController
             (new DeliveryOrderService())->changeStatus(
                 $uid,
                 (string) $data['status'],
-                (int) session('user_id'),
+                (int) \App\Services\AuthService::id('delivery'),
                 $data['notes'] ?? null,
                 ($data['expected_status'] ?? '') ?: null,
             );
@@ -91,7 +91,7 @@ class OrderController extends BaseApiController
             return $this->error('Unable to update this order. Please try again.', ResponseInterface::HTTP_SERVICE_UNAVAILABLE);
         }
 
-        $current = (new DeliveryOrderModel())->currentForRider((int) session('user_id'), $uid)[0] ?? null;
+        $current = (new DeliveryOrderModel())->currentForRider((int) \App\Services\AuthService::id('delivery'), $uid)[0] ?? null;
         return $this->success(['order' => $current ? $this->riderOrder($current) : null], 'Order status updated');
     }
 

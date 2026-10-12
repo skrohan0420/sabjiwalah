@@ -1,4 +1,4 @@
-<div class="welcome-overlay" data-onboarding hidden data-required="<?= ! empty($onboardingRequired) ? 'true' : 'false' ?>" data-save-account="<?= ! empty($onboardingRequired) ? 'true' : 'false' ?>" data-account-email="<?= esc((string) session('user_email'), 'attr') ?>" data-account-name="<?= esc((string) session('user_name'), 'attr') ?>">
+<div class="welcome-overlay" data-onboarding hidden data-required="<?= ! empty($onboardingRequired) ? 'true' : 'false' ?>" data-save-account="<?= ! empty($onboardingRequired) ? 'true' : 'false' ?>" data-account-email="<?= esc((string) (\App\Services\AuthService::identity('customer')['email'] ?? null), 'attr') ?>" data-account-name="<?= esc((string) (\App\Services\AuthService::identity('customer')['name'] ?? null), 'attr') ?>">
     <section class="welcome-panel" role="dialog" aria-modal="true" aria-labelledby="welcome-title" tabindex="-1">
         <div class="welcome-topline">
             <span class="welcome-brand"><img src="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo-header.png'), 'attr') ?>" alt="" width="42" height="30"> Sabjiwalah</span>

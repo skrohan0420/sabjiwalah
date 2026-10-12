@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Real services on connection-local temporary tables; persistent configuration/orders are untouched.
 define('ENVIRONMENT','development'); define('FCPATH',dirname(__DIR__,2).'/public/');
 require dirname(__DIR__,2).'/app/Config/Paths.php'; $paths=new Config\Paths(); require $paths->systemDirectory.'/Boot.php';
@@ -17,7 +18,7 @@ function settingsReject(callable $action,string $type):void{
 $db->table('operational_settings')->insert(['id'=>1,'shop_open'=>1,'orders_paused'=>0,'delivery_charge'=>40,'free_delivery_minimum'=>499,'minimum_order_amount'=>0,'revision'=>1,'updated_at'=>date('Y-m-d H:i:s')]);
 $users=new App\Models\UserModel();$admin=$users->insert(['name'=>'Admin <script>','phone'=>'9876560001','role'=>'admin','status'=>'active']);
 $customer=$users->insert(['name'=>'Customer','phone'=>'9876560002','role'=>'customer','status'=>'active']);
-session()->set(['user_id'=>$customer,'user_role'=>'customer','is_logged_in'=>true]);
+fixtureIdentity($customer);
 $service=new App\Services\OperationalSettingsService();
 function settingsInput(array $changes=[]):array{global $service;return array_replace(array_diff_key($service->get(),['revision'=>true,'updated_at'=>true]),['expected_revision'=>$service->get()['revision']],$changes);}
 $default=$service->get();settingsCheck($default['delivery_charge']==='40.00'&&$default['free_delivery_minimum']==='499.00','Default pricing changed.');

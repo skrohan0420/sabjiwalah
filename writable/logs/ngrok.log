@@ -17,3 +17,660 @@ t=2026-10-11T13:03:13+0530 lvl=info msg="join connections" obj=join id=275373ded
 t=2026-10-11T13:03:18+0530 lvl=info msg="join connections" obj=join id=5036cf3a947b l=[::1]:8080 r=152.56.156.124:64470
 t=2026-10-11T13:03:20+0530 lvl=info msg="join connections" obj=join id=01676fff26a5 l=[::1]:8080 r=152.56.156.124:58564
 t=2026-10-11T13:03:34+0530 lvl=info msg="join connections" obj=join id=494426cfb793 l=[::1]:8080 r=152.56.156.124:58564
+t=2026-10-12T16:37:59+0530 lvl=info msg="no configuration paths supplied"
+t=2026-10-12T16:37:59+0530 lvl=info msg="using configuration at default config path" path=C:\\Users\\Rohan\\AppData\\Local/ngrok/ngrok.yml
+t=2026-10-12T16:37:59+0530 lvl=info msg="open config file" path=C:\\Users\\Rohan\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+t=2026-10-12T16:37:59+0530 lvl=info msg="FIPS 140 mode" enabled=false
+t=2026-10-12T16:37:59+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2026-10-12T16:37:59+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-10-12T16:37:59+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-10-12T16:37:59+0530 lvl=info msg="update available" obj=updater
+t=2026-10-12T16:38:00+0530 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:8080 url=https://cristine-nonsubordinate-stevie.ngrok-free.dev
+t=2026-10-12T16:38:09+0530 lvl=info msg=start pg=/api/tunnels id=d9015c4c62407142
+t=2026-10-12T16:38:09+0530 lvl=info msg=end pg=/api/tunnels id=d9015c4c62407142 status=200 dur=0s
+t=2026-10-12T16:38:09+0530 lvl=info msg="join connections" obj=join id=ab3a5764412e l=127.0.0.1:8080 r=152.56.156.140:52719
+t=2026-10-12T17:30:35+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=f2ac323c13a6 clientid=01f86d52526c209bc9bae8ba3c74d7f4
+t=2026-10-12T17:30:35+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a4d0c3a5871f err="session closed"
+t=2026-10-12T17:30:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:30:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:30:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:30:38+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:30:42+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:30:50+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:31:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:31:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:32:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:32:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:33:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:33:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:34:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:34:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:35:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:35:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:36:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:36:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:37:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:37:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:38:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:38:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:39:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:39:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:40:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:40:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:41:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:41:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:42:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:42:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:43:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:43:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:44:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:44:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:45:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:45:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:46:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:46:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:47:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:47:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:48:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:48:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:49:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:49:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:50:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:50:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:51:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:51:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:52:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:52:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:53:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:53:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:54:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:54:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:55:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:55:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:56:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:56:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:57:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:57:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:58:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:58:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:59:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T17:59:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:00:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:00:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:01:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:01:36+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:02:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:02:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:03:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:03:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:04:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:04:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:05:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:05:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:06:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:06:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:07:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:07:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:08:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:08:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:09:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:09:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:10:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:10:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:11:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:11:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:12:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:12:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:13:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:13:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:14:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:14:37+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:15:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T18:15:38+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-10-12T18:15:38+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-10-12T18:15:56+0530 lvl=info msg=start pg=/api/tunnels id=635c1c09cb9e8fb3
+t=2026-10-12T18:15:56+0530 lvl=info msg=end pg=/api/tunnels id=635c1c09cb9e8fb3 status=200 dur=0s
+t=2026-10-12T18:15:56+0530 lvl=info msg="join connections" obj=join id=102224f4a018 l=127.0.0.1:8080 r=152.56.156.3:54857
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=dc2a34b278ab l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=b2958061e08f l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=823cc3509698 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=33ecf098a96e l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=34e68c5af999 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=6f1f76d8c1ee l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=d27878e29c9b l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=7f33f0830aaf l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=a990bd7bbcb5 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=70fb7a14596f l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=5c4af9a5bb46 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=3e48a3f9b59e l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=075a809af5d8 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=96cb277ff588 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=30791fc49a81 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=de7bb979f507 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:07+0530 lvl=info msg="join connections" obj=join id=695f3bd0e686 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:08+0530 lvl=info msg="join connections" obj=join id=0a0d5031217f l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:11+0530 lvl=info msg="join connections" obj=join id=e5907bf6fc2c l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:11+0530 lvl=info msg="join connections" obj=join id=43375e8033a0 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=a489bd3941f3 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=d3672d85a905 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=d220cb59c6f4 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=2a7b7bcba1aa l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=278368158a8c l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=33402c96b3ca l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=99f54d42efa2 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=c60e57225a5e l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=c6f67f5b3f22 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=aa9cb00f711a l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=3dc6627b2ed4 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:12+0530 lvl=info msg="join connections" obj=join id=5fa347f4f65a l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=a0991004a3a6 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=1a24a603171d l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=c588ede9f0d7 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=6faa96c05025 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=572649c6560c l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=ebed444a52db l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=5fbed66d6a42 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=a192d5a2c889 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=289281547f5f l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=14ac7ed56bfa l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=4cfe54048085 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=2f829383346a l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=31269fdd540d l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=a3dd08768f6c l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=9b33b0d550d6 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=a6e15e4ffe7f l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:15+0530 lvl=info msg="join connections" obj=join id=2910ae1990f4 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=e2d4b25cee9e l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=0552569517f5 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=b655906f8b83 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=ba4e9e787a6c l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=00ca8a6e842a l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=11b761474a6a l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=fddb12537559 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=dae1825f28ac l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=62496000e33d l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=aeb8747a9354 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=05d9d0e991c1 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=bfc509f35220 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=1072048e6074 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=9b4fdd59913d l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=3b5c598ced43 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=4eb21c9b1fc0 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:16+0530 lvl=info msg="join connections" obj=join id=29bd796eb2a5 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:16:17+0530 lvl=info msg="join connections" obj=join id=77276a35a107 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=6627a21245cc l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=24704c94fdd7 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=77a0ea4e95a4 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=9cd179c3b1b6 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=ca1b7cb94636 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=7bf4147b2306 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=767f46631a94 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=eede262b5f64 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=56b3a6b702c7 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=0d274169f2b8 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=883133db6210 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=94ac717441de l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=988752671004 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:05+0530 lvl=info msg="join connections" obj=join id=e2de5a257fd3 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=cf7f2ea02b7b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=e99472e96d44 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=1161ff226511 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=9b10334957ce l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=7093cb893f71 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=8f71137a8998 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=c2387fc2e908 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=2eb699a7e6cf l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=874e8431607d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=09e3ceb41911 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=11b4b01c7a3a l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:07+0530 lvl=info msg="join connections" obj=join id=548132918826 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:09+0530 lvl=info msg="join connections" obj=join id=70658bdd42b9 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:09+0530 lvl=info msg="join connections" obj=join id=24f0ed9336f6 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:09+0530 lvl=info msg="join connections" obj=join id=adfc082c2a1a l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:09+0530 lvl=info msg="join connections" obj=join id=68ad2aeb1a74 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:09+0530 lvl=info msg="join connections" obj=join id=3929727434a8 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=d292e0ccdf07 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=05cd0366b98b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=f39d59a29b77 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=8634631c446d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=c7f782481c75 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=903f5c37a472 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=73a06e55cd6e l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=7223a775fda0 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=a35febbbb637 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:11+0530 lvl=info msg="join connections" obj=join id=2a52418b089c l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:12+0530 lvl=info msg="join connections" obj=join id=a89515e0ef7b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:13+0530 lvl=info msg="join connections" obj=join id=ec990329eb02 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=ef18fbd96f6b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=9612018a009c l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=d04074234568 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=90af6905f472 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=b9efb6ab6fa2 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=bf42a9d6301d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=5c7381a67b1c l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=47dc4d3315e0 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=add7b488555b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:14+0530 lvl=info msg="join connections" obj=join id=bf927e29f114 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:15+0530 lvl=info msg="join connections" obj=join id=f367f0435c6f l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:15+0530 lvl=info msg="join connections" obj=join id=00d7fb10317b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:17+0530 lvl=info msg="join connections" obj=join id=ece60bb7feaf l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:17+0530 lvl=info msg="join connections" obj=join id=3df1ce4ed457 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:17+0530 lvl=info msg="join connections" obj=join id=46b14762f2af l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:17+0530 lvl=info msg="join connections" obj=join id=bd769d2b8cb2 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=e2554108fe88 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=a88a11ed34f8 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=5974cc966c5b l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=da5fac7f2e66 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=738817c0ac31 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=6d9d046915c2 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=25d18f3dbdf4 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=77a4ae01d6f5 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=14dca185da82 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:18+0530 lvl=info msg="join connections" obj=join id=085cf1810504 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:19+0530 lvl=info msg="join connections" obj=join id=978ddbb75f13 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:19+0530 lvl=info msg="join connections" obj=join id=2f44635dbe19 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:20+0530 lvl=info msg="join connections" obj=join id=e92093f98312 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=1edee09a141d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=e688688edd26 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=b498c2cfa562 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=687cf3f4d3d0 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=c550beb6f6e3 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=a5c597b8da23 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:21+0530 lvl=info msg="join connections" obj=join id=f944dd673a74 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:23+0530 lvl=info msg="join connections" obj=join id=ec4d48dac80d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:23+0530 lvl=info msg="join connections" obj=join id=63ce18385b7a l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:24+0530 lvl=info msg="join connections" obj=join id=db3650f06660 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:24+0530 lvl=info msg="join connections" obj=join id=3e13ac25126c l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:24+0530 lvl=info msg="join connections" obj=join id=10a009391ed4 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:25+0530 lvl=info msg="join connections" obj=join id=d396ffa0e1ba l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:44:47+0530 lvl=info msg="join connections" obj=join id=6ed54f435437 l=127.0.0.1:8080 r=152.56.156.3:55781
+t=2026-10-12T18:47:08+0530 lvl=info msg="join connections" obj=join id=d1b2035014be l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=d915be055426 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=663b4f903660 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=bbf0430a5475 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=b367233668f8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=ced1c4a191b2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=edefd4c9d292 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=5c44096c8571 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=e2d10906f93f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=af4f2e28c651 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=1fd58a3c06f4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=8387759673aa l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=3e040cb511c6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=13384cad1ef0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=86bb07fb8f97 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=d9bffb127215 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:09+0530 lvl=info msg="join connections" obj=join id=1d3c89c910e8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:11+0530 lvl=info msg="join connections" obj=join id=9507f90dcd66 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:12+0530 lvl=info msg="join connections" obj=join id=b5b719ecefea l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:12+0530 lvl=info msg="join connections" obj=join id=7e43f2205437 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:12+0530 lvl=info msg="join connections" obj=join id=876ca8db962f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:12+0530 lvl=info msg="join connections" obj=join id=c9410c1ec488 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:12+0530 lvl=info msg="join connections" obj=join id=6484e621efb0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:13+0530 lvl=info msg="join connections" obj=join id=a693ed4326ae l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=3d86633ace40 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=3eaf1ea30894 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=ea1185a5d407 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=a84f0a985457 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=0b8cbafe8977 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=f87b6c596ff5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=38ceb2d8979d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=82573a8cdd07 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=812ff4e36519 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=d905df252cd1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:14+0530 lvl=info msg="join connections" obj=join id=7be37520e297 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=2c34ea02af53 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=b237358fcaac l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=b8576d76b20b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=cc8ecf4e54b4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=846b371f3614 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=42ab25afcd7c l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=dce4c6666941 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:15+0530 lvl=info msg="join connections" obj=join id=dcf5183de305 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:16+0530 lvl=info msg="join connections" obj=join id=c5677e0486f8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:16+0530 lvl=info msg="join connections" obj=join id=f7ccd3b4cb7a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:23+0530 lvl=info msg="join connections" obj=join id=029285257837 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:23+0530 lvl=info msg="join connections" obj=join id=399c4954a729 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=08a7e2518afc l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=0a04fd1eea2f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=1d79272368c3 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=842f8009c7a6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=f93fbc9bdafd l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=a06e9a7a4f22 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=9ce28f63ef12 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=827d103af5a2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=829dfe3af409 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=acf1b711d70c l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=73d2f778b667 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=c54302d277e7 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=1bc9360f2f41 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=a08634e728d0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=8ba6fbb7b5d4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:31+0530 lvl=info msg="join connections" obj=join id=5720172820c4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:32+0530 lvl=info msg="join connections" obj=join id=893293c321b9 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=f1208c28b3b6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=d6e7693993b8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=3cea9d28ebf1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=2c82e27e370a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=0847cc772a94 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=3760be1cd74a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=dfd9be53ad6d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=9a70c5938557 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=eae0691e5702 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=d276a237bcfc l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=18cfcbebd172 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:33+0530 lvl=info msg="join connections" obj=join id=80bbc9344271 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:34+0530 lvl=info msg="join connections" obj=join id=f8c3731fe439 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:34+0530 lvl=info msg="join connections" obj=join id=5c17a5c12b8f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:34+0530 lvl=info msg="join connections" obj=join id=0e1508537a49 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:34+0530 lvl=info msg="join connections" obj=join id=d3fe993a7336 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:34+0530 lvl=info msg="join connections" obj=join id=2873aa4ba6c1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=53d67e6c10c7 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=c3f5bcc3a6ad l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=27daa6d85d7f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=b5ed2fc0e54b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=72537235dc28 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=d7895a5ddca7 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=a26e934e1adc l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=4fadaadb2a9a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=d4b148e49667 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=e35e2bb3dae6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=5dc6be1bc075 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:35+0530 lvl=info msg="join connections" obj=join id=cc260eb12b95 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=3b090eadd5e1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=42e041e001ab l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=fa834fde0f58 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=ef8ba4d69565 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=eed6c96f6f1f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=99dfd9fe9992 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=a6f906a77de4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:36+0530 lvl=info msg="join connections" obj=join id=d995497d868a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=966ff68890a7 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=ef990fa24763 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=65cc5f345da5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=f7b1948e2653 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=d54d01cf4658 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=c54671b6d7a9 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:37+0530 lvl=info msg="join connections" obj=join id=be8880e17a5c l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=bd1b6ac0f262 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=dce834a94a5a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=d3b049d451a9 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=f236dc4f92f3 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=814ed295fb04 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=0fe71be4a987 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=e4267384e39b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=b5e7ebf228a6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=4d7d742cec41 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=e47783052bea l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=9573607bf85d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=291817977b99 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=80eeae7aba8e l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:38+0530 lvl=info msg="join connections" obj=join id=d5335da7ac70 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=af9ce74d8cad l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=b496689f6b8e l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=59c8b19be49d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=31f5785d437e l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=e43ec133a86a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=3c7d72a8e4c4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=d8b7988836c2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=300bb35c729a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=60192485f98d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=3b690957eed1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=88a517a57054 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=b6bf5b1785d5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:39+0530 lvl=info msg="join connections" obj=join id=f06a8e953ba1 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:40+0530 lvl=info msg="join connections" obj=join id=70443c176750 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:40+0530 lvl=info msg="join connections" obj=join id=ca87530309b2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:40+0530 lvl=info msg="join connections" obj=join id=14c67438dfc9 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:40+0530 lvl=info msg="join connections" obj=join id=7ecedafb5c5a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=68bc10c89440 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=0caed1be4175 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=e10190c68278 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=ad676e1a4d9f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=1b9c7c7f9b32 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=b608e2ba5eb8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:42+0530 lvl=info msg="join connections" obj=join id=4cf2aa05ab67 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=59d6921fe319 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=b28d81cb0020 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=1e1a0820aab5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=01b8f301d05b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=474eaf622dff l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=931a095a2bfd l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:43+0530 lvl=info msg="join connections" obj=join id=8ec1cb7941ee l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:44+0530 lvl=info msg="join connections" obj=join id=f3d48d9b3a16 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=72457499ef6a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=903466e54e57 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=c1b6e4a40396 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=5d6b81b70fbb l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=8674ff8efda2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=c221be80e0a0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=e9e643b75022 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=6caffbcbafbf l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=ec2b59619763 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=b09d066e9f13 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=3f2a556fa938 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=e284aba7b22a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=b847a6e6e2b9 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=3bb79b982335 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=1179efc97dc2 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:45+0530 lvl=info msg="join connections" obj=join id=b577ad996175 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:46+0530 lvl=info msg="join connections" obj=join id=6420a2d8a8c5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:46+0530 lvl=info msg="join connections" obj=join id=7827e4c2d812 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=814726f6dcd8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=8cc33052e44b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=633c7f6a5974 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=75929ebe82a4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=6367f230f5bf l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=8d1fa3515f0d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=e26977ca8168 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=f9d7f26af9dc l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=66f93856333a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:47+0530 lvl=info msg="join connections" obj=join id=53f40c58bdbb l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:49+0530 lvl=info msg="join connections" obj=join id=d8c97be3b5a8 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=013fe788fda7 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=efa9cd831d8d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=0ba51902c196 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=3528cb38ab37 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=084ffee1b726 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=33585e9e6f1d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=e69905b1aea6 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=11875cbc3334 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=7e240ab22aee l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=301951e71ef0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:50+0530 lvl=info msg="join connections" obj=join id=d30f6d24decd l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:55+0530 lvl=info msg="join connections" obj=join id=5ea53577aec0 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=c3869ed52906 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=c640cde389bf l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=27beb3e6cb31 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=f137f9928c0b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=950c53b46f51 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=c02933009bd5 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=fe5fa666c1fe l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=018611abb13a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=9fb795dc650d l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=fce6cdaa023b l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:56+0530 lvl=info msg="join connections" obj=join id=8843e69136bf l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=7a83f355b104 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=87c55d1dfbae l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=9415321c7984 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=edb730c15e13 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=051e65d26b4a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=cbc22d713815 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=ae361a5a5928 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=4bb45974a38f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=2af064bb553f l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=f7aa2e4dc735 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=6666aedbb939 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=5ddba78a4dfe l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=282f468d8e7a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=e49207f2152e l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=9df87319872a l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=3762c290c4a4 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:47:57+0530 lvl=info msg="join connections" obj=join id=df4599ea3415 l=127.0.0.1:8080 r=152.56.156.3:55681
+t=2026-10-12T18:50:35+0530 lvl=info msg="join connections" obj=join id=1029ccdf535d l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:39948
+t=2026-10-12T18:50:40+0530 lvl=info msg="join connections" obj=join id=585c03475b48 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:40716
+t=2026-10-12T18:50:45+0530 lvl=info msg="join connections" obj=join id=efe467920faa l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:38008
+t=2026-10-12T18:50:49+0530 lvl=info msg="join connections" obj=join id=b5ebf6bcabb9 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:38008
+t=2026-10-12T18:54:26+0530 lvl=info msg="join connections" obj=join id=49edc2ca30c0 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:44936
+t=2026-10-12T18:54:34+0530 lvl=info msg="join connections" obj=join id=329f4983236f l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:44936
+t=2026-10-12T18:54:34+0530 lvl=info msg="join connections" obj=join id=9e973baeaa10 l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:44936
+t=2026-10-12T18:54:36+0530 lvl=info msg="join connections" obj=join id=81565df817de l=127.0.0.1:8080 r=[2409:40e0:4c:66b7:d44a:17ff:fe8b:592a]:44936
+t=2026-10-12T21:10:03+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=dfb1e3db79d6 clientid=01f86d52526c209bc9bae8ba3c74d7f4
+t=2026-10-12T21:10:03+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a4d0c3a5871f err="session closed"
+t=2026-10-12T21:10:03+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:03+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:06+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:10+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:18+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:10:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:11:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:11:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:12:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:12:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:13:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:13:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:14:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:14:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:15:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:15:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:16:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:16:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:17:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:17:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:18:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:18:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:19:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:19:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:20:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:20:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:21:04+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:21:34+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:22:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:22:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:23:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:23:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:24:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:24:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:25:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:25:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:26:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:26:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:27:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:27:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:28:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:28:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:29:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:29:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:30:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:30:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:31:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:31:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:32:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:32:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:33:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:33:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:34:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:34:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:35:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:35:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:36:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:36:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:37:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:37:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:38:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:38:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:39:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:39:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:40:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:40:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:41:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:41:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:42:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:42:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:43:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:43:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:44:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:44:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:45:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:45:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:46:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:46:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:47:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:47:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:48:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:48:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:49:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:49:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:50:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:50:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:51:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:51:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:52:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:52:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:53:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:53:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:54:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:54:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:55:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:55:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:56:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:56:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:57:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:57:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:58:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:58:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:59:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T21:59:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:00:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:00:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:01:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:01:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:02:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:02:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:03:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:03:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:04:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:04:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:05:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:05:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:06:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:06:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:07:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:07:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:08:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:08:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:09:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:09:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:10:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:10:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:11:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:11:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:12:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:12:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:13:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:13:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:14:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:14:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:15:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:15:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:16:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:16:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:17:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:17:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:18:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:18:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:19:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:19:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:20:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:20:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:21:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:21:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:22:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:22:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:23:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:23:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:24:05+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2026-10-12T22:24:36+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2026-10-12T22:24:36+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2026-10-12T22:38:01+0530 lvl=info msg="update available" obj=updater

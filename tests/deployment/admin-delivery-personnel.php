@@ -10,7 +10,7 @@ service('session'); session_start();
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1'; config('Otp')->developmentMode = true;
 $db = db_connect();
 if ($db->DBDriver !== 'MySQLi' || $db->DBPrefix !== '') throw new RuntimeException('Use local MySQL without prefix.');
-foreach (['users', 'orders', 'delivery_assignments', 'delivery_personnel_profiles', 'otp_rate_limits'] as $table) {
+foreach (['delivery_locations', 'users', 'orders', 'delivery_assignments', 'delivery_personnel_profiles', 'otp_rate_limits'] as $table) {
     $definition = $db->query("SHOW CREATE TABLE {$table}")->getRowArray()['Create Table'];
     $definition = str_replace('CREATE TABLE', 'CREATE TEMPORARY TABLE', $definition);
     $definition = preg_replace('/^\s*CONSTRAINT .* FOREIGN KEY .*\n/m', '', $definition);
@@ -59,7 +59,7 @@ foreach ([$users->find($customer)['uid'], $users->find($manager)['uid'], 'usr_mi
 foreach ([['page'=>'0'],['per_page'=>'101'],['status'=>'bad']] as $query) riderCheck(riderAction('index', [], null, $query)[0] === 422, 'Invalid query accepted.');
 riderCheck(riderAction('show', [], $uid, ['mode'=>'invalid'])[0] === 422, 'Invalid history mode accepted.');
 $valid = ['name' => 'New rider', 'phone' => '+91 98765 00004', 'email' => 'NEW@EXAMPLE.TEST'];
-foreach ([$valid+['role'=>'admin'], $valid+['status'=>'active'], $valid+['uid'=>'usr_injected'], $valid+['password_hash'=>'x'], ['name'=>'x','phone'=>['x']], ['name'=>'x','phone'=>'9999876500004'], ['name'=>'x','phone'=>'1234567890'], ['name'=>'x','phone'=>'9876500000'], ['name'=>'x','phone'=>'9876500004','email'=>'bad']] as $invalid) riderCheck(riderAction('create', $invalid)[0] === 422, 'Unsafe/duplicate account input accepted.');
+foreach ([$valid+['role'=>'admin'], $valid+['status'=>'active'], $valid+['uid'=>'usr_injected'], $valid+['password_hash'=>'x'], ['name'=>'x','phone'=>['x']], ['name'=>'x','phone'=>'9999876500004'], ['name'=>'x','phone'=>'1234567890'], ['name'=>'x','phone'=>'9876500002'], ['name'=>'x','phone'=>'9876500004','email'=>'bad']] as $invalid) riderCheck(riderAction('create', $invalid)[0] === 422, 'Unsafe/duplicate account input accepted.');
 [$status,$data] = riderAction('create', $valid);
 riderCheck($status === 201, 'Account creation failed: ' . json_encode($data));
 $newUid = $data['data']['uid']; $new = $users->where('uid', $newUid)->first();
@@ -71,14 +71,14 @@ riderCheck(riderAction('updateAvailability', ['availability'=>'assigned','expect
 riderCheck(riderAction('updateAvailability', ['availability'=>'available','expected_availability'=>'offline'], $newUid)[0] === 200, 'Availability failed.');
 riderCheck(riderAction('updateAvailability', ['availability'=>'unavailable','expected_availability'=>'offline'], $newUid)[0] === 409, 'Stale availability accepted.');
 riderCheck(riderAction('updateStatus', ['status'=>'inactive','expected_status'=>'active','role'=>'admin'], $newUid)[0] === 422, 'Extra write accepted.');
-$auth = new App\Services\AuthService(); $otp = $auth->startPhoneOtp('9876500004');
-riderCheck($auth->verifyPhoneOtp('9876500004', $otp['dev_otp']) && session('user_role') === 'delivery', 'Existing OTP login not compatible.');
+$auth = App\Services\AuthService::forRole('delivery'); $otp = $auth->startPhoneOtp('9876500004');
+riderCheck($auth->verifyPhoneOtp('9876500004', $otp['dev_otp']) && session('delivery_auth')['role'] === 'delivery', 'Existing OTP login not compatible.');
 riderCheck(riderAction('updateStatus', ['status'=>'inactive','expected_status'=>'active'], $newUid)[0] === 200, 'Deactivation failed.');
-(new App\Services\ActiveSessionService())->validate();riderCheck(!session('is_logged_in'), 'Inactive rider session retained access.');
+(new App\Services\ActiveSessionService())->validate();riderCheck(!session('delivery_auth'), 'Inactive rider session retained access.');
 riderCheck($db->table('delivery_personnel_profiles')->where('user_id',$new['id'])->get()->getRowArray()['availability'] === 'offline', 'Deactivation did not reset availability.');
 riderCheck(riderAction('updateStatus', ['status'=>'active','expected_status'=>'active'], $newUid)[0] === 409, 'Stale status accepted.');
 riderCheck(riderAction('updateStatus', ['status'=>'active','expected_status'=>'inactive'], $newUid)[0] === 200, 'Reactivation failed.');
-riderCheck(!session('is_logged_in'), 'Reactivation restored old session.');
+riderCheck(!session('delivery_auth'), 'Reactivation restored old session.');
 $db->table('otp_rate_limits')->set('last_used_at', time()-60)->update();$otp = $auth->startPhoneOtp('9876500004');riderCheck($auth->verifyPhoneOtp('9876500004',$otp['dev_otp']), 'Fresh OTP login failed.');
 // Deactivation keeps active assignments/history, and rolls back if the profile write fails.
 riderCheck(riderAction('updateStatus', ['status'=>'inactive','expected_status'=>'active'], $uid)[0] === 200, 'Legacy rider deactivation failed.');

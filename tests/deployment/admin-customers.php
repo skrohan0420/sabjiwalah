@@ -69,14 +69,15 @@ customerCheck($db->table('orders')->where('user_id', $one)->countAllResults() ==
 session()->set(['user_id' => $one, 'user_uid' => $uid, 'user_role' => 'customer', 'is_logged_in' => true, 'auth_otp' => ['code' => '123456'], 'checkout_otp' => ['code' => '123456']]);
 (new App\Services\ActiveSessionService())->validate();
 customerCheck(!session('is_logged_in') && !session('auth_otp') && !session('checkout_otp'), 'Inactive session retained access or OTP state.');
-$auth = new App\Services\AuthService();$otp = $auth->startPhoneOtp('9876543210');
-customerCheck(!$auth->verifyPhoneOtp('9876543210', $otp['dev_otp']), 'Inactive customer logged in.');
+$auth = App\Services\AuthService::forRole('customer');
+$denied=false;try { $auth->startPhoneOtp('9876543210'); } catch (InvalidArgumentException) { $denied=true; }
+customerCheck($denied, 'Inactive customer obtained a challenge.');
 customerAction('updateStatus', ['status' => 'active', 'expected_status' => 'inactive'], $uid);
 $db->table('otp_rate_limits')->set('last_used_at', time()-60)->update();$otp=$auth->startPhoneOtp('9876543210');
 customerCheck($auth->verifyPhoneOtp('9876543210', $otp['dev_otp']), 'Reactivated customer cannot log in.');
-(new App\Services\ActiveSessionService())->validate();customerCheck((bool)session('is_logged_in'), 'Active customer session rejected.');
+(new App\Services\ActiveSessionService())->validate();customerCheck($auth->check(), 'Active customer session rejected.');
 $db->table('users')->where('id', $one)->update(['name' => 'Updated fixture name']);
-(new App\Services\ActiveSessionService())->validate();customerCheck(session('user_name') === 'Updated fixture name', 'Session profile was not refreshed.');
+(new App\Services\ActiveSessionService())->validate();customerCheck($auth->user()['name'] === 'Updated fixture name', 'Session profile was not refreshed.');
 $db->query('ALTER TABLE users CHANGE status fixture_unavailable_status VARCHAR(20) NOT NULL');
 try {
     $request = new CodeIgniter\HTTP\IncomingRequest(config('App'), new CodeIgniter\HTTP\URI('http://localhost/api/v1/auth/me'), null, new CodeIgniter\HTTP\UserAgent());
@@ -84,7 +85,7 @@ try {
     customerCheck($failure && $failure->getStatusCode() === 503 && !json_decode($failure->getBody(), true)['success'], 'Unavailable session verification must block protected operations.');
 } finally { $db->query('ALTER TABLE users CHANGE fixture_unavailable_status status VARCHAR(20) NOT NULL'); }
 $db->table('users')->where('id', $one)->update(['role' => 'admin']);
-(new App\Services\ActiveSessionService())->validate();customerCheck(!session('is_logged_in'), 'Changed role retained stale authorization.');
+(new App\Services\ActiveSessionService())->validate();customerCheck(!session('customer_auth'), 'Changed role retained stale authorization.');
 $new = $auth->registerCustomer(['name' => 'Registration fixture', 'phone' => '9876500003', 'role' => 'admin', 'status' => 'inactive', 'uid' => 'usr_injected']);
 customerCheck($new && $users->find($new)['role'] === 'customer' && $users->find($new)['status'] === 'active' && $users->find($new)['uid'] !== 'usr_injected', 'Public registration allowed privilege injection.');
 $raceUid = $users->find($new)['uid']; $interleave = true;

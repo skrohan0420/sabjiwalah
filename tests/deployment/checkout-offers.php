@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Real MySQL/services on connection-local temporary tables; no persistent orders or stock are changed.
 define('ENVIRONMENT', 'development'); define('FCPATH', dirname(__DIR__, 2) . '/public/');
 require dirname(__DIR__, 2) . '/app/Config/Paths.php'; $paths = new Config\Paths(); require $paths->systemDirectory . '/Boot.php';
@@ -17,7 +18,7 @@ function offerReject(callable $action, string $type): void {
     if (!$caught || !($caught instanceof $type)) throw new RuntimeException('Expected ' . $type . ', received ' . ($caught ? get_class($caught) . ': ' . $caught->getMessage() : 'success'));
 }
 $user = (new App\Models\UserModel())->insert(['name'=>'Fixture','phone'=>'9876550000','role'=>'customer','status'=>'active']);
-session()->set(['user_id'=>$user,'user_role'=>'customer','is_logged_in'=>true]);
+fixtureIdentity($user);
 $products = new App\Models\ProductModel();
 $id = $products->insert(['name'=>'Sample product','slug'=>'sample-offer-product','price'=>'100.00','sale_price'=>'80.00','unit'=>'kg','stock_quantity'=>20,'is_active'=>1]);
 $uid = $products->find($id)['uid']; $cart = new App\Services\CartService(); $cart->add($uid, 3);

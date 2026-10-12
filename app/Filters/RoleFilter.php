@@ -1,36 +1,21 @@
 <?php
-
 namespace App\Filters;
-
+use App\Services\AuthService;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-
 class RoleFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (! session('is_logged_in')) {
-            $path = '/' . ltrim($request->getUri()->getPath(), '/');
-            $query = $request->getUri()->getQuery();
-            $redirect = $query === '' ? $path : $path . '?' . $query;
-
-            return redirect()
-                ->to(site_url('login') . '?redirect=' . rawurlencode($redirect))
-                ->with('error', 'Please log in to continue.');
-        }
-
-        $allowedRoles = $arguments ?? [];
-
-        if ($allowedRoles !== [] && ! in_array(session('user_role'), $allowedRoles, true)) {
-            return redirect()->to(site_url())->with('error', 'You do not have access to that area.');
-        }
-
-        return null;
+        $role = $arguments[0] ?? 'customer';
+        if (AuthService::forRole($role)->check()) return null;
+        $login = $role === 'customer' ? 'login' : $role . '/login';
+        $path = $request->getUri()->getPath();
+        $base = (string) parse_url(base_url(), PHP_URL_PATH);
+        if ($base !== '/' && str_starts_with($path, $base)) $path = substr($path, strlen($base));
+        $path = '/' . ltrim(preg_replace('#^/?index\.php/#', '', $path), '/');
+        return redirect()->to(site_url($login) . '?redirect=' . rawurlencode($path))->with('error', 'Please log in to continue.');
     }
-
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
-    {
-        return null;
-    }
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) { return null; }
 }

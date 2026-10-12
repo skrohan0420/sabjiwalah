@@ -114,7 +114,10 @@ php tests/deployment/environment.php production
 php tests/deployment/environment.php testing
 ```
 
-### Authentication rollout (Phase 11A)
+### Authentication rollout
+
+See [independent role authentication](role-authentication.md) for the additive
+account migration and the current session/endpoint contract.
 
 Production phone login and checkout are unavailable until a real SMS verification
 provider is integrated. OTP endpoints return HTTP 503 without a testing code in
@@ -150,7 +153,8 @@ existing phpMyAdmin workflow. Missing rate-limit storage fails closed. Bucket
 keys are hashed; the table does not store raw phone numbers or IP addresses.
 Each phone and purpose allows five sends and five verification submissions per
 fifteen minutes (successful submissions count too), with sixty seconds between
-sends. IP limits are shared across login and checkout: twenty sends and sixty
+sends per purpose. A second aggregate phone budget also limits all purposes together
+to five sends and five verification submissions per fifteen minutes. IP limits are shared across login and checkout: twenty sends and sixty
 verification submissions per fifteen minutes. Resending or opening a new browser
 session does not reset these budgets. HTTP 429 includes Retry-After.
 

@@ -4,6 +4,13 @@ Sabjiwalah is a grocery and vegetable delivery application built with CodeIgnite
 
 The current priority is backend foundation first: database structure, authentication, authorization, routing, models, services, migrations, seeders, and simple working pages. Frontend design, categories, and payment gateway work are intentionally out of scope for the first milestone.
 
+## Independent role authentication
+
+Customer, administrator and delivery accounts now use separate OTP login pages at
+`/login`, `/admin/login` and `/delivery/login`. They can stay signed in together
+in one browser, including with the same phone. See [role authentication rollout](deployment/role-authentication.md)
+for the new migration, endpoint contracts, shared expiry, provisioning and verification.
+
 ## Project Status
 
 Current phase: admin panel Phase 11 (local hardening and final regression testing) completed. Production rollout is blocked until SMS verification is integrated and hosted deployment checks pass.
@@ -157,7 +164,7 @@ Done:
 - Checkout currently collects name, phone, delivery address, city, state, postal code, and notes. Email is not required for checkout.
 - Removed `index.php` from generated application URLs and added redirects from old `/index.php/...` URLs to clean URLs.
 - Replaced customer-facing password auth with phone OTP auth. OTPs are shown in the UI/API for local testing.
-- Made customer email and password optional, with phone as the unique OTP login identifier.
+- Made customer email and password optional, with phone and role as the unique OTP login identifier.
 - Normalized customer phone numbers for OTP auth so local, leading-zero, and `+91` formats resolve to one canonical 10-digit login phone.
 - Added one basic responsive auth page for phone OTP login/signup combined.
 - Added a customer account section for managing personal details with AJAX profile updates.
@@ -245,7 +252,7 @@ Important database rules:
 
 - Passwords, when present for legacy/internal accounts, must be stored as secure hashes only.
 - Customer auth is phone OTP based; email, name, and password are not required for customer login/signup.
-- OTP login phones are stored in canonical 10-digit form to avoid duplicate accounts from formats like `+91...`, `0...`, and plain local numbers.
+- OTP login phones are stored in canonical 10-digit form to avoid duplicate accounts from formats like `+91...`, `0091...`, and plain local numbers.
 - User roles are `customer`, `admin`, and `delivery`.
 - Public OTP self-auth must always create `customer` users for new phone numbers.
 - Admin and delivery users must not be creatable through public self-auth.

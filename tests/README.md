@@ -1,5 +1,25 @@
 # Sabjiwalah tests
 
+Independent role authentication regressions:
+
+```powershell
+php tests/deployment/role-accounts.php
+node tests/deployment/role-auth-session.cjs
+```
+
+These cover the additive migration, per-role uniqueness and normalization, model
+editing/imports, one-cookie-jar simultaneous OTP logins, logout/CSRF/session rotation,
+OTP purpose and aggregate limits, revocation, customer state, and actual checkout,
+dispatch and delivery audit actors. The migration test never merges conflicting
+fixture users. See [rollout notes](../deployment/role-authentication.md).
+
+Owned HTTP fixtures optionally accept `SW_TEST_DB_PORT`, `SW_TEST_DB_NAME` (a `sw_`
+prefixed disposable database), `SW_TEST_DB_USER`, and `SW_TEST_DB_PASSWORD`. These
+override only test fixtures, force loopback, and are not application configuration.
+Initialize and migrate that disposable schema before running the fixtures. Without
+these variables the existing local database configuration is used, with business
+tables shadowed by connection-local temporary tables. Never use production data.
+
 Install locked dependencies with `composer install`. PHP 8.2+ and the application's
 intl/mbstring extensions are required. `composer test -- --no-coverage` invokes
 the project PHPUnit runner, not the old XAMPP/PEAR global PHPUnit. The default

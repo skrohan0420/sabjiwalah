@@ -19,6 +19,13 @@ $routes->get('signup', 'Client\AuthController::register');
 $routes->post('signup', 'Client\AuthController::storeRegistration');
 $routes->post('logout', 'Client\AuthController::logout', ['filter' => 'auth']);
 
+$routes->get('admin/login', 'Admin\AuthController::login');
+$routes->post('admin/login', 'Admin\AuthController::attemptLogin');
+$routes->post('admin/logout', 'Admin\AuthController::logout', ['filter' => 'role:admin']);
+$routes->get('delivery/login', 'Delivery\AuthController::login');
+$routes->post('delivery/login', 'Delivery\AuthController::attemptLogin');
+$routes->post('delivery/logout', 'Delivery\AuthController::logout', ['filter' => 'role:delivery']);
+
 $routes->group('admin', ['filter' => 'role:admin'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Admin\DashboardController::index');
     $routes->get('orders', 'Admin\OrderController::index');
@@ -58,6 +65,19 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
     $routes->post('checkout/otp/start', 'CheckoutController::startOtp', ['filter' => 'apiRole:customer']);
     $routes->post('checkout/otp/verify', 'CheckoutController::verifyOtp', ['filter' => 'apiRole:customer']);
     $routes->post('checkout/place', 'CheckoutController::place', ['filter' => 'apiRole:customer']);
+
+    $routes->post('admin/auth/otp/start', 'AdminAuthController::startOtp');
+    $routes->post('admin/auth/otp/verify', 'AdminAuthController::verifyOtp');
+    $routes->post('admin/auth/logout', 'AdminAuthController::logout', ['filter' => 'apiRole:admin']);
+    $routes->get('admin/auth/me', 'AdminAuthController::me', ['filter' => 'apiRole:admin']);
+    $routes->post('delivery/auth/otp/start', 'DeliveryAuthController::startOtp');
+    $routes->post('delivery/auth/otp/verify', 'DeliveryAuthController::verifyOtp');
+    $routes->post('delivery/auth/logout', 'DeliveryAuthController::logout', ['filter' => 'apiRole:delivery']);
+    $routes->get('delivery/auth/me', 'DeliveryAuthController::me', ['filter' => 'apiRole:delivery']);
+    $routes->post('customer/auth/otp/start', 'AuthController::startOtp');
+    $routes->post('customer/auth/otp/verify', 'AuthController::verifyOtp');
+    $routes->post('customer/auth/logout', 'AuthController::logout', ['filter' => 'apiRole:customer']);
+    $routes->get('customer/auth/me', 'AuthController::me', ['filter' => 'apiRole:customer']);
 
     $routes->post('auth/register', 'AuthController::register');
     $routes->post('auth/login', 'AuthController::login');

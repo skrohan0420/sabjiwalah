@@ -11,9 +11,8 @@ class CustomerSetupFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (! session('is_logged_in') || CustomerSetup::complete([
-            'role' => session('user_role'), 'name' => session('user_name'),
-        ])) {
+        $customer = \App\Services\AuthService::identity('customer');
+        if (!$customer || CustomerSetup::complete($customer)) {
             return null;
         }
 
@@ -23,6 +22,7 @@ class CustomerSetupFilter implements FilterInterface
             $path = substr($path, strlen($basePath) + 1);
         }
         $path = preg_replace('#^index\.php/?#', '', $path);
+        if (preg_match('#^(?:admin|delivery)(?:/|$)#', $path) || $path === 'login') return null;
         // These are the only screens needed to finish setup or end the session.
         if (in_array($path, ['account', 'logout'], true) || str_starts_with($path, 'assets/')) {
             return null;

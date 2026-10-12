@@ -12,14 +12,14 @@ class OrderController extends BaseController
     public function show(string $uid)
     {
         $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0')->setHeader('Pragma', 'no-cache');
-        try { $detail = (new \App\Services\CustomerOrderService())->detail($uid, (int) session('user_id')); }
+        try { $detail = (new \App\Services\CustomerOrderService())->detail($uid, (int) \App\Services\AuthService::id('customer')); }
         catch (\OutOfBoundsException) { throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound(); }
         return view('client/orders/show', ['detail'=>$detail]);
     }
     public function index(): string
     {
         $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0');
-        $user = (new AuthService())->user();
+        $user = AuthService::forRole('customer')->user();
         $orders = [];
 
         if ($user && ($user['role'] ?? null) === 'customer') {

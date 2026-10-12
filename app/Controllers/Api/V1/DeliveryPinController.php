@@ -13,7 +13,7 @@ class DeliveryPinController extends BaseApiController
         $this->response->setHeader('Cache-Control', 'private, no-store, max-age=0')->setHeader('Pragma', 'no-cache');
         if ($this->requestData() !== []) return $this->validationError(['payload' => 'No customer, PIN, or expiry fields are accepted.']);
         try {
-            return $this->success((new DeliveryPinService())->issue($uid, (int) session('user_id')),
+            return $this->success((new DeliveryPinService())->issue($uid, (int) \App\Services\AuthService::id('customer')),
                 'Delivery PIN generated. It is shown only on this screen.');
         } catch (\OutOfBoundsException $exception) {
             return $this->error($exception->getMessage(), 404);

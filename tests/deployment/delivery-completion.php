@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Real services/controllers with connection-local temporary tables only.
 define('ENVIRONMENT','development'); define('FCPATH',dirname(__DIR__,2).'/public/');
 require dirname(__DIR__,2).'/app/Config/Paths.php'; $paths=new Config\Paths(); require $paths->systemDirectory.'/Boot.php';
@@ -22,7 +23,7 @@ completeReject(fn()=>$service->complete($uid,$rider,$pin,true),App\Services\Deli
 $db->table('order_delivery_pins')->where('order_id',$id)->update(['attempt_window_ends_at'=>date('Y-m-d H:i:s',time()+120)]);
 try {$service->complete($uid,$rider,$pin,true);throw new RuntimeException('Attempt lockout bypassed.');}
 catch(App\Services\DeliveryVerificationException $e){completeCheck($e->reason==='pin_attempt_limit'&&$e->retryAfter>0&&$e->retryAfter<=120,'Retry metadata missing or inaccurate.');}
-session()->set('user_id',$rider);service('validation')->reset();
+fixtureIdentity($rider);service('validation')->reset();
 $request=new CodeIgniter\HTTP\IncomingRequest(config('App'),new CodeIgniter\HTTP\URI('http://localhost/'),json_encode(['pin'=>$pin,'cash_received'=>true]),new CodeIgniter\HTTP\UserAgent());
 $controller=new App\Controllers\Api\V1\Delivery\OrderController();$controller->initController($request,new CodeIgniter\HTTP\Response(config('App')),service('logger'));$response=$controller->complete($uid);$payload=json_decode($response->getBody(),true);
 completeCheck($response->getStatusCode()===429&&$payload['data']['code']==='pin_attempt_limit'&&(int)$response->getHeaderLine('Retry-After')===$payload['data']['retry_after'],'API lockout status/header metadata failed.');

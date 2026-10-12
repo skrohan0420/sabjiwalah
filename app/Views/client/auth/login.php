@@ -1,17 +1,18 @@
+<?php $authRole = $authRole ?? 'customer'; $loginPath = $loginPath ?? 'login'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <?= view('shared/favicon') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sabjiwalah</title>
+    <title><?= esc(ucfirst($authRole)) ?> Login - Sabjiwalah</title>
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/auth.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
     <?= view('shared/theme') ?>
 </head>
 <body>
     <main class="auth-page">
-        <a class="auth-back" href="<?= esc(base_url('account'), 'attr') ?>" aria-label="Go back" data-history-back>
+        <a class="auth-back" href="<?= esc(base_url($authRole === 'customer' ? 'account' : $authRole), 'attr') ?>" aria-label="Go back">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>
@@ -66,7 +67,7 @@
             <span class="auth-logo" aria-hidden="true">
                 <img src="<?= esc(app_static_url('assets/images/sabjiwalah-cart-logo.png'), 'attr') ?>" alt="">
             </span>
-            <h1 id="auth-title">Fresh groceries at your doorstep</h1>
+            <h1 id="auth-title"><?= $authRole === 'customer' ? 'Fresh groceries at your doorstep' : esc(ucfirst($authRole) . ' sign in') ?></h1>
         </section>
 
         <section class="auth-card">
@@ -86,7 +87,7 @@
                 </ul>
             <?php endif; ?>
 
-            <form method="post" action="<?= esc(base_url('login'), 'attr') ?>" class="auth-form" data-auth-form data-auth-mode="login">
+            <form method="post" action="<?= esc(base_url($loginPath), 'attr') ?>" class="auth-form" data-auth-form data-auth-mode="login" data-auth-role="<?= esc($authRole, 'attr') ?>" data-auth-api="<?= esc('/api/v1/' . $authRole . '/auth', 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="redirect" value="<?= esc($redirect ?? '', 'attr') ?>" data-auth-redirect>
 

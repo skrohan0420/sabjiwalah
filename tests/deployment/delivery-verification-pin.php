@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Connection-local temporary tables. No persistent customer/order/PIN records are changed.
 define('ENVIRONMENT', 'development'); define('FCPATH', dirname(__DIR__, 2) . '/public/');
 require dirname(__DIR__, 2) . '/app/Config/Paths.php'; $paths = new Config\Paths(); require $paths->systemDirectory . '/Boot.php';
@@ -13,7 +14,7 @@ foreach (['users', 'orders', 'order_delivery_pins', 'order_items'] as $table) {
 }
 function pinCheck(bool $ok, string $message): void { if (! $ok) throw new RuntimeException($message); }
 function pinAction(int $actor, string $uid, array $body = []): array {
-    session()->set('user_id', $actor);
+    fixtureIdentity($actor);
     $request = new CodeIgniter\HTTP\IncomingRequest(config('App'), new CodeIgniter\HTTP\URI('http://localhost/'), json_encode($body), new CodeIgniter\HTTP\UserAgent());
     $controller = new App\Controllers\Api\V1\DeliveryPinController();
     $controller->initController($request, new CodeIgniter\HTTP\Response(config('App')), service('logger'));

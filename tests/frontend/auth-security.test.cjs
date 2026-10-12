@@ -1,21 +1,22 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 function element(){return{value:'',textContent:'',disabled:false,hidden:false,classList:{add(){},remove(){},toggle(){}},focus(){},select(){}};}
-function setup(){
+function setup(role='customer'){
+  const saved=new Map([['sabjiwalah.customerProfile','customer-state'],['sabjiwalah.loginPhone','9000000003']]);
   const nodes=Object.fromEntries(['data-auth-phone','data-auth-dev-otp','data-auth-otp','data-auth-otp-panel','data-auth-otp-phone','data-auth-message','data-auth-redirect'].map(key=>['['+key+']',element()])),events={},calls=[];
   nodes['[data-auth-phone]'].value='9000000001';
-  const form={classList:{toggle(){}},querySelector:selector=>nodes[selector]||null,querySelectorAll:()=>[],closest:()=>({querySelector:selector=>nodes[selector]||null})};
+  const form={dataset:{authRole:role,authApi:'/api/v1/'+role+'/auth'},classList:{toggle(){}},querySelector:selector=>nodes[selector]||null,querySelectorAll:()=>[],closest:()=>({querySelector:selector=>nodes[selector]||null})};
   const button=element();button.closest=()=>form;
-  const context={document:{querySelector:selector=>nodes[selector]||null,addEventListener:(name,handler)=>events[name]=handler},window:{Sabjiwalah:{url:path=>path},localStorage:{getItem:()=>null,setItem(){}}},fetch:(path,options)=>new Promise((resolve,reject)=>calls.push({path,options,resolve,reject})),Array,JSON,String,Error};
+  const context={document:{querySelector:selector=>selector==='[data-auth-form]'?form:nodes[selector]||null,addEventListener:(name,handler)=>events[name]=handler},window:{Sabjiwalah:{url:path=>path},location:{href:''},localStorage:{getItem:key=>saved.get(key)||null,setItem:(key,value)=>saved.set(key,value)}},fetch:(path,options)=>new Promise((resolve,reject)=>calls.push({path,options,resolve,reject})),Array,JSON,String,Error};
   vm.runInNewContext(fs.readFileSync('public/assets/js/auth.js','utf8'),context);
-  return{nodes,form,button,events,calls};
+  return{nodes,form,button,events,calls,saved,context};
 }
 function send(s){return{target:{closest:selector=>selector==='[data-send-auth-otp]'?s.button:null}};}
 function respond(call,data,status=200,message=''){call.resolve({ok:status<400,json:async()=>({success:status<400,data,message})});}
 test('OTP issuance blocks duplicate clicks, phone changes and verification until the request finishes',async()=>{
   const s=setup();s.events.click(send(s));assert.equal(s.button.disabled,true);assert.equal(s.nodes['[data-auth-phone]'].disabled,true);
   s.events.click(send(s));s.events.click({target:{closest:selector=>selector==='[data-change-auth-phone]'?s.button:null}});s.events.submit({preventDefault(){},target:{closest:()=>s.form}});assert.equal(s.calls.length,1);
-  respond(s.calls[0],{header_name:'X-CSRF',token_value:'fresh'});await flush();assert.equal(s.calls[1].path,'/api/v1/auth/otp/start');assert.deepEqual(JSON.parse(s.calls[1].options.body),{phone:'9000000001'});
+  respond(s.calls[0],{header_name:'X-CSRF',token_value:'fresh'});await flush();assert.equal(s.calls[1].path,'/api/v1/customer/auth/otp/start');assert.deepEqual(JSON.parse(s.calls[1].options.body),{phone:'9000000001'});
   respond(s.calls[1],{dev_otp:'123456',user_exists:true,user_name:'Sample'});await flush();assert.equal(s.button.disabled,false);assert.equal(s.nodes['[data-auth-phone]'].disabled,false);assert.match(s.nodes['[data-auth-dev-otp]'].textContent,/123456/);
 });
 test('rate-limit and unavailable responses explain the error and never retry issuance automatically',async()=>{
@@ -23,4 +24,13 @@ test('rate-limit and unavailable responses explain the error and never retry iss
     const s=setup();s.events.click(send(s));respond(s.calls[0],{header_name:'X-CSRF',token_value:'fresh'});await flush();respond(s.calls[1],null,status,message);await flush();
     assert.equal(s.calls.length,2);assert.equal(s.button.disabled,false);assert.equal(s.nodes['[data-auth-phone]'].disabled,false);assert.equal(s.nodes['[data-auth-message]'].textContent,message);assert.equal(s.nodes['[data-auth-dev-otp]'].hidden,true);
   }
+});
+
+for(const role of ['customer','admin','delivery'])test(role+' login uses its area endpoint, redirect and saved phone',async()=>{
+ const s=setup(role);s.events.click(send(s));respond(s.calls[0],{header_name:'X-CSRF',token_value:'fresh'});await flush();
+ assert.equal(s.calls[1].path,'/api/v1/'+role+'/auth/otp/start');respond(s.calls[1],{dev_otp:'123456',user_exists:true,user_name:'Sample'});await flush();
+ s.form.querySelectorAll=()=>Array.from('123456',value=>({...element(),value}));s.events.submit({preventDefault(){},target:{closest:()=>s.form}});
+ respond(s.calls[2],{header_name:'X-CSRF',token_value:'fresh'});await flush();assert.equal(s.calls[3].path,'/api/v1/'+role+'/auth/otp/verify');
+ respond(s.calls[3],{user:{role,name:'Sample',profile_complete:true}});await flush();assert.equal(s.context.window.location.href,role==='customer'?'/account':'/'+role);
+ assert.equal(s.saved.get('sabjiwalah.customerProfile'),'customer-state');if(role!=='customer'){assert.equal(s.saved.get('sabjiwalah.loginPhone'),'9000000003');assert.equal(s.saved.get('sabjiwalah.loginPhone.'+role),'9000000001');}
 });

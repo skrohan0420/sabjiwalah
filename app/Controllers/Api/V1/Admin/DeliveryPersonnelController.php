@@ -38,14 +38,17 @@ class DeliveryPersonnelController extends BaseApiController
             if (isset($data[$field]) && ! is_string($data[$field])) return $this->validationError([$field => 'Must be text.']);
             $data[$field] = trim($data[$field] ?? '');
         }
-        if (! preg_match('/^[+0-9 ()-]+$/', $data['phone'])) return $this->validationError(['phone' => 'Enter a valid 10-digit Indian mobile number.']);
-        $digits = preg_replace('/\D+/', '', $data['phone']);
-        if (strlen($digits) === 12 && str_starts_with($digits, '91')) $digits = substr($digits, 2);
-        $data['phone'] = $digits; $data['email'] = strtolower($data['email']);
+        try { $data['phone'] = \App\Services\OtpService::normalizePhone($data['phone']); }
+        catch (\InvalidArgumentException $e) { return $this->validationError(['phone' => $e->getMessage()]); }
+        $data['email'] = strtolower($data['email']);
         if (! $this->validateData($data, [
-            'name' => 'required|max_length[120]', 'phone' => 'required|regex_match[/^[6-9][0-9]{9}$/]|is_unique[users.phone]',
-            'email' => 'permit_empty|valid_email|max_length[190]|is_unique[users.email]',
+            'name' => 'required|max_length[120]', 'phone' => 'required|regex_match[/^[6-9][0-9]{9}$/]',
+            'email' => 'permit_empty|valid_email|max_length[190]',
         ])) return $this->validationError($this->validator->getErrors());
+        foreach (['phone', 'email'] as $field) {
+            if ($data[$field] !== '' && (new \App\Models\UserModel())->where('role', 'delivery')->where($field, $data[$field])->first())
+                return $this->validationError([$field => 'Already belongs to a delivery account.']);
+        }
         try { return $this->success(['uid' => (new AdminDeliveryPersonnelService())->create($data), 'status' => 'inactive'], 'Delivery account created inactive. Review and activate it before login.', 201); }
         catch (\Throwable $exception) {
             // A unique-key race must not overwrite or convert an existing customer/admin account.

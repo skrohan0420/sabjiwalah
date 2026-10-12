@@ -9,7 +9,7 @@ class AccountController extends BaseApiController
 {
     public function profile()
     {
-        $auth = new AuthService();
+        $auth = AuthService::forRole('customer');
 
         return $this->success([
             'user' => $this->publicUser($auth->user()),
@@ -28,7 +28,7 @@ class AccountController extends BaseApiController
             return $this->validationError($this->validator->getErrors());
         }
 
-        $auth = new AuthService();
+        $auth = AuthService::forRole('customer');
         $user = $auth->user();
 
         if (! $user) {

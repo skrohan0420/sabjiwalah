@@ -1,6 +1,9 @@
 (function () {
-  const savedPhoneStorageKey = 'sabjiwalah.loginPhone';
-  const savedProfileStorageKey = 'sabjiwalah.loginProfile';
+  const authForm = document.querySelector('[data-auth-form]');
+  const authRole = authForm?.dataset.authRole || 'customer';
+  const authApi = authForm?.dataset.authApi || '/api/v1/customer/auth';
+  const savedPhoneStorageKey = 'sabjiwalah.loginPhone' + (authRole === 'customer' ? '' : '.' + authRole);
+  const savedProfileStorageKey = 'sabjiwalah.loginProfile' + (authRole === 'customer' ? '' : '.' + authRole);
   let isVerifyingOtp = false;
   let isSendingOtp = false;
 
@@ -131,7 +134,7 @@
     const payload = await response.json();
 
     if (!response.ok || !payload.success) {
-      throw new Error(payload.message || 'Request failed');
+      throw new Error(payload.errors?.phone_or_otp || payload.message || 'Request failed');
     }
 
     return payload;
@@ -258,7 +261,7 @@
 
     try {
       saveProfile(phone);
-      const payload = await api('/api/v1/auth/otp/verify', { phone, otp });
+      const payload = await api(authApi + '/otp/verify', { phone, otp });
       saveProfile(phone, payload.data.user?.name);
       window.location.href = window.Sabjiwalah.url(targetFor(payload.data.user, redirect));
     } catch (error) {
@@ -367,7 +370,7 @@
 
     try {
       saveProfile(phone);
-      const payload = await api('/api/v1/auth/otp/start', { phone });
+      const payload = await api(authApi + '/otp/start', { phone });
       saveProfile(phone, payload.data.user_name);
       renderSavedProfile(document.querySelector('[data-auth-saved-phone]'), getSavedProfile());
       showOtp(form, payload.data.dev_otp);

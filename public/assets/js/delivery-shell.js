@@ -90,11 +90,11 @@
     if (window.SabjiwalahDeliveryTracking) await window.SabjiwalahDeliveryTracking.stop('Tracking stopped for sign out.');
     message.hidden = true;
     try {
-      await api('api/v1/auth/logout', {});
-      if (alive) window.location.assign(window.Sabjiwalah.url('login'));
+      await api('api/v1/delivery/auth/logout', {});
+      if (alive) window.location.assign(window.Sabjiwalah.url('delivery/login'));
     } catch (error) {
       if (!alive) return;
-      if (error.status === 401) { window.location.assign(window.Sabjiwalah.url('login')); return; }
+      if (error.status === 401) { window.location.assign(window.Sabjiwalah.url('delivery/login')); return; }
       message.textContent = errorText(error);
       message.hidden = false;
     } finally { setBusy(false); }

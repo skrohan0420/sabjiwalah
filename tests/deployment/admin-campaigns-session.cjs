@@ -13,8 +13,8 @@ const net = require('node:net'), {randomUUID} = require('node:crypto'), {spawn} 
 if(PHP_SAPI!=='cli-server'||!in_array($_SERVER['REMOTE_ADDR'],['127.0.0.1','::1'],true))exit;
 header('X-Sabjiwalah-Fixture: ${token}');$path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 if($path==='/admin'||$path==='/admin/'){header('Location: /admin/offers');exit;}if(str_starts_with($path,'/assets/'))return false;
-if(!preg_match('#^/(?:login|admin/(?:offers|promotions)|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|admin/(?:offers|promotions)(?:/[^/]+)?))$#D',$path)){http_response_code(404);exit;}
-define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);config('Otp')->developmentMode=true;config('App')->baseURL='${base}';
+if(!preg_match('#^/(?:(?:admin/|delivery/)?login|admin/(?:offers|promotions)|api/v1/(?:csrf|(?:(?:customer|admin|delivery)/)?auth/(?:otp/start|otp/verify|logout|me)|admin/(?:offers|promotions)(?:/[^/]+)?))$#D',$path)){http_response_code(404);exit;}
+define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);require '${root}/tests/_support/fixture-database.php';config('Otp')->developmentMode=true;config('App')->baseURL='${base}';
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix');
 $tables=['users','offers','promotions','otp_rate_limits'];
 foreach($tables as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$db->query($ddl);}
@@ -41,14 +41,14 @@ $app->run();$state=[];foreach($tables as $table)$state[$table]=$db->table($table
     const csrf = (await (await request('api/v1/csrf')).json()).data;
     return request(url, {method, headers: {'Content-Type': 'application/json', [csrf.header_name]: csrf.token_value}, body: JSON.stringify(body)});
   }
-  async function login(request, phone) {
+  async function login(request, phone) {request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';
     // Age only disposable resend timestamps; campaign conflict tests need two admin sessions.
     const file=path.join(directory,'state.json'),state=JSON.parse(await fs.readFile(file,'utf8'));
     for(const bucket of state.otp_rate_limits)bucket.last_used_at=Number(bucket.last_used_at)-60;
     await fs.writeFile(file,JSON.stringify(state));
-    const otp = (await (await mutate(request, 'api/v1/auth/otp/start', {phone})).json()).data;
+    const otp = (await (await mutate(request, 'api/v1/'+request.authRole+'/auth/otp/start', {phone})).json()).data;
     assert.equal(otp.user_exists, true);
-    assert.equal((await mutate(request, 'api/v1/auth/otp/verify', {phone, otp: otp.dev_otp})).status, 200);
+    assert.equal((await mutate(request, 'api/v1/'+request.authRole+'/auth/otp/verify', {phone, otp: otp.dev_otp})).status, 200);
   }
   try {
     let ready = false;
@@ -63,13 +63,13 @@ $app->run();$state=[];foreach($tables as $table)$state[$table]=$db->table($table
       assert.equal((await guest('admin/' + kind)).status, 302);
     }
     for (const phone of ['9000000002', '9000000003']) {
-      const request = client(); await login(request, phone);
+      const request = client();request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer'; await login(request, phone);
       for (const kind of ['offers', 'promotions']) {
         assert.equal((await request('api/v1/admin/' + kind)).status, 403);
         assert.equal((await mutate(request, 'api/v1/admin/' + kind, {})).status, 403);
         assert.equal((await mutate(request, 'api/v1/admin/' + kind + '/off_missing', {}, 'PUT')).status, 403);
       }
-      await mutate(request, 'api/v1/auth/logout', {});
+      await mutate(request,'api/v1/'+request.authRole+'/auth/logout', {});
     }
     await login(admin, '9000000001'); await login(second, '9000000001');
     const offer = {name: 'Fresh basket savings', code: 'fresh10', type: 'percentage', value: '10', minimum_order_amount: '200', maximum_discount: '80', usage_limit: '50', starts_at: null, ends_at: null, is_active: 0};
@@ -99,7 +99,7 @@ $app->run();$state=[];foreach($tables as $table)$state[$table]=$db->table($table
       response = await admin('admin/' + kind); assert.equal(response.status, 200); assert.match(await response.text(), /admin-campaigns\.js/);
     }
     console.log('PASS: HTTP campaign create/edit/deactivate, duplicate/stale requests, role/CSRF checks, private pages/listings, scheduling and unsafe data rejection. Temporary SQL/storage; single-worker fixture.');
-    for (const request of [admin, second]) await mutate(request, 'api/v1/auth/logout', {});
+    for (const request of [admin, second]) await mutate(request,'api/v1/'+request.authRole+'/auth/logout', {});
     if (preview) {
       console.log('Preview: ' + base + 'login (sample admin phone 9000000001). Send stop to close.');
       await new Promise(resolve => { process.once('SIGINT', resolve); process.stdin.once('data', resolve); }); process.stdin.pause();

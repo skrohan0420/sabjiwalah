@@ -73,7 +73,7 @@ class OrderController extends BaseApiController
             $orders = new OrderModel();
             $order = $orders->findByUid($uid);
             if (! $order) return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
-            (new OrderService())->changeStatus((int) $order['id'], (string) $data['status'], (int) session('user_id'),
+            (new OrderService())->changeStatus((int) $order['id'], (string) $data['status'], (int) \App\Services\AuthService::id('admin'),
                 $data['notes'] ?? null, ($data['expected_status'] ?? '') ?: null);
             return $this->success(['order' => $this->publicOrder($orders->find((int) $order['id']))], 'Order status updated');
         } catch (OrderConflictException $exception) {

@@ -30,7 +30,7 @@ class DispatchController extends BaseApiController
         if (array_diff(array_keys($data), ['rider_uid', 'expected_assignment_uid']) !== []) return $this->validationError(['assignment' => 'Only rider and observed assignment can be supplied.']);
         foreach (['rider_uid', 'expected_assignment_uid'] as $field) if (isset($data[$field]) && ! is_string($data[$field])) return $this->validationError([$field => 'Must be a UID string.']);
         if (! $this->validateData($data, ['rider_uid' => 'required|max_length[40]', 'expected_assignment_uid' => 'required|max_length[40]'])) return $this->validationError($this->validator->getErrors());
-        try { return $this->success((new DispatchService())->assign($uid, $data['rider_uid'], $data['expected_assignment_uid'], (int) session('user_id')), 'Delivery assignment saved'); }
+        try { return $this->success((new DispatchService())->assign($uid, $data['rider_uid'], $data['expected_assignment_uid'], (int) \App\Services\AuthService::id('admin')), 'Delivery assignment saved'); }
         catch (\OutOfBoundsException $exception) { return $this->error($exception->getMessage(), 404); }
         catch (OrderConflictException $exception) { return $this->error($exception->getMessage(), 409); }
         catch (\DomainException $exception) { return $this->error($exception->getMessage(), 403); }

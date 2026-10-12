@@ -28,7 +28,7 @@ $productSections = [
     ['title' => 'Chai-time companions', 'products' => array_reverse($products), 'show_all' => false],
 ];
 
-$isLoggedIn = (bool) session('is_logged_in');
+$isLoggedIn = (bool) (\App\Services\AuthService::identity('customer') !== null);
 $accountUrl = base_url('account');
 $accountLabel = $isLoggedIn ? 'Account' : 'My Account';
 ?>

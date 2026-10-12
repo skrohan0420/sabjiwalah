@@ -15,7 +15,7 @@ class SettingsController extends BaseApiController
     public function update()
     {
         $this->response->setHeader('Cache-Control','private, no-store');
-        try { return $this->success(['settings'=>(new OperationalSettingsService())->save($this->requestData(),(int)session('user_id'))],'Settings saved.'); }
+        try { return $this->success(['settings'=>(new OperationalSettingsService())->save($this->requestData(),(int)\App\Services\AuthService::id('admin'))],'Settings saved.'); }
         catch(SettingsValidationException $e){return $this->validationError($e->errors);}
         catch(OrderConflictException $e){return $this->error($e->getMessage(),409);}
         catch(\OutOfBoundsException $e){return $this->error($e->getMessage(),403);}

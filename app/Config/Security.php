@@ -71,7 +71,8 @@ class Security extends BaseConfig
      *
      * Regenerate CSRF Token on every submission.
      */
-    public bool $regenerate = true;
+    // One browser cookie is shared by all role tabs; a stable token avoids stale-tab failures.
+    public bool $regenerate = false;
 
     /**
      * --------------------------------------------------------------------------

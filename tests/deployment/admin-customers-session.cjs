@@ -8,9 +8,9 @@ if(PHP_SAPI !== 'cli-server' || !in_array($_SERVER['REMOTE_ADDR'],['127.0.0.1','
 $path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 if($path==='/admin'){header('Location: /admin/customers');exit;}
 if(str_starts_with($path,'/assets/'))return false;
-if(!preg_match('#^/(?:login|admin/customers|api/v1/(?:csrf|auth/(?:otp/start|otp/verify|logout|me)|checkout/summary|admin/customers(?:/[^/]+(?:/status)?)?))$#D',$path)){http_response_code(404);exit;}
+if(!preg_match('#^/(?:(?:admin/|delivery/)?login|admin/customers|api/v1/(?:csrf|(?:(?:customer|admin|delivery)/)?auth/(?:otp/start|otp/verify|logout|me)|checkout/summary|admin/customers(?:/[^/]+(?:/status)?)?))$#D',$path)){http_response_code(404);exit;}
 define('ENVIRONMENT','development');define('FCPATH','${root}/public/');require '${root}/app/Config/Paths.php';
-$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);
+$paths=new Config\\Paths();$paths->writableDirectory=__DIR__.'/writable';require $paths->systemDirectory.'/Boot.php';$app=CodeIgniter\\Boot::bootWorker($paths);require '${root}/tests/_support/fixture-database.php';
 config('Otp')->developmentMode=true;config('App')->baseURL='http://127.0.0.1:8768/';
 $db=db_connect();if($db->DBDriver!=='MySQLi'||$db->DBPrefix!=='')throw new RuntimeException('Use local MySQL without prefix');
 foreach(['delivery_locations','users','orders','otp_rate_limits'] as $table){$ddl=$db->query('SHOW CREATE TABLE '.$table)->getRowArray()['Create Table'];$ddl=str_replace('CREATE TABLE','CREATE TEMPORARY TABLE',$ddl);$ddl=preg_replace('/^\\s*CONSTRAINT .* FOREIGN KEY .*\\n/m','',$ddl);$db->query(preg_replace('/,\\s*\\)/',')',$ddl));}
@@ -27,23 +27,23 @@ $state['status']=$db->table('users')->select('status')->where('id',2)->get()->ge
   let diagnostics='';server.stderr.on('data',chunk=>{diagnostics+=chunk;});
   function client(){const cookies=new Map();return async(url,options={})=>{const response=await fetch('http://127.0.0.1:8768/'+url,{...options,redirect:'manual',headers:{Accept:'application/json',...options.headers,Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}});for(const cookie of response.headers.getSetCookie()){const [pair]=cookie.split(';');const i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1));}return response;};}
   async function mutate(request,url,body,method='POST'){const response=await request('api/v1/csrf');const csrf=await response.json();assert.equal(response.status,200,csrf.message);assert.ok(csrf.data,csrf.message);return request(url,{method,headers:{'Content-Type':'application/json',[csrf.data.header_name]:csrf.data.token_value},body:JSON.stringify(body)});}
-  async function login(request,phone){const start=await mutate(request,'api/v1/auth/otp/start',{phone});assert.equal(start.status,200);const otp=(await start.json()).data;return mutate(request,'api/v1/auth/otp/verify',{phone,otp:otp.dev_otp});}
+  async function login(request,phone){request.authRole=phone==='9000000001'?'admin':phone==='9000000002'?'delivery':'customer';const start=await mutate(request,'api/v1/'+request.authRole+'/auth/otp/start',{phone});if(start.status!==200)return start;const otp=(await start.json()).data;return mutate(request,'api/v1/'+request.authRole+'/auth/otp/verify',{phone,otp:otp.dev_otp});}
   try{
     let ready=false;for(let i=0;i<40;i++){try{await fetch('http://127.0.0.1:8768/api/v1/csrf');ready=true;break;}catch{await new Promise(resolve=>setTimeout(resolve,100));}}assert.ok(ready,diagnostics);
     const admin=client(),customer=client();assert.equal((await login(admin,'9000000001')).status,200);assert.equal((await login(customer,'9000000003')).status,200);
-    assert.equal((await customer('api/v1/auth/me')).status,200);
+    assert.equal((await customer('api/v1/'+customer.authRole+'/auth/me')).status,200);
     const action='api/v1/admin/customers/usr_fixture_customer/status';
     assert.equal((await mutate(admin,action,{status:'inactive',expected_status:'active'},'PATCH')).status,200);
-    assert.equal((await customer('api/v1/auth/me')).status,401,'Existing session must be revoked.');
+    assert.equal((await customer('api/v1/'+customer.authRole+'/auth/me')).status,401,'Existing session must be revoked.');
     assert.equal((await customer('api/v1/checkout/summary')).status,401,'Inactive account must not checkout.');
-    assert.equal((await login(customer,'9000000003')).status,401,'Inactive account must not log in.');
+    assert.equal((await login(customer,'9000000003')).status,422,'Inactive account must not log in.');
     const details=(await(await admin('api/v1/admin/customers/usr_fixture_customer?per_page=10')).json()).data;
     assert.equal(details.customer.status,'inactive');assert.equal(details.orders.pager.total,12);assert.equal(details.orders.items.length,10);
     assert.equal((await mutate(admin,action,{status:'active',expected_status:'active'},'PATCH')).status,409);
     assert.equal((await mutate(admin,action,{status:'active',expected_status:'inactive'},'PATCH')).status,200);
-    assert.equal((await customer('api/v1/auth/me')).status,401,'Reactivation must not resurrect a revoked session.');
-    assert.equal((await login(customer,'9000000003')).status,200);assert.equal((await customer('api/v1/auth/me')).status,200);
-    await mutate(admin,'api/v1/auth/logout',{});await mutate(customer,'api/v1/auth/logout',{});
+    assert.equal((await customer('api/v1/'+customer.authRole+'/auth/me')).status,401,'Reactivation must not resurrect a revoked session.');
+    assert.equal((await login(customer,'9000000003')).status,200);assert.equal((await customer('api/v1/'+customer.authRole+'/auth/me')).status,200);
+    await mutate(admin,'api/v1/'+admin.authRole+'/auth/logout',{});await mutate(customer,'api/v1/'+customer.authRole+'/auth/logout',{});
     console.log('PASS: real HTTP deactivation revokes existing sessions, blocks checkout/login, retains order history, rejects stale actions and requires fresh login after reactivation. Temporary SQL/storage only.');
     if(process.argv.includes('--preview')){console.log('Isolated sample preview: http://127.0.0.1:8768/login (admin phone 9000000001). Stop with Ctrl+C.');await new Promise(resolve=>process.once('SIGINT',resolve));}
   }finally{

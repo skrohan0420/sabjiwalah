@@ -106,7 +106,7 @@ class CheckoutController extends BaseApiController
         } catch (\App\Services\OtpUnavailableException $e) { return $this->error($e->getMessage(), 503); }
 
         try {
-            $order = (new OrderService())->createFromCart((int) session('user_id'), $data);
+            $order = (new OrderService())->createFromCart((int) \App\Services\AuthService::id('customer'), $data);
         } catch (\App\Services\OrderConflictException $exception) {
             return $this->error($exception->getMessage(), 409);
         } catch (InvalidArgumentException $exception) {

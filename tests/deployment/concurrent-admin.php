@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../_support/role-identity.php';
 // Worker for concurrent-admin.cjs. All writes are confined to its newly-created disposable database.
 if (PHP_SAPI !== 'cli') exit(1);
 [$script, $database, $directory, $action] = $argv;
@@ -82,7 +83,7 @@ if ($action === 'prepare-availability') {
 }
 $worker=(int)($argv[4]??0); $_SERVER['REMOTE_ADDR']='127.0.0.1'; config('Otp')->developmentMode=true;
 service('session'); session_id('concurrent'.$action.$worker); session_start();
-session()->set(['user_id'=>$worker%2===0?2:3,'user_role'=>'customer','is_logged_in'=>true]);
+fixtureIdentity($worker%2===0?2:3);
 if (str_starts_with($action,'checkout-')) {
     (new App\Services\CartService())->add('prd_concurrent',1);
     if ($action==='checkout-coupon') session()->set('checkout_offer','LAST');
@@ -100,8 +101,8 @@ try {
         else { $changed=(new App\Services\AdminDeliveryPersonnelService())->changeOwnAvailability(5,'offline','available');if($changed!=='changed')throw new App\Services\OrderConflictException($changed); }
     }
     elseif ($action==='availability-stale') { $changed=(new App\Services\AdminDeliveryPersonnelService())->changeOwnAvailability(4,$worker===0?'offline':'unavailable','available');if($changed!=='changed')throw new App\Services\OrderConflictException($changed); }
-    elseif ($action==='otp-phone') (new App\Services\OtpService())->start('auth','9000000100');
-    elseif ($action==='otp-ip') (new App\Services\OtpService())->start('auth','9000001'.str_pad((string)$worker,3,'0',STR_PAD_LEFT));
+    elseif ($action==='otp-phone') (new App\Services\OtpService())->start('customer_login','9000000100');
+    elseif ($action==='otp-ip') (new App\Services\OtpService())->start('customer_login','9000001'.str_pad((string)$worker,3,'0',STR_PAD_LEFT));
     elseif (str_starts_with($action,'delivery-')) {
         $fixture=json_decode(file_get_contents($directory.'/delivery-race.json'),true);$id=$fixture['id'];
         if($action==='delivery-pickup-reassign') {
@@ -115,7 +116,7 @@ try {
     }
     elseif (str_starts_with($action,'checkout-')) {
         $quote=(new App\Services\CheckoutSummaryService())->summary();
-        (new App\Services\OrderService())->createFromCart((int)session('user_id'),['customer_name'=>'Fixture Shopper','customer_phone'=>'9000000002','address_line'=>'Fixture','city'=>'Fixture','postal_code'=>'700001','quote_token'=>$quote['quote_token']]);
+        (new App\Services\OrderService())->createFromCart((int)App\Services\AuthService::id('customer'),['customer_name'=>'Fixture Shopper','customer_phone'=>'9000000002','address_line'=>'Fixture','city'=>'Fixture','postal_code'=>'700001','quote_token'=>$quote['quote_token']]);
     } else throw new RuntimeException('Unknown fixture action.');
     $result='ok';
 } catch (App\Services\OtpRateLimitException) { $result='limited'; }

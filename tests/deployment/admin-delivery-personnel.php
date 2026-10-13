@@ -63,7 +63,7 @@ foreach ([$valid+['role'=>'admin'], $valid+['status'=>'active'], $valid+['uid'=>
 [$status,$data] = riderAction('create', $valid);
 riderCheck($status === 201, 'Account creation failed: ' . json_encode($data));
 $newUid = $data['data']['uid']; $new = $users->where('uid', $newUid)->first();
-riderCheck($new['role'] === 'delivery' && $new['status'] === 'inactive' && $new['phone'] === '9876500004' && $new['email'] === 'new@example.test' && $new['password_hash'] === null, 'Creation authoritative fields/normalization failed.');
+riderCheck($new['role'] === 'delivery' && $new['status'] === 'inactive' && $new['phone'] === '9876500004' && $new['email'] === 'new@example.test' && !array_key_exists('password_hash', $new), 'Creation authoritative fields/normalization failed.');
 riderCheck($db->table('delivery_personnel_profiles')->where('user_id',$new['id'])->countAllResults() === 1, 'Account missing profile.');
 riderCheck(riderAction('updateAvailability', ['availability'=>'available','expected_availability'=>'offline'], $newUid)[0] === 409, 'Inactive rider availability changed.');
 riderCheck(riderAction('updateStatus', ['status'=>'active','expected_status'=>'inactive'], $newUid)[0] === 200, 'Activation failed.');

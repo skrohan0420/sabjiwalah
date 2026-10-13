@@ -90,7 +90,7 @@
     for (const [id, navigate] of [['delivery-map-navigate', true], ['delivery-map-browser', false]]) {
       const link = byId(id); link.hidden = !active || (!next && !address);
       const target = next ? next.lat + ',' + next.lng : address;
-      link.href = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&' + (navigate ? 'dir_action=navigate&' : '') + 'destination=' + encodeURIComponent(target);
+      link.href = 'https://www.google.com/maps/dir/?api=1&travelmode=two-wheeler&' + (navigate ? 'dir_action=navigate&' : '') + 'destination=' + encodeURIComponent(target);
       if (navigate) link.textContent = next ? 'Navigate to Customer' : 'Navigate using address';
     }
     if (!next) { status.textContent = 'Saved coordinates are missing or invalid. Confirm the address with the customer; address directions may be approximate.'; controls(); return; }

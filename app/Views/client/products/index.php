@@ -35,18 +35,16 @@ $accountUrl = base_url('account');
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/home.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
     <?= view('shared/theme') ?>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/customer-catalog.css'), 'attr') ?>">
 </head>
 <body class="category-body">
     <div class="app-shell category-app-shell">
         <header class="category-shop-header">
             <div class="category-shop-topbar">
-                <a class="category-icon-button category-back-link" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back></a>
+                <a class="category-icon-button category-back-link" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a>
                 <div class="category-shop-title">
                     <h1>Top deals</h1>
-                    <button type="button" aria-label="Delivery location">
-                        <strong>Delivering to</strong>
-                        <span>Surajpur, Greater Noida</span>
-                    </button>
+                    <p>Fresh picks, everyday savings</p>
                 </div>
                 <a class="category-icon-button category-search-link" href="<?= esc(base_url('search'), 'attr') ?>" aria-label="Search products"></a>
                 <button class="category-icon-button category-share-button" type="button" aria-label="Share" data-share-page></button>

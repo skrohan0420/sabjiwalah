@@ -1,10 +1,20 @@
 <?= $this->extend('admin/layout') ?>
 <?= $this->section('content') ?>
-<section class="admin-heading"><div><p class="admin-eyebrow">SABJIWALAH OPERATIONS</p><h1>Orders</h1><p class="admin-muted">Follow every order from placement to preparation.</p></div><button class="admin-button admin-button-secondary" id="orders-refresh" type="button">Refresh</button></section>
+<?php $operations = $operations ?? false; ?>
+<section class="admin-heading"><div><p class="admin-eyebrow">SABJIWALAH OPERATIONS</p><h1><?= $operations ? 'Operations' : 'Orders' ?></h1><p class="admin-muted"><?= $operations ? 'Accept, prepare and assign deliveries in one workspace.' : 'Follow every order from placement to preparation.' ?></p></div><button class="admin-button admin-button-secondary" id="orders-refresh" type="button">Refresh</button></section>
+<?php if ($operations): ?>
+<nav id="operations-queues" class="operations-queues" aria-label="Order queues" data-map-key="<?= esc(config('Maps')->googleApiKey, 'attr') ?>" data-map-id="<?= esc(config('Maps')->googleMapId, 'attr') ?>">
+<?php foreach (['new'=>'New','preparing'=>'Preparing','ready'=>'Ready','on_way'=>'On the way','history'=>'History'] as $key=>$label): ?><button type="button" data-queue="<?= esc($key, 'attr') ?>" aria-pressed="false"><?= esc($label) ?><span data-queue-count="<?= esc($key, 'attr') ?>">—</span></button><?php endforeach ?>
+</nav>
+<p id="operations-feedback" class="admin-alert admin-alert-error" role="alert" hidden></p>
+<?php endif ?>
 <div id="orders-new" class="admin-alert" role="status" hidden></div>
 <form id="orders-filters" class="admin-card orders-filters">
+<?php if ($operations): ?><input type="hidden" name="queue" id="operations-queue" value="new"><?php endif ?>
     <div class="admin-field"><label for="orders-search">Search orders</label><input id="orders-search" name="search" type="search" maxlength="120" placeholder="Order number or customer name"></div>
+<?php if (!$operations): ?>
     <div class="admin-field"><label for="orders-status">Status</label><select id="orders-status" name="status"><option value="">All statuses</option><?php foreach (['pending', 'confirmed', 'preparing', 'ready_for_delivery', 'out_for_delivery', 'delivered', 'cancelled', 'delivery_failed'] as $status): ?><option value="<?= esc($status, 'attr') ?>"><?= esc(ucwords(str_replace('_', ' ', $status))) ?></option><?php endforeach ?></select></div>
+<?php endif ?>
     <div class="admin-field"><label for="orders-from">From date (India)</label><input id="orders-from" name="from" type="date"></div>
     <div class="admin-field"><label for="orders-to">To date (India)</label><input id="orders-to" name="to" type="date"></div>
     <div class="admin-field"><label for="orders-sort">Sort by</label><select id="orders-sort" name="sort"><option value="created_at">Order date</option><option value="order_number">Order number</option><option value="total_amount">Total amount</option></select></div>
@@ -17,7 +27,7 @@
 <div id="orders-loading"><?= view('admin/components/state', ['state' => 'loading', 'message' => 'Loading orders…']) ?></div>
 <div id="orders-list" aria-busy="true"></div>
 <nav class="orders-pagination" aria-label="Order pages"><button id="orders-prev" class="admin-button admin-button-secondary" type="button" disabled>Previous</button><span id="orders-page" role="status"></span><button id="orders-next" class="admin-button admin-button-secondary" type="button" disabled>Next</button></nav>
-<dialog id="order-details" class="admin-dialog order-details" aria-labelledby="order-detail-title">
+<dialog id="order-details" class="admin-dialog order-details<?= $operations ? ' operations-details' : '' ?>" aria-labelledby="order-detail-title">
     <div class="orders-detail-heading"><h2 id="order-detail-title">Order details</h2><button id="order-close" class="admin-icon-button" type="button" aria-label="Close order details">×</button></div>
     <div id="order-detail-error" class="admin-alert admin-alert-error" role="alert" hidden></div>
     <p id="order-detail-stale" class="admin-alert" role="status" hidden>This order has changed. Reload details before applying an action.</p>
@@ -32,4 +42,5 @@
 </dialog>
 <noscript><p class="admin-alert admin-alert-error">Enable JavaScript to manage orders.</p></noscript>
 <script defer src="<?= esc(app_static_url('assets/js/admin-orders.js'), 'attr') ?>"></script>
+<?php if ($operations): ?><script defer src="<?= esc(app_static_url('assets/js/admin-pickup-map.js'), 'attr') ?>"></script><script defer src="<?= esc(app_static_url('assets/js/admin-operations.js'), 'attr') ?>"></script><?php endif ?>
 <?= $this->endSection() ?>

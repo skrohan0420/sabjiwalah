@@ -48,7 +48,7 @@ class DispatchService
             if (! $order) throw new \OutOfBoundsException('Order not found.');
             $actor = $model->lockUser($actorId, true);
             if (! $actor || $actor['role'] !== 'admin' || $actor['status'] !== 'active') throw new \DomainException('Admin access required.');
-            if ($order['order_status'] !== OrderService::STATUS_READY_FOR_DELIVERY) throw new OrderConflictException('Only orders ready for delivery can be assigned or reassigned.');
+            if (!in_array($order['order_status'], [OrderService::STATUS_PREPARING, OrderService::STATUS_READY_FOR_DELIVERY], true)) throw new OrderConflictException('Only preparing or ready orders can be assigned or reassigned.');
             $latest = $model->latest((int) $order['id']);
             if (($latest['uid'] ?? 'none') !== $expectedAssignment) throw new OrderConflictException('Assignment changed. Reload dispatch before trying again.');
             $rider = $model->lockUser($riderUid);

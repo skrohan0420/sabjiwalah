@@ -8,7 +8,7 @@
     <title><?= esc(ucfirst($authRole)) ?> Login - Sabjiwalah</title>
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/auth.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
-    <?= view('shared/theme') ?>
+    <?= view('shared/theme', ['themePanel' => $authRole === 'customer' ? 'client' : $authRole]) ?>
 </head>
 <body>
     <main class="auth-page">

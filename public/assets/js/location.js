@@ -26,9 +26,11 @@
     status.classList.toggle('is-error', error);
   };
   const renderHeader = location => {
-    document.querySelector('[data-current-location-label]').textContent = location?.label || 'Choose delivery location';
+    const label = document.querySelector('[data-current-location-label]');
+    if (label) label.textContent = location?.label || 'Choose delivery location';
     const region = [location?.city, location?.state, location?.postalCode].filter(Boolean).join(', ');
-    document.querySelector('[data-current-location-detail]').textContent = region || location?.summary || 'Pin your address on the map';
+    const detail = document.querySelector('[data-current-location-detail]');
+    if (detail) detail.textContent = region || location?.summary || 'Pin your address on the map';
     document.querySelector('[data-location-open]').title = location ? [location.label, location.summary].filter(Boolean).join(' — ') : 'Choose delivery location';
   };
   const coordinateText = p => p.latitude.toFixed(6) + ', ' + p.longitude.toFixed(6);
@@ -98,7 +100,7 @@
       const center = saved ? { lat: saved.latitude, lng: saved.longitude } : { lat: 22.9, lng: 78.96 };
       if (!map) {
         map = new GoogleMap(canvas, { center, zoom: saved ? 18 : 5, mapId: canvas.dataset.googleMapId || 'DEMO_MAP_ID',
-          mapTypeId: 'roadmap', zoomControl: true, mapTypeControl: false, streetViewControl: false,
+          mapTypeId: 'hybrid', zoomControl: true, mapTypeControl: false, streetViewControl: false,
           fullscreenControl: false, scaleControl: true, gestureHandling: 'greedy', clickableIcons: true, tilt: 0,
           cameraControl: false, rotateControl: false });
         map.addListener('center_changed', () => {
@@ -248,7 +250,9 @@
       state: part('administrative_area_level_1'), postalCode: part('postal_code') };
     try { localStorage.setItem(key, JSON.stringify(location)); }
     catch { message('Could not save your location. Enable browser storage and try again.', true); return; }
-    renderHeader(location); close();
+    renderHeader(location);
+    document.dispatchEvent(new CustomEvent('sabjiwalah:location-changed', { detail: location }));
+    close();
   });
   window.addEventListener('storage', event => { if (event.key === key) renderHeader(read()); });
   renderHeader(read());

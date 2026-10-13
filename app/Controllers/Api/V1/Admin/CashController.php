@@ -8,7 +8,9 @@ class CashController extends BaseApiController
     public function index()
     {
         $this->response->setHeader('Cache-Control','private, no-store'); $query=$this->request->getGet();
-        if (!$this->validateData($query,['page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[1000000]','per_page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[100]','status'=>'permit_empty|in_list[pending,reconciled]','search'=>'permit_empty|max_length[120]'])) return $this->validationError($this->validator->getErrors());
+        foreach(['status','search','from','to'] as $field)if(isset($query[$field])&&!is_string($query[$field]))return $this->validationError([$field=>'Must be text.']);
+        if (!$this->validateData($query,['page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[1000000]','per_page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[100]','status'=>'permit_empty|in_list[pending,reconciled]','search'=>'permit_empty|max_length[120]','from'=>'permit_empty|valid_date[Y-m-d]','to'=>'permit_empty|valid_date[Y-m-d]'])) return $this->validationError($this->validator->getErrors());
+        if(!empty($query['from'])&&!empty($query['to'])&&$query['from']>$query['to'])return $this->validationError(['to'=>'End date must follow start date.']);
         $query['page']=(int)($query['page']??1)?:1; $query['per_page']=(int)($query['per_page']??20)?:20;
         try {
             $data=(new DeliveryCompletionModel())->cashListing($query);

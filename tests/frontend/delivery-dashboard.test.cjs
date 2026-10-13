@@ -47,14 +47,29 @@ test('availability drafts survive polls; busy assignments and offline state disa
 });
 test('cancel sends no write; confirmed availability uses expected server state and blocks overlap',async()=>{
  const s=setup();s.requests[0].resolve({data:data()});await flush();s.ids['rider-availability-choice'].value='offline';submit(s);s.confirmations[0](false);await flush();assert.equal(s.requests.length,1);
- submit(s);s.confirmations[1](true);await flush();assert.equal(s.requests[1].method,'PATCH');assert.equal(s.requests[1].body.expected_availability,'available');assert.equal(s.requests[1].body.availability,'offline');submit(s);s.ids['rider-dashboard-refresh'].events.click();assert.equal(s.requests.length,2);
+ assert.equal(s.ids['rider-availability-choice'].value,'available');s.ids['rider-availability-choice'].value='offline';submit(s);s.confirmations[1](true);await flush();assert.equal(s.requests[1].method,'PATCH');assert.equal(s.requests[1].body.expected_availability,'available');assert.equal(s.requests[1].body.availability,'offline');submit(s);s.ids['rider-dashboard-refresh'].events.click();assert.equal(s.requests.length,2);
  s.requests[1].resolve({data:{base_availability:'offline'}});await flush();assert.equal(s.requests[2].body,undefined);s.requests[2].resolve({data:{...data(),base_availability:'offline',availability:'offline'}});await flush();assert.equal(s.ids['rider-availability-choice'].value,'offline');assert.equal(s.ids['rider-availability-save'].disabled,false);
 });
 test('uncertain write and failed verification block resubmission until a successful read',async()=>{
- const s=setup();s.requests[0].resolve({data:data()});await flush();s.ids['rider-availability-choice'].value='unavailable';submit(s);s.confirmations[0](true);await flush();s.requests[1].reject(new Error('Connection lost'));await flush();s.requests[2].reject(new Error('Still offline'));await flush();assert.equal(s.ids['rider-availability-save'].disabled,true);submit(s);assert.equal(s.requests.length,3);
- s.ids['rider-dashboard-refresh'].events.click();s.requests[3].resolve({data:{...data(),availability:'unavailable',base_availability:'unavailable'}});await flush();assert.equal(s.ids['rider-availability-choice'].value,'unavailable');assert.equal(s.ids['rider-availability-save'].disabled,false);
+ const s=setup();s.requests[0].resolve({data:data()});await flush();s.ids['rider-availability-choice'].value='offline';submit(s);s.confirmations[0](true);await flush();s.requests[1].reject(new Error('Connection lost'));await flush();s.requests[2].reject(new Error('Still offline'));await flush();assert.equal(s.ids['rider-availability-save'].disabled,true);submit(s);assert.equal(s.requests.length,3);
+ s.ids['rider-dashboard-refresh'].events.click();s.requests[3].resolve({data:{...data(),availability:'unavailable',base_availability:'unavailable'}});await flush();assert.equal(s.ids['rider-availability-choice'].value,'offline');assert.equal(s.ids['rider-availability-save'].disabled,false);
 });
 test('write authorization loss clears data; cancelled departure cannot issue a late write',async()=>{
  const s=setup();s.requests[0].resolve({data:data()});await flush();s.ids['rider-availability-choice'].value='offline';submit(s);s.confirmations[0](true);await flush();s.requests[1].reject(Object.assign(new Error('Forbidden'),{status:403}));await flush();assert.equal(s.ids['rider-dashboard-content'].hidden,true);assert.equal(s.requests.length,2);assert.equal(s.ids['rider-availability-save'].disabled,true);
  const leaving=setup();leaving.requests[0].resolve({data:data()});await flush();leaving.ids['rider-availability-choice'].value='offline';submit(leaving);leaving.windowEvents.pagehide();leaving.confirmations[0](true);await flush();assert.equal(leaving.requests.length,1);
+});
+
+test('legacy unavailable state displays Offline and keeps its expected value when going Available',async()=>{
+ const s=setup();s.requests[0].resolve({data:{...data(),availability:'unavailable',base_availability:'unavailable'}});await flush();
+ assert.equal(s.ids['rider-availability-choice'].value,'offline');assert.equal(s.ids['delivery-availability-value'].textContent,'Offline');
+ submit(s);assert.equal(s.confirmations.length,0);
+ s.ids['rider-availability-choice'].value='available';submit(s);s.confirmations[0](true);await flush();
+ assert.equal(s.requests[1].body.availability,'available');assert.equal(s.requests[1].body.expected_availability,'unavailable');
+});
+
+test('preparing rider dashboard announces package readiness once',async()=>{
+ const s=setup();s.requests[0].resolve({data:{...data(),availability:'assigned',active_order:{...data().active_order,order_status:'preparing'}}});await flush();
+ assert.equal(s.ids['rider-active-order'].children[1].textContent,'Preparing · Head to pickup');
+ s.ids['rider-dashboard-refresh'].events.click();s.requests[1].resolve({data:data()});await flush();assert.equal(s.notifications.length,1);assert.match(s.notifications[0],/package is ready/);
+ s.ids['rider-dashboard-refresh'].events.click();s.requests[2].resolve({data:data()});await flush();assert.equal(s.notifications.length,1);
 });

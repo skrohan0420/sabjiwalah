@@ -8,7 +8,7 @@ class DeliveryOrderModel extends OrderModel
     {
         $query = $this->currentQuery($riderId)->select('o.*, a.uid AS assignment_uid, a.assigned_at, a.completed_at');
         if ($uid !== null) $query->where('o.uid', $uid);
-        if ($activeOnly) $query->whereIn('o.order_status', ['ready_for_delivery', 'out_for_delivery']);
+        if ($activeOnly) $query->whereIn('o.order_status', ['preparing', 'ready_for_delivery', 'out_for_delivery']);
         return $query->orderBy('o.created_at', 'DESC')->orderBy('o.id', 'DESC')->get()->getResultArray();
     }
 
@@ -20,9 +20,9 @@ class DeliveryOrderModel extends OrderModel
 
     public function dashboardSummary(int $riderId): array
     {
-        $counts = $this->currentQuery($riderId)->whereIn('o.order_status', ['ready_for_delivery', 'out_for_delivery'])
-            ->select("COUNT(*) AS active_count, COALESCE(SUM(o.order_status = 'ready_for_delivery'),0) AS pending_pickups", false)->get()->getRowArray();
-        $active = $this->currentQuery($riderId)->whereIn('o.order_status', ['ready_for_delivery', 'out_for_delivery'])
+        $counts = $this->currentQuery($riderId)->whereIn('o.order_status', ['preparing', 'ready_for_delivery', 'out_for_delivery'])
+            ->select("COUNT(*) AS active_count, COALESCE(SUM(o.order_status IN ('preparing','ready_for_delivery')),0) AS pending_pickups", false)->get()->getRowArray();
+        $active = $this->currentQuery($riderId)->whereIn('o.order_status', ['preparing', 'ready_for_delivery', 'out_for_delivery'])
             ->select('o.uid, o.order_number, o.order_status, o.total_amount, o.payment_method, a.assigned_at')
             ->orderBy('o.order_status', 'ASC')->orderBy('a.assigned_at', 'ASC')->orderBy('a.id', 'ASC')->limit(1)->get()->getRowArray();
         $recent = $this->currentQuery($riderId)->select('a.uid AS assignment_uid, o.order_number, a.assigned_at')

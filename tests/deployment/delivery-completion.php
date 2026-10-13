@@ -47,6 +47,10 @@ finally{$db->resetTransStatus();$db->query('ALTER TABLE order_status_history CHA
 $service->reconcile($uid,$admin);$service->reconcile($uid,$admin);
 completeCheck($db->table('order_status_history')->where('order_id',$id)->countAllResults()===2 && (int)$db->table('delivery_completions')->where('order_id',$id)->get()->getRowArray()['reconciled_by']===$admin,'Reconciliation audit/idempotence failed.');
 $list=(new App\Models\DeliveryCompletionModel())->cashListing(['page'=>1,'per_page'=>20,'status'=>'reconciled']);completeCheck(count($list['items'])===1 && $list['totals']['pending']==='0.00' && !str_contains(json_encode($list),'pin_hash'),'Cash totals/privacy failed.');
+$cashModel=new App\Models\DeliveryCompletionModel();
+completeCheck(count($cashModel->cashListing(['page'=>1,'per_page'=>20,'from'=>'2099-01-01'])['items'])===0,'Cash collection start date filter failed.');
+completeCheck(count($cashModel->cashListing(['page'=>1,'per_page'=>20,'to'=>'2000-01-01'])['items'])===0,'Cash collection end date filter failed.');
+completeCheck(count($cashModel->cashListing(['page'=>1,'per_page'=>20,'status'=>''])['items'])===1,'Reconciled record missing from full ledger.');
 // Expired PIN and unpaid non-COD cannot complete; paid non-COD produces no cash ledger amount.
 $id=$orderIds[1];$uid=$orders->find($id)['uid'];$pin=$pins->issue($uid,$customer)['pin'];$db->table('order_delivery_pins')->where('order_id',$id)->update(['expires_at'=>date('Y-m-d H:i:s',time()-1)]);completeReject(fn()=>$service->complete($uid,$rider,$pin,true),App\Services\DeliveryVerificationException::class);
 $id=$orderIds[2];$uid=$orders->find($id)['uid'];$pin=$pins->issue($uid,$customer)['pin'];$db->table('orders')->where('id',$id)->update(['payment_method'=>'prepaid']);completeReject(fn()=>$service->complete($uid,$rider,$pin,false),App\Services\DeliveryVerificationException::class);$db->table('orders')->where('id',$id)->update(['payment_status'=>'paid']);$service->complete($uid,$rider,$pin,false);completeCheck($db->table('delivery_completions')->where('order_id',$id)->get()->getRowArray()['cash_amount']===null,'Prepaid created cash collection.');

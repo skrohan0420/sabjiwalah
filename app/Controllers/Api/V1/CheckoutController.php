@@ -99,14 +99,16 @@ class CheckoutController extends BaseApiController
         }
 
         try {
-            if (! (new \App\Services\OtpService())->verifiedForCheckout((string) $data['customer_phone'])) {
-                return $this->error('Please verify the checkout phone number before placing the order.', ResponseInterface::HTTP_FORBIDDEN);
-            }
+            $customer = \App\Services\AuthService::identity('customer');
+            if (! $customer) return $this->error('Sign in before placing an order.', ResponseInterface::HTTP_UNAUTHORIZED);
+            $phone = \App\Services\OtpService::normalizePhone((string) $data['customer_phone']);
+            if ($phone !== $customer['phone']) return $this->validationError(['customer_phone' => 'Use the phone number verified at sign-in.']);
+            $data['customer_phone'] = $customer['phone'];
         } catch (InvalidArgumentException $e) { return $this->validationError(['customer_phone' => $e->getMessage()]);
-        } catch (\App\Services\OtpUnavailableException $e) { return $this->error($e->getMessage(), 503); }
+        }
 
         try {
-            $order = (new OrderService())->createFromCart((int) \App\Services\AuthService::id('customer'), $data);
+            $order = (new OrderService())->createFromCart((int) $customer['id'], $data);
         } catch (\App\Services\OrderConflictException $exception) {
             return $this->error($exception->getMessage(), 409);
         } catch (InvalidArgumentException $exception) {

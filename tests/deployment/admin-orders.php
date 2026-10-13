@@ -79,6 +79,30 @@ CodeIgniter\Events\Events::on('DBQuery', $listener);
 try { $transitions->changeStatus($race, 'cancelled', 1, null, 'pending'); throw new RuntimeException('Competing write overwritten.'); } catch (App\Services\OrderConflictException) {} finally { CodeIgniter\Events\Events::removeListener('DBQuery', $listener); }
 orderCheck(! $interleave && $orders->find($race)['order_status'] === 'confirmed', 'Compare-and-set must preserve the competing write.');
 orderCheck($db->table('order_status_history')->where('order_id', $race)->countAllResults() === 0, 'Conflict must not create misleading history.');
+
+$atomic = fixtureOrder($orders, 'SW_FIXTURE_ATOMIC_PREPARE', 'pending', '2026-10-09 10:00:00');
+$transitions->acceptAndPrepare($atomic, 1);
+orderCheck($orders->find($atomic)['order_status'] === 'preparing', 'Accept & prepare must reach preparing.');
+$atomicHistory = $db->table('order_status_history')->where('order_id', $atomic)->orderBy('id')->get()->getResultArray();
+orderCheck(count($atomicHistory) === 2 && $atomicHistory[0]['old_status'] === 'pending' && $atomicHistory[0]['new_status'] === 'confirmed' && $atomicHistory[1]['new_status'] === 'preparing', 'Combined action must preserve both history entries.');
+try { $transitions->acceptAndPrepare($atomic, 1); throw new RuntimeException('Duplicate acceptance allowed.'); } catch (App\Services\OrderConflictException) {}
+orderCheck($db->table('order_status_history')->where('order_id', $atomic)->countAllResults() === 2, 'Duplicate acceptance must not add history.');
+$atomicRollback = fixtureOrder($orders, 'SW_FIXTURE_ATOMIC_ROLLBACK', 'pending', '2026-10-09 10:00:00');
+$injectFailure = static function ($query): void {
+    $sql = (string) $query;
+    if (str_starts_with($sql, 'INSERT') && str_contains($sql, 'order_status_history') && str_contains($sql, "'preparing'")) throw new RuntimeException('Injected second history failure.');
+};
+CodeIgniter\Events\Events::on('DBQuery', $injectFailure);
+try { $transitions->acceptAndPrepare($atomicRollback, 1); throw new RuntimeException('Partial acceptance committed.'); } catch (RuntimeException $e) { orderCheck($e->getMessage() === 'Injected second history failure.', 'Expected injected failure.'); } finally { CodeIgniter\Events\Events::removeListener('DBQuery', $injectFailure); }
+orderCheck($orders->find($atomicRollback)['order_status'] === 'pending', 'Second transition failure must roll back confirmation too.');
+orderCheck($db->table('order_status_history')->where('order_id', $atomicRollback)->countAllResults() === 0, 'Failed combined action must leave no history.');
+$db->resetTransStatus();
+$queueList = $service->listing(['queue'=>'preparing','page'=>1,'per_page'=>100]);
+orderCheck($queueList['queues']['preparing'] === $queueList['pager']['total'], 'Queue counts must match filtered listing.');
+foreach ($queueList['items'] as $item) orderCheck(in_array($item['order_status'], ['confirmed','preparing'], true), 'Preparing queue includes unexpected status.');
+$filteredQueues = $service->listing(['queue'=>'new','search'=>'SW_FIXTURE_ATOMIC_ROLLBACK','page'=>1,'per_page'=>20]);
+orderCheck($filteredQueues['pager']['total'] === 1 && $filteredQueues['queues']['new'] === 1 && array_sum($filteredQueues['queues']) === 1, 'Queue counts must respect search filters.');
+
 echo "PASS: order search, filtering, pagination, snapshots, assignments, valid/invalid transitions, duplicate/stale requests, atomic rollback, and simulated competing write. Persistent data unchanged.\n";
 
 

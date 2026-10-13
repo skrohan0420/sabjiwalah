@@ -8,17 +8,19 @@
   const errorNode = document.getElementById('settings-error');
   const version = document.getElementById('settings-version');
   const history = document.getElementById('settings-history');
-  const labels = { shop_open: 'Shop open', orders_paused: 'Orders paused', delivery_charge: 'Delivery charge', free_delivery_minimum: 'Free delivery subtotal', minimum_order_amount: 'Minimum subtotal', maximum_active_orders: 'Active order capacity', opens_at: 'Opens (India time)', closes_at: 'Closes (India time)' };
+  const labels = { pickup_latitude: 'Pickup latitude', pickup_longitude: 'Pickup longitude', shop_open: 'Shop open', orders_paused: 'Orders paused', delivery_charge: 'Delivery charge', free_delivery_minimum: 'Free delivery subtotal', minimum_order_amount: 'Minimum subtotal', maximum_active_orders: 'Active order capacity', opens_at: 'Opens (India time)', closes_at: 'Closes (India time)' };
   let revision = null, busy = false, dirty = false;
   function error(message = '') { errorNode.textContent = message; errorNode.hidden = !message; }
-  function lock(working) { busy = working; refresh.disabled = working; fields.disabled = working || revision === null; }
+  function lock(working) { busy = working; refresh.disabled = working; fields.disabled = working || revision === null; window.SabjiwalahPickupPicker?.lock(fields.disabled); }
   function show(settings) {
     revision = settings.revision;
-    for (const key of Object.keys(labels)) form.elements.namedItem(key).value = settings[key] ?? '';
+    for (const key of Object.keys(labels)) if (form.elements.namedItem(key)) form.elements.namedItem(key).value = settings[key] ?? '';
     version.textContent = 'Revision ' + revision + ' · Updated ' + new Date(settings.updated_at).toLocaleString();
     dirty = false;
+    window.SabjiwalahPickupPicker?.set(settings);
   }
   function value(key, data) {
+    if (data == null && key.startsWith('pickup_')) return 'Not set';
     if (data == null) return key === 'free_delivery_minimum' ? 'Disabled' : 'Unlimited / all day';
     if (key === 'shop_open' || key === 'orders_paused') return Number(data) ? 'Yes' : 'No';
     return String(data);
@@ -48,11 +50,12 @@
   }
   form.addEventListener('input', () => { dirty = true; });
   form.addEventListener('change', () => { dirty = true; });
+  window.addEventListener?.('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
   refresh.addEventListener('click', load);
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (busy || revision === null) return;
     const body = { expected_revision: revision };
-    for (const key of Object.keys(labels)) body[key] = form.elements.namedItem(key).value;
+    for (const key of Object.keys(labels)) if (form.elements.namedItem(key)) body[key] = form.elements.namedItem(key).value;
     lock(true); error();
     try {
       const payload = await admin.api('/api/v1/admin/settings', { method: 'PUT', body });

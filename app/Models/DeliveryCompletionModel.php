@@ -41,6 +41,8 @@ class DeliveryCompletionModel extends Model
         if (($filters['status']??'')==='pending') $query->where('c.reconciled_at',null);
         if (($filters['status']??'')==='reconciled') $query->where('c.reconciled_at IS NOT NULL',null,false);
         if (($filters['search']??'')!=='') $query->groupStart()->like('o.order_number',$filters['search'])->orLike('u.name',$filters['search'])->groupEnd();
+        if(!empty($filters['from']))$query->where('c.collected_at >=',$filters['from'].' 00:00:00');
+        if(!empty($filters['to']))$query->where('c.collected_at <',(new \DateTimeImmutable($filters['to']))->modify('+1 day')->format('Y-m-d').' 00:00:00');
         $total=$query->countAllResults(false);
         $items=$query->select('o.uid, o.order_number, u.name AS rider_name, c.cash_amount, c.collected_at, c.verified_at, c.reconciled_at, manager.name AS reconciled_by_name')->orderBy('c.collected_at','DESC')->orderBy('c.order_id','DESC')->limit($filters['per_page'],($filters['page']-1)*$filters['per_page'])->get()->getResultArray();
         $totals=$this->db->table($this->table)->select("COALESCE(SUM(cash_amount),0) AS collected, COALESCE(SUM(CASE WHEN reconciled_at IS NULL THEN cash_amount ELSE 0 END),0) AS pending, COALESCE(SUM(CASE WHEN reconciled_at IS NOT NULL THEN cash_amount ELSE 0 END),0) AS reconciled",false)->get()->getRowArray();

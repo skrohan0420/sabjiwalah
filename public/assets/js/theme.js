@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  const key = 'sabjiwalah.theme';
+  const requestedPanel = document.currentScript?.dataset.themePanel;
+  const panel = ['admin', 'delivery'].includes(requestedPanel) ? requestedPanel : 'client';
+  const key = `sabjiwalah.${panel}.theme`;
   const legacyKey = 'sabjiwalah.accountTheme';
   let current = 'light';
   const valid = value => value === 'dark' || value === 'light';
@@ -8,7 +10,7 @@
     try {
       const saved = localStorage.getItem(key);
       if (valid(saved)) return saved;
-      const legacy = localStorage.getItem(legacyKey);
+      const legacy = panel === 'client' ? (localStorage.getItem('sabjiwalah.theme') || localStorage.getItem(legacyKey)) : null;
       if (valid(legacy)) { localStorage.setItem(key, legacy); return legacy; }
     } catch { /* Theme switching still works without browser storage. */ }
     return 'light';
@@ -24,7 +26,7 @@
   }
   const set = theme => {
     apply(theme);
-    try { localStorage.setItem(key, current); localStorage.removeItem(legacyKey); } catch { /* Use the chosen theme until navigation. */ }
+    try { localStorage.setItem(key, current); } catch { /* Use the chosen theme until navigation. */ }
   };
   window.SabjiwalahTheme = { set, get: () => current, toggle: () => set(current === 'dark' ? 'light' : 'dark') };
   // Set the root theme in the head, before the first page paint.
@@ -35,6 +37,6 @@
     if (event.target.closest('[data-account-appearance], [data-theme-toggle]')) window.SabjiwalahTheme.toggle();
   });
   window.addEventListener('storage', event => {
-    if (event.key === key || event.key === legacyKey || event.key === null) apply(read());
+    if (event.key === key || event.key === null) apply(read());
   });
 })();

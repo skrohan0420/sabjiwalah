@@ -10,7 +10,7 @@ class DispatchModel extends Model
     {
         $query = $this->db->table('orders o')->join('delivery_assignments a', 'a.order_id = o.id AND NOT EXISTS (SELECT 1 FROM delivery_assignments newer WHERE newer.order_id = a.order_id AND newer.id > a.id)', 'left', false)
             ->join('users u', 'u.id = a.delivery_user_id', 'left');
-        $query->whereIn('o.order_status', empty($filters['status']) ? ['ready_for_delivery', 'out_for_delivery'] : [$filters['status']]);
+        $query->whereIn('o.order_status', empty($filters['status']) ? ['preparing', 'ready_for_delivery', 'out_for_delivery'] : [$filters['status']]);
         if (($filters['search'] ?? '') !== '') $query->like('o.order_number', $filters['search']);
         if (($filters['assignment'] ?? '') === 'unassigned') $query->where('a.id', null);
         if (($filters['assignment'] ?? '') === 'assigned') $query->where('a.id IS NOT NULL', null, false);
@@ -32,11 +32,21 @@ class DispatchModel extends Model
         return ['items' => $items, 'tracking_available' => $trackingAvailable, 'pager' => $this->pager($filters['page'], $filters['per_page'], $total)];
     }
 
-    public function candidates(array $filters): array
+    public function candidates(array $filters, ?array $pickup = null, bool $withLocation = false): array
     {
         $query = $this->db->table('users u')->select('u.uid, u.name')->join('delivery_personnel_profiles p', 'p.user_id = u.id')
             ->where('u.role', 'delivery')->where('u.status', 'active')->where('p.availability', 'available')
             ->where("NOT EXISTS (SELECT 1 FROM delivery_assignments a JOIN orders o ON o.id = a.order_id WHERE a.delivery_user_id = u.id AND o.order_status NOT IN ('delivered','cancelled','delivery_failed') AND NOT EXISTS (SELECT 1 FROM delivery_assignments n WHERE n.order_id = a.order_id AND n.id > a.id))", null, false);
+        if ($withLocation) {
+            $query->join('delivery_rider_presence rp', 'rp.delivery_user_id=u.id AND rp.expires_at > UTC_TIMESTAMP() AND rp.accuracy <= 5000', 'left', false)
+                ->select('rp.latitude,rp.longitude,rp.accuracy,rp.recorded_at');
+            if ($pickup !== null) {
+                $lat=(float)$pickup['latitude'];$lng=(float)$pickup['longitude'];
+                $distance="6371000 * ACOS(LEAST(1,GREATEST(-1,COS(RADIANS({$lat}))*COS(RADIANS(rp.latitude))*COS(RADIANS(rp.longitude)-RADIANS({$lng}))+SIN(RADIANS({$lat}))*SIN(RADIANS(rp.latitude)))))";
+                $query->select($distance.' AS distance_m',false);
+                $query->orderBy('rp.latitude IS NULL','ASC',false)->orderBy('rp.accuracy > 100','ASC',false)->orderBy('distance_m','ASC');
+            }
+        }
         if (($filters['search'] ?? '') !== '') $query->like('u.name', $filters['search']);
         $total = $query->countAllResults(false);
         $items = $query->orderBy('u.name', 'ASC')->orderBy('u.id', 'ASC')->limit($filters['per_page'], ($filters['page'] - 1) * $filters['per_page'])->get()->getResultArray();

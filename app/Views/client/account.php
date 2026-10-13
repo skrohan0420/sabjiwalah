@@ -15,7 +15,7 @@
 </head>
 <body class="account-guest-body">
     <main class="account-page account-page--guest account-page--with-nav" data-account-page>
-        <a class="account-back" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></a>
+        <header class="account-client-topbar"><a class="account-back" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a><h2>My account</h2></header>
         <section class="guest-hero" aria-labelledby="member-account-title">
             <div class="guest-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><circle class="avatar-ring" cx="32" cy="32" r="25"/><circle class="avatar-head" cx="32" cy="24.5" r="7.2"/><path class="avatar-body" d="M19 48c2.7-8.6 7.6-12.9 13-12.9S42.3 39.4 45 48"/></svg></div>
             <div class="account-identity-copy">

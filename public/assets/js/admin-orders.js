@@ -4,6 +4,7 @@
   if (!form) return;
   const ui = window.SabjiwalahAdmin;
   const get = id => document.getElementById(id);
+  const operations = !!get('operations-queues');
   const list = get('orders-list'), refreshButton = get('orders-refresh'), errorBox = get('orders-error');
   const dialog = get('order-details'), actionForm = get('order-action-form'), notes = get('order-action-notes'), action = get('order-action');
   const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
@@ -16,6 +17,7 @@
   let latestUid, initialized = false;
   const initial = new URLSearchParams(location.search);
   for (const field of form.elements) if (field.name && initial.has(field.name)) field.value = initial.get(field.name);
+  if (operations && !initial.has('dir')) form.elements.namedItem('dir').value = 'asc';
   page = Math.max(1, Math.min(1000000, Number(initial.get('page')) || 1));
   function readFilters() {
     filters = new URLSearchParams();
@@ -52,19 +54,36 @@
     const wrapper = node('div', '', 'admin-table-wrap');
     if (!data.items.length) wrapper.append(node('p', 'No orders match these filters.', 'admin-empty'));
     else {
-      const table = node('table', '', 'admin-table orders-table');
+      const table = node('table', '', 'admin-table orders-table' + (operations ? ' operations-table' : ''));
       table.setAttribute('aria-label', 'Orders');
-      const labels = ['Order', 'Customer', 'Placed', 'Items', 'Total', 'Payment', 'Status', 'Delivery person', 'Elapsed', 'Details'];
+      const labels = operations ? ['Order', 'Customer', 'Total', 'Progress', 'Rider', 'Waiting', 'Next action'] : ['Order', 'Customer', 'Placed', 'Items', 'Total', 'Payment', 'Status', 'Delivery person', 'Elapsed', 'Details'];
       const thead = node('thead'), header = node('tr'), tbody = node('tbody');
       labels.forEach(label => { const th = node('th', label); th.scope = 'col'; header.append(th); });
       thead.append(header);
       data.items.forEach(order => {
         const row = node('tr');
+        if (operations) row.setAttribute('data-order-uid', order.uid);
         const payment = node('div'); payment.append(node('span', order.payment_method.toUpperCase()), node('small', order.payment_status));
         const button = node('button', 'View', 'admin-button admin-button-secondary'); button.type = 'button';
         button.setAttribute('aria-label', 'View order ' + order.order_number);
         button.addEventListener('click', () => openDetails(order.uid));
-        const values = [order.order_number, order.customer_name, when(order.placed_at), String(order.item_count), money.format(order.total_amount), payment, badge(order.order_status), order.assigned_delivery_name || 'Unassigned', elapsed(order.placed_at), button];
+        let values = [order.order_number, order.customer_name, when(order.placed_at), String(order.item_count), money.format(order.total_amount), payment, badge(order.order_status), order.assigned_delivery_name || 'Unassigned', elapsed(order.placed_at), button];
+        if (operations) {
+          const controls = node('div', '', 'operations-row-actions');
+          const nextLabel = { pending: 'Accept & prepare', confirmed: 'Start preparing', preparing: 'Ready for pickup', ready_for_delivery: order.assigned_delivery_name ? 'Reassign' : 'Assign rider' }[order.order_status];
+          if (nextLabel) {
+            const next = node('button', nextLabel, 'admin-button'); next.type = 'button';
+            if (window.SabjiwalahOperations?.isBlocked(order.uid)) { next.disabled = true; next.textContent = 'Review required'; }
+            next.addEventListener('click', () => window.SabjiwalahOperations?.act(order, row, next)); controls.append(next);
+          }
+          if(order.order_status==='preparing'){
+            const assign=node('button',order.assigned_delivery_name?'Reassign':'Assign rider','admin-button admin-button-secondary');assign.type='button';
+            assign.disabled=!!window.SabjiwalahOperations?.isBlocked(order.uid);
+            assign.addEventListener('click',()=>window.SabjiwalahOperations?.chooseRider(order,row));controls.append(assign);
+          }
+          controls.append(button);
+          values = [order.order_number, order.customer_name, money.format(order.total_amount), badge(order.order_status), order.assigned_delivery_name || 'Unassigned', elapsed(order.status_changed_at || order.placed_at), controls];
+        }
         values.forEach((value, i) => { const td = node('td'); td.dataset.label = labels[i]; td.append(typeof value === 'string' ? node('div', value) : value); row.append(td); });
         tbody.append(row);
         if (selected?.order.uid === order.uid && selected.order.order_status !== order.order_status) setStale(true);
@@ -72,6 +91,8 @@
       table.append(thead, tbody); wrapper.append(table);
     }
     list.replaceChildren(wrapper);
+    if (operations) window.SabjiwalahOperations?.renderQueues(data.queues || {});
+    if (operations) window.SabjiwalahOperations?.afterRender(data.items);
     pages = data.pager.page_count;
     get('orders-page').textContent = `${data.pager.total} ${data.pager.total === 1 ? 'order' : 'orders'} · Page ${page} of ${Math.max(1, pages)}`;
     get('orders-prev').disabled = page <= 1;
@@ -89,6 +110,7 @@
   function schedule() { clearTimeout(timer); if (!stopped && !terminal && !document.hidden) timer = setTimeout(refresh, 8000); }
   async function refresh() {
     if (stopped || terminal || document.hidden || inFlight) return;
+    if (operations && (saving || window.SabjiwalahOperations?.isBusy())) { schedule(); return; }
     clearTimeout(timer); inFlight = true;
     const currentRevision = revision;
     controller = new AbortController();
@@ -114,7 +136,10 @@
   function reloadList() { revision++; syncUrl(); if (inFlight) { reloadPending = true; controller.abort(); } else refresh(); }
   form.addEventListener('submit', event => { event.preventDefault(); readFilters(); page = 1; reloadList(); });
   form.addEventListener('reset', () => setTimeout(() => { readFilters(); page = 1; reloadList(); }, 0));
-  refreshButton.addEventListener('click', refresh);
+  refreshButton.addEventListener('click', () => {
+    if (operations && window.SabjiwalahOperations?.review() === false) return;
+    refresh();
+  });
   get('orders-prev').addEventListener('click', () => { if (page > 1) { page--; reloadList(); } });
   get('orders-next').addEventListener('click', () => { if (page < pages) { page++; reloadList(); } });
 
@@ -227,5 +252,8 @@
   window.addEventListener('beforeunload', event => { if (dirty || saving) { event.preventDefault(); event.returnValue = ''; } });
   window.addEventListener('pagehide', () => { stopped = true; clearTimeout(timer); controller?.abort(); detailController?.abort(); });
   window.addEventListener('pageshow', event => { if (event.persisted) { stopped = false; refresh(); } });
+  if (operations) window.SabjiwalahOrderWorkspace = { refresh: reloadList, changeQueue: queue => {
+    form.elements.namedItem('queue').value = queue; readFilters(); page = 1; reloadList();
+  } };
   refresh();
 })();

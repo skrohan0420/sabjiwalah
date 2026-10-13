@@ -188,6 +188,25 @@ class OrderService
         return $orders->find((int) $orderId);
     }
 
+    public function acceptAndPrepare(int $orderId, int $changedBy): bool
+    {
+        $db = db_connect();
+        if (!$db->transBegin()) throw new \RuntimeException('Unable to begin order update.');
+        try {
+            $table = $db->protectIdentifiers('orders', true);
+            $order = $db->query("SELECT id, order_status FROM {$table} WHERE id = ? FOR UPDATE", [$orderId])->getRowArray();
+            if (!$order) throw new InvalidArgumentException('Order not found.');
+            if ($order['order_status'] !== self::STATUS_PENDING) throw new OrderConflictException('This order changed. Refresh before accepting it.');
+            $this->changeStatus($orderId, self::STATUS_CONFIRMED, $changedBy, null, self::STATUS_PENDING);
+            $this->changeStatus($orderId, self::STATUS_PREPARING, $changedBy, null, self::STATUS_CONFIRMED);
+            if (!$db->transStatus() || !$db->transCommit()) throw new \RuntimeException('Unable to prepare order.');
+            return true;
+        } catch (\Throwable $exception) {
+            $db->transRollback();
+            throw $exception;
+        }
+    }
+
     public function changeStatus(int $orderId, string $newStatus, ?int $changedBy = null, ?string $notes = null, ?string $expectedStatus = null): bool
     {
         $orders = new OrderModel();

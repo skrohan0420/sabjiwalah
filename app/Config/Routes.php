@@ -29,10 +29,12 @@ $routes->post('delivery/logout', 'Delivery\AuthController::logout', ['filter' =>
 $routes->group('admin', ['filter' => 'role:admin'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Admin\DashboardController::index');
     $routes->get('orders', 'Admin\OrderController::index');
+    $routes->get('operations', 'Admin\OrderController::operations');
     $routes->get('products', 'Admin\ProductController::index');
     $routes->get('customers', 'Admin\CustomerController::index');
     $routes->get('delivery-personnel', 'Admin\DeliveryPersonnelController::index');
     $routes->get('dispatch', 'Admin\DispatchController::index');
+    $routes->get('live-map', 'Admin\LiveMapController::index');
     $routes->get('cash', 'Admin\CashController::index');
     $routes->get('settings', 'Admin\SettingsController::index');
     $routes->get('offers', 'Admin\CampaignController::offers');
@@ -107,6 +109,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
         $routes->post('cash/(:segment)/reconcile', 'CashController::reconcile/$1');
         $routes->get('dispatch', 'DispatchController::index');
         $routes->get('dispatch/candidates', 'DispatchController::candidates');
+        $routes->get('dispatch/recommendations', 'DispatchController::recommendations');
+        $routes->get('live-map', 'LiveMapController::index');
+        $routes->get('dispatch/overview', 'LiveMapController::index');
         $routes->post('orders/(:segment)/assignment', 'DispatchController::assign/$1');
         $routes->get('delivery-personnel', 'DeliveryPersonnelController::index');
         $routes->post('delivery-personnel', 'DeliveryPersonnelController::create');
@@ -132,6 +137,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], static funct
 
     $routes->group('delivery', ['namespace' => 'App\Controllers\Api\V1\Delivery', 'filter' => 'apiRole:delivery'], static function (RouteCollection $routes): void {
         $routes->post('location', 'LocationController::create');
+        $routes->post('presence', 'PresenceController::create');
+        $routes->delete('presence', 'PresenceController::stop');
         $routes->delete('location', 'LocationController::stop');
         $routes->get('dashboard', 'DashboardController::show');
         $routes->patch('availability', 'DashboardController::updateAvailability');

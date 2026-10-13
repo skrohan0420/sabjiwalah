@@ -30,7 +30,7 @@ $accountUrl = base_url('account');
     <div class="app-shell search-app-shell">
         <header class="search-results-header">
             <form class="search-results-bar" action="<?= esc(base_url('search'), 'attr') ?>" method="get" role="search">
-                <a class="search-back-button" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back></a>
+                <a class="search-back-button" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back"></a>
                 <label class="sr-only" for="search-results-input">Search products</label>
                 <input
                     id="search-results-input"

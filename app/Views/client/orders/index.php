@@ -16,11 +16,12 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/delivery-pin.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
     <?= view('shared/theme') ?>
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/customer-orders.css'), 'attr') ?>">
 </head>
 <body class="orders-body">
     <div class="app-shell orders-app-shell">
-        <header class="orders-header">
-            <a class="orders-back-link" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back></a>
+        <header class="orders-header customer-orders-header">
+            <a class="orders-back-link" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a>
             <div>
                 <h1>My Orders</h1>
                 <p>Track your fresh grocery orders</p>
@@ -45,16 +46,14 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
             <?php else : ?>
                 <section class="orders-list" aria-label="Your orders">
                     <?php foreach ($orders as $order) : ?>
-                        <article class="order-card">
-                            <div>
-                                <strong>#<?= esc($order['order_number']) ?></strong>
-                                <span><?= esc($statusLabel((string) $order['order_status'])) ?></span>
-                            </div>
-                            <p><?= esc((string) ((int) ($order['item_count'] ?? 0))) ?> items</p>
-                            <p><a href="<?= esc(base_url('orders/' . rawurlencode($order['uid'])), 'attr') ?>">Track order and view details</a></p>
+                        <article class="order-card" data-order-status="<?= esc($order['order_status'], 'attr') ?>">
+                            <header class="order-card-heading">
+                                <div><small>ORDER</small><strong>#<?= esc($order['order_number']) ?></strong></div>
+                                <span class="order-status-badge"><?= esc($statusLabel((string) $order['order_status'])) ?></span>
+                            </header>
                             <dl>
                                 <div>
-                                    <dt>Total</dt>
+                                    <dt><?= esc((string) ((int) ($order['item_count'] ?? 0))) ?> <?= (int) ($order['item_count'] ?? 0) === 1 ? 'item' : 'items' ?> · Total</dt>
                                     <dd><?= esc($compactMoney((float) $order['total_amount'])) ?></dd>
                                 </div>
                                 <div>
@@ -62,6 +61,7 @@ $statusLabel = static fn (string $status): string => ucwords(str_replace('_', ' 
                                     <dd><?= esc($statusLabel((string) $order['payment_status'])) ?></dd>
                                 </div>
                             </dl>
+                            <a class="order-track-button" href="<?= esc(base_url('orders/' . rawurlencode($order['uid'])), 'attr') ?>" aria-label="<?= esc('Track order ' . $order['order_number'], 'attr') ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v11H3zM14 10h4l3 4v3h-7M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg><span><?= in_array($order['order_status'], ['delivered', 'cancelled'], true) ? 'View order details' : 'Track order' ?></span><span aria-hidden="true">→</span></a>
                             <?php if ($order['order_status'] === 'out_for_delivery') : ?>
                                 <section class="order-delivery-pin" data-delivery-pin="<?= esc($order['uid'], 'attr') ?>" aria-label="Delivery PIN for <?= esc($order['order_number'], 'attr') ?>">
                                     <p>Generate your delivery PIN when your order arrives. Share it only after receiving your groceries. Each PIN expires after 30 minutes.</p>

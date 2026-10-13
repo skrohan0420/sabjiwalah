@@ -68,6 +68,13 @@ async function login(phone) {
     assert.equal((await patch({status:'invalid'})).status,422);
     assert.equal((await patch({status:'confirmed',notes:'x'.repeat(1001)})).status,422);
   }
+  for(const queue of ['new','preparing','ready','on_way','history']) {
+    const response=await admin('api/v1/admin/orders?queue='+queue+'&per_page=1');assert.equal(response.status,200);
+    const payload=(await response.json()).data;assert.equal(payload.pager.total,payload.queues[queue]);
+  }
+  assert.equal((await admin('api/v1/admin/orders?queue=invalid')).status,422);
+  assert.equal((await guest('admin/operations')).status,302);
+  const operations=await admin('admin/operations');assert.equal(operations.status,200);assert.match(await operations.text(),/admin-operations\.js/);
   const page=await admin('admin/orders');assert.equal(page.status,200);assert.match(await page.text(),/admin-orders\.js/);
   await post(admin,'api/v1/'+admin.authRole+'/auth/logout',{});
   console.log('PASS: live order role authorization, list/detail contracts, filters, missing orders, invalid transitions, stale status, CSRF and notes validation. No orders changed.');

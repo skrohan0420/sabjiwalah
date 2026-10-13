@@ -17,14 +17,12 @@ class DevelopmentSeeder extends Seeder
     private function seedUsers(): void
     {
         $users = new UserModel();
-        $password = null;
 
         $records = [
             [
                 'name'          => 'Admin User',
                 'email'         => 'admin@sabjiwalah.local',
                 'phone'         => '9000000001',
-                'password_hash' => $password,
                 'role'          => 'admin',
                 'status'        => 'active',
             ],
@@ -32,7 +30,6 @@ class DevelopmentSeeder extends Seeder
                 'name'          => 'Delivery User',
                 'email'         => 'delivery@sabjiwalah.local',
                 'phone'         => '9000000002',
-                'password_hash' => $password,
                 'role'          => 'delivery',
                 'status'        => 'active',
             ],
@@ -40,7 +37,6 @@ class DevelopmentSeeder extends Seeder
                 'name'          => 'Customer User',
                 'email'         => 'customer@sabjiwalah.local',
                 'phone'         => '9000000003',
-                'password_hash' => $password,
                 'role'          => 'customer',
                 'status'        => 'active',
             ],
@@ -50,7 +46,6 @@ class DevelopmentSeeder extends Seeder
             $existing = $users->where('role', $record['role'])->where('phone', $record['phone'])->first();
 
             if ($existing) {
-                unset($record['password_hash']); // Preserve legacy hashes; they no longer authenticate.
                 $users->update($existing['id'], $record);
                 continue;
             }

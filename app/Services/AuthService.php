@@ -25,7 +25,7 @@ class AuthService
             'name' => trim((string) ($data['name'] ?? '')),
             'email' => strtolower(trim((string) ($data['email'] ?? ''))) ?: null,
             'phone' => OtpService::normalizePhone((string) ($data['phone'] ?? '')),
-            'password_hash' => null, 'role' => 'customer', 'status' => 'active',
+            'role' => 'customer', 'status' => 'active',
         ]);
     }
     public function startPhoneOtp(string $phone, ?string $name = null): array
@@ -69,6 +69,7 @@ class AuthService
     public function logout(): void
     {
         if ($this->role === 'delivery' && is_array(session('delivery_auth'))) {
+            try { (new RiderPresenceService())->stop((int)session('delivery_auth')['id']); } catch (\Throwable) { /* The snapshot expires within five minutes. */ }
             try { (new DeliveryLocationService())->stop((int) session('delivery_auth')['id']); }
             catch (\Throwable) { /* Expiry/pruning handles unavailable storage. */ }
         }

@@ -2,7 +2,7 @@
 namespace App\Services;
 class OperationalSettingsService
 {
-    private const FIELDS = ['shop_open','orders_paused','delivery_charge','free_delivery_minimum','minimum_order_amount','opens_at','closes_at','maximum_active_orders'];
+    private const FIELDS = ['shop_open','orders_paused','delivery_charge','free_delivery_minimum','minimum_order_amount','opens_at','closes_at','maximum_active_orders','pickup_latitude','pickup_longitude'];
     public function get(bool $lock = false): array
     {
         $db = db_connect();
@@ -30,6 +30,7 @@ class OperationalSettingsService
         $db=db_connect(); if (!$db->transBegin()) throw new \RuntimeException('Unable to begin settings update.');
         try {
             $before=$this->get(true);
+            $data=$this->validate($input + array_intersect_key($before,array_flip(['pickup_latitude','pickup_longitude'])));
             $admin=$db->query('SELECT id FROM '.$db->protectIdentifiers('users',true)." WHERE id=? AND role='admin' AND status='active' FOR UPDATE",[$adminId])->getRowArray();
             if (!$admin) throw new \OutOfBoundsException('An active admin account is required.');
             if ($before['revision']!==(int)$expected) throw new OrderConflictException('These settings changed. Refresh before saving.');
@@ -57,7 +58,11 @@ class OperationalSettingsService
             }
             if (is_bool($value)) { $errors[$key]='Use a text or number field.';continue; }
             $value=$value===null?null:trim((string)$value);if($value==='')$value=null;
-            if (in_array($key,['delivery_charge','minimum_order_amount','free_delivery_minimum'],true)) {
+            if (in_array($key,['pickup_latitude','pickup_longitude'],true)) {
+                $limit = $key === 'pickup_latitude' ? 90 : 180;
+                if ($value !== null && (!is_numeric($value) || !is_finite((float)$value) || abs((float)$value) > $limit)) $errors[$key]='Enter valid pickup coordinates.';
+                $data[$key]=$value===null?null:number_format((float)$value,7,'.','');
+            } elseif (in_array($key,['delivery_charge','minimum_order_amount','free_delivery_minimum'],true)) {
                 if ($value===null&&$key==='free_delivery_minimum'){$data[$key]=null;continue;}
                 if ($value===null||!preg_match('/^\d{1,6}(?:\.\d{1,2})?$/D',$value))$errors[$key]='Use an amount from 0 to 999999.99 with at most two decimal places.';
                 $data[$key]=number_format((float)$value,2,'.','');
@@ -71,6 +76,7 @@ class OperationalSettingsService
         }
         if ((($data['opens_at']??null)===null)!==(($data['closes_at']??null)===null)) $errors['opens_at']='Provide both opening and closing times, or leave both blank.';
         if (!empty($data['opens_at'])&&$data['opens_at']===($data['closes_at']??null))$errors['closes_at']='Opening and closing times must differ. Leave both blank for all-day ordering.';
+        if ((($data['pickup_latitude']??null)===null)!==(($data['pickup_longitude']??null)===null)) $errors['pickup_longitude']='Set both pickup coordinates or leave both blank.';
         if($errors)throw new SettingsValidationException($errors);return$data;
     }
     public function notice(array $settings, float $subtotal, bool $lock = false, ?\DateTimeImmutable $now = null): ?string

@@ -19,6 +19,7 @@ class OrderController extends BaseApiController
             'page' => 'permit_empty|is_natural_no_zero|less_than_equal_to[1000000]',
             'per_page' => 'permit_empty|is_natural_no_zero|less_than_equal_to[100]',
             'status' => 'permit_empty|in_list[pending,confirmed,preparing,ready_for_delivery,out_for_delivery,delivered,cancelled,delivery_failed]',
+            'queue' => 'permit_empty|in_list[new,preparing,ready,on_way,history]',
             'search' => 'permit_empty|max_length[120]',
             'from' => 'permit_empty|valid_date[Y-m-d]',
             'to' => 'permit_empty|valid_date[Y-m-d]',
@@ -38,6 +39,7 @@ class OrderController extends BaseApiController
                 'item_count' => $order['item_count'],
                 'assigned_delivery_name' => $order['assigned_delivery_name'],
                 'placed_at' => $service->timestamp($order['created_at']),
+                'status_changed_at' => $service->timestamp($order['updated_at']),
             ]), $data['items']);
             return $this->success($data);
         } catch (\Throwable $exception) {
@@ -67,14 +69,20 @@ class OrderController extends BaseApiController
             'status' => 'required|in_list[pending,confirmed,preparing,ready_for_delivery,out_for_delivery,delivered,cancelled,delivery_failed]',
             'expected_status' => 'permit_empty|in_list[pending,confirmed,preparing,ready_for_delivery,out_for_delivery,delivered,cancelled,delivery_failed]',
             'notes' => 'permit_empty|max_length[1000]',
+            'action' => 'permit_empty|in_list[accept_prepare]',
         ];
         if (! $this->validateData($data, $rules)) return $this->validationError($this->validator->getErrors());
         try {
             $orders = new OrderModel();
             $order = $orders->findByUid($uid);
             if (! $order) return $this->error('Order not found', ResponseInterface::HTTP_NOT_FOUND);
-            (new OrderService())->changeStatus((int) $order['id'], (string) $data['status'], (int) \App\Services\AuthService::id('admin'),
-                $data['notes'] ?? null, ($data['expected_status'] ?? '') ?: null);
+            if (($data['action'] ?? '') === 'accept_prepare') {
+                if ($data['status'] !== 'preparing' || ($data['expected_status'] ?? '') !== 'pending') return $this->validationError(['action' => 'Accept & prepare requires a pending order.']);
+                (new OrderService())->acceptAndPrepare((int) $order['id'], (int) \App\Services\AuthService::id('admin'));
+            } else {
+                (new OrderService())->changeStatus((int) $order['id'], (string) $data['status'], (int) \App\Services\AuthService::id('admin'),
+                    $data['notes'] ?? null, ($data['expected_status'] ?? '') ?: null);
+            }
             return $this->success(['order' => $this->publicOrder($orders->find((int) $order['id']))], 'Order status updated');
         } catch (OrderConflictException $exception) {
             return $this->error($exception->getMessage(), ResponseInterface::HTTP_CONFLICT);

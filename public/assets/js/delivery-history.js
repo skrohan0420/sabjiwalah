@@ -15,16 +15,16 @@
       card.append(node('p',(row.order_status==='delivered'?'Delivery date: ':'Failure recorded: ')+date(row.outcome_at)),node('p',row.amount_collected===null?'Cash collection: no verified cash record for your assignment.':'Cash collected: '+money.format(Number(row.amount_collected))));target.append(card);}
     if(!data.items.length)target.append(node('p','No completed or failed deliveries match these filters.','delivery-panel'));
     $('rider-history-page').textContent=`Page ${page} of ${Math.max(1,pages)} · ${data.pager.total} ${data.pager.total === 1 ? 'order' : 'orders'}`;
-    message.textContent='History updated '+date(new Date().toISOString())+'.';
+    message.textContent='';
   }
   function renderProfile(data){
     if(!data||typeof data.name!=='string'||!data.cod)throw new Error('Unexpected profile response. Refresh to try again.');
-    const card=node('section','','delivery-panel'),facts=node('dl','','delivery-profile-facts');
+    const card=node('section','','delivery-panel delivery-profile-card'),facts=node('dl','','delivery-profile-facts');
     card.append(node('h2',data.name),node('p','Delivery partner'));
-    for(const [label,value] of [['Phone',data.phone],['Account status',data.account_status],['Availability',data.availability]]){const row=node('div','');row.append(node('dt',label),node('dd',value));facts.append(row);}card.append(facts);
-    const stats=node('dl','','delivery-stats');
-    for(const [label,value] of [['Total completed deliveries',data.completed_total],['Deliveries today',data.completed_today],['COD collected today',money.format(Number(data.cod_collected_today))],['Total COD collected',money.format(Number(data.cod.collected))],['Awaiting cash handover',money.format(Number(data.cod.pending))],['Cash handover recorded',money.format(Number(data.cod.reconciled))]]){const row=node('div','');row.append(node('dt',label),node('dd',String(value)));stats.append(row);}
-    target.replaceChildren(card,stats);message.textContent='Updated '+date(data.generated_at)+' · Today: '+data.day+' (India).';
+    for(const [label,value] of [['Phone',data.phone],['Account status',data.account_status],['Availability',data.availability]]){const row=node('div','');row.setAttribute('data-profile-icon',label==='Phone'?'phone':label==='Account status'?'shield':'status');row.append(node('dt',label),node('dd',value));facts.append(row);}card.append(facts);
+    const stats=node('dl','','delivery-stats delivery-profile-stats');
+    for(const [label,value] of [['Total completed deliveries',data.completed_total],['Deliveries today',data.completed_today],['COD collected today',money.format(Number(data.cod_collected_today))],['Total COD collected',money.format(Number(data.cod.collected))],['Awaiting cash handover',money.format(Number(data.cod.pending))],['Cash handover recorded',money.format(Number(data.cod.reconciled))]]){const row=node('div','');row.setAttribute('data-profile-icon',label.includes('deliver')?'box':label.includes('handover')?'handover':'cash');row.append(node('dt',label),node('dd',String(value)));stats.append(row);}
+    target.replaceChildren(card,stats);message.textContent='';
     $('delivery-rider-name').textContent=data.name;
   }
   async function load(){
@@ -36,7 +36,13 @@
     finally{inFlight=false;refresh.disabled=!alive;target.setAttribute('aria-busy','false');nav();if(pending&&alive){pending=false;load();}}
   }
   function change(){++revision;page=1;pages=0;target.replaceChildren();$('rider-history-page').textContent='';load();}
-  if(form){form.addEventListener('submit',event=>{event.preventDefault();filters=new URLSearchParams(new FormData(form));change();});form.addEventListener('reset',()=>{filters=new URLSearchParams();change();});
+  const filterDialog=$('rider-filters-dialog'),filterOpen=$('rider-filters-open');
+  function closeFilters(){filterDialog?.close();filterOpen?.focus();}
+  function filterCount(){const count=$('rider-filters-count');if(count){const total=Array.from(filters.values()).filter(value=>value.trim()).length;count.hidden=!total;count.textContent=String(total);}}
+  filterOpen?.addEventListener('click',()=>filterDialog.showModal());
+  $('rider-filters-close')?.addEventListener('click',closeFilters);
+  filterDialog?.addEventListener('click',event=>{if(event.target===filterDialog){const rect=filterDialog.getBoundingClientRect();if(event.clientY<rect.top||event.clientY>rect.bottom||event.clientX<rect.left||event.clientX>rect.right)closeFilters();}});
+  if(form){form.addEventListener('submit',event=>{event.preventDefault();filters=new URLSearchParams(new FormData(form));filterCount();closeFilters();change();});form.addEventListener('reset',()=>{filters=new URLSearchParams();filterCount();closeFilters();change();});
     $('rider-history-prev').addEventListener('click',()=>{if(page>1&&!inFlight){page--;++revision;load();}});$('rider-history-next').addEventListener('click',()=>{if(page<pages&&!inFlight){page++;++revision;load();}});}
   refresh.addEventListener('click',load);
   document.addEventListener('visibilitychange',()=>{if(document.hidden){++revision;pending=false;target.replaceChildren();}else load();});

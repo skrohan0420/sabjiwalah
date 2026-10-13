@@ -11,12 +11,21 @@ class DispatchController extends BaseApiController
 {
     public function index() { return $this->listing(false); }
     public function candidates() { return $this->listing(true); }
+    public function recommendations()
+    {
+        $this->response->setHeader('Cache-Control','private, no-store');
+        $query=$this->request->getGet();
+        if (!$this->validateData($query,['page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[1000000]','per_page'=>'permit_empty|is_natural_no_zero|less_than_equal_to[100]','search'=>'permit_empty|max_length[120]'])) return $this->validationError($this->validator->getErrors());
+        $query['page']=(int)($query['page']??1)?:1;$query['per_page']=(int)($query['per_page']??10)?:10;
+        try {return $this->success((new \App\Services\RiderRecommendationService())->candidates($query));}
+        catch (\Throwable $e) {return $this->unavailable($e);}
+    }
     private function listing(bool $candidates)
     {
         $this->response->setHeader('Cache-Control', 'no-store, private');
         $query = $this->request->getGet();
         $rules = ['page' => 'permit_empty|is_natural_no_zero|less_than_equal_to[1000000]', 'per_page' => 'permit_empty|is_natural_no_zero|less_than_equal_to[100]', 'search' => 'permit_empty|max_length[120]'];
-        if (! $candidates) $rules += ['status' => 'permit_empty|in_list[ready_for_delivery,out_for_delivery]', 'assignment' => 'permit_empty|in_list[assigned,unassigned]'];
+        if (! $candidates) $rules += ['status' => 'permit_empty|in_list[preparing,ready_for_delivery,out_for_delivery]', 'assignment' => 'permit_empty|in_list[assigned,unassigned]'];
         if (! $this->validateData($query, $rules)) return $this->validationError($this->validator->getErrors());
         $query['page'] = (int) ($query['page'] ?? 1) ?: 1; $query['per_page'] = (int) ($query['per_page'] ?? 20) ?: 20;
         try { return $this->success($candidates ? (new DispatchModel())->candidates($query) : (new DispatchService())->queue($query)); }

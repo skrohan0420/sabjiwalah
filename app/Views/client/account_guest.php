@@ -12,7 +12,7 @@
 </head>
 <body class="account-guest-body">
     <main class="account-page account-page--guest account-page--with-nav">
-        <a class="account-back" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back" data-history-back>
+        <a class="account-back" href="<?= esc(base_url(''), 'attr') ?>" aria-label="Go back">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15 5 8 12l7 7"></path>
             </svg>

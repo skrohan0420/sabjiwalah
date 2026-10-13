@@ -5,9 +5,11 @@ namespace App\Models;
 /** Read operations for the admin order workspace. */
 class AdminOrderModel extends OrderModel
 {
+    public const QUEUES = ['new' => ['pending'], 'preparing' => ['confirmed', 'preparing'], 'ready' => ['ready_for_delivery'], 'on_way' => ['out_for_delivery'], 'history' => ['delivered', 'cancelled', 'delivery_failed']];
     public function listing(array $filters, ?string $start, ?string $end): array
     {
         $query = $this->db->table('orders');
+        if (isset(self::QUEUES[$filters['queue'] ?? ''])) $query->whereIn('order_status', self::QUEUES[$filters['queue']]);
         if (! empty($filters['status'])) {
             $query->where('order_status', $filters['status']);
         }
@@ -48,6 +50,18 @@ class AdminOrderModel extends OrderModel
     {
         return $this->db->table('order_items')->select('uid, product_name, unit, quantity, unit_price, total_price')
             ->where('order_id', $orderId)->orderBy('id', 'ASC')->get()->getResultArray();
+    }
+
+    public function queueCounts(array $filters, ?string $start, ?string $end): array
+    {
+        $query = $this->db->table('orders')->select('order_status, COUNT(*) AS total')->groupBy('order_status');
+        if (!empty($filters['search'])) $query->groupStart()->like('order_number', $filters['search'])->orLike('customer_name', $filters['search'])->groupEnd();
+        if ($start !== null) $query->where('created_at >=', $start);
+        if ($end !== null) $query->where('created_at <', $end);
+        $byStatus = array_column($query->get()->getResultArray(), 'total', 'order_status');
+        $counts = [];
+        foreach (self::QUEUES as $key => $statuses) $counts[$key] = array_sum(array_map(static fn($status) => (int) ($byStatus[$status] ?? 0), $statuses));
+        return $counts;
     }
 
     public function newest(): ?array

@@ -28,7 +28,7 @@ function customerAction(string $method, array $input = [], ?string $uid = null, 
     return [$response->getStatusCode(), json_decode($response->getBody(), true)];
 }
 $users = new App\Models\UserModel();
-$one = $users->skipValidation(true)->insert(['name' => '<img src=x>', 'email' => 'fixture@example.test', 'phone' => '9876543210', 'role' => 'customer', 'status' => 'active', 'password_hash' => 'HASH_MUST_NEVER_LEAK']);
+$one = $users->skipValidation(true)->insert(['name' => '<img src=x>', 'email' => 'fixture@example.test', 'phone' => '9876543210', 'role' => 'customer', 'status' => 'active']);
 $two = $users->skipValidation(true)->insert(['name' => 'Fixture B', 'phone' => '9876500000', 'role' => 'customer', 'status' => 'inactive']);
 $manager = $users->skipValidation(true)->insert(['name' => 'Manager fixture', 'phone' => '9876500001', 'role' => 'admin', 'status' => 'active']);
 $rider = $users->skipValidation(true)->insert(['name' => 'Rider fixture', 'phone' => '9876500002', 'role' => 'delivery', 'status' => 'active']);
@@ -43,7 +43,7 @@ foreach ([$one, $one, $two] as $index => $id) {
 customerCheck($status === 200 && $data['data']['pager']['total'] === 2 && count($data['data']['items']) === 1, 'Only customers should be listed and paginated.');
 $row = $data['data']['items'][0];
 customerCheck($row['uid'] === $uid && $row['order_count'] === 2 && str_ends_with($row['phone_masked'], '3210'), 'Count/masked phone failed.');
-customerCheck(!isset($row['email'], $row['phone'], $row['password_hash'], $row['id']) && !str_contains(json_encode($data), 'HASH_MUST_NEVER_LEAK'), 'List leaked private fields.');
+customerCheck(!isset($row['email'], $row['phone'], $row['password_hash'], $row['id']), 'List leaked private fields.');
 foreach (['9876543210', '+91 98765 43210', '<img src=x>'] as $search) {
     [$status,$data] = customerAction('index', [], null, ['search' => $search]);
     customerCheck($status === 200 && $data['data']['pager']['total'] === 1, 'Name/phone search failed.');

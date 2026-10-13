@@ -33,6 +33,13 @@
   }
   async function run(body, path, method, successText, feedback) {
     if (busy || ui.isBusy() || uncertain || !alive) return;
+    const actionButton = document.activeElement?.tagName === 'BUTTON' ? document.activeElement : null;
+    const originalLabel = actionButton?.textContent;
+    if (actionButton) {
+      actionButton.textContent = 'Saving…';
+      actionButton.setAttribute('aria-busy', 'true');
+      actionButton.classList.add('delivery-action-loading');
+    }
     setBusy(true, 'Saving delivery action…');
     message.hidden = true;
     try {
@@ -47,7 +54,14 @@
       uncertain = uncertain || !error.status || error.status >= 500 || [401, 403].includes(error.status) || (error.status === 409 && error.code !== 'pin_expired');
       feedback?.(error);
       showError(error);
-    } finally { setBusy(false); }
+    } finally {
+      if (actionButton) {
+        actionButton.textContent = originalLabel;
+        actionButton.setAttribute('aria-busy', 'false');
+        actionButton.classList.remove('delivery-action-loading');
+      }
+      setBusy(false);
+    }
   }
   async function loadOrders() {
     const { data } = await ui.api('api/v1/delivery/orders' + (detailUid ? '/' + encodeURIComponent(detailUid) : ''));
@@ -57,16 +71,20 @@
     if (detailUid) window.SabjiwalahDeliveryTracking?.setOrder(data.order);
     list.replaceChildren();
     uncertain = false;
-    const active = detailUid ? [data.order] : data.items.filter(row => ['ready_for_delivery', 'out_for_delivery'].includes(row.order_status));
+    const active = detailUid ? [data.order] : data.items.filter(row => ['preparing', 'ready_for_delivery', 'out_for_delivery'].includes(row.order_status));
     document.getElementById('delivery-count').textContent = detailUid ? data.order.order_number : 'Assigned orders: ' + active.length;
     for (const order of active) {
       const card = el('article', '', 'delivery-panel delivery-record');
-      const status = order.order_status === 'ready_for_delivery' ? 'Ready for pickup' : statusName(order.order_status);
-      card.append(el('h2', order.order_number), el('p', status, 'delivery-status'),
-        el('p', order.customer_name + ' · ' + order.customer_phone),
+      card.setAttribute('data-status', order.order_status);
+      const status = order.order_status === 'preparing' ? 'Preparing · Head to pickup' : order.order_status === 'ready_for_delivery' ? 'Ready for pickup' : statusName(order.order_status);
+      const heading = el('div', '', 'delivery-record-heading');
+      heading.append(el('h2', order.order_number), el('p', status, 'delivery-status'));
+      card.append(heading,
+        el('p', order.customer_name + ' · ' + order.customer_phone, 'delivery-customer'),
         el('p', [order.address_line, order.city, order.state, order.postal_code].filter(Boolean).join(', '), 'delivery-address'));
       card.append(el('p', money.format(Number(order.total_amount)) + ' · ' + (order.payment_method === 'cod' ? 'Cash on delivery' : statusName(order.payment_method)) + ' · Payment ' + statusName(order.payment_status)),
-        el('p', 'Assigned ' + stamp(order.assigned_at), 'delivery-note'), el('p', 'Delivery instructions: ' + (order.notes || 'None provided.')));
+        el('p', 'Assigned ' + stamp(order.assigned_at), 'delivery-note'));
+      if (order.notes) card.append(el('p', 'Delivery instructions: ' + order.notes, 'delivery-instructions'));
       if (!detailUid) card.append(link('View order details', window.Sabjiwalah.url('delivery/orders/' + encodeURIComponent(order.uid))));
       const actionable = ['ready_for_delivery','out_for_delivery'].includes(order.order_status);
       if (actionable) {
@@ -77,7 +95,7 @@
         const hasCoords = lat !== null && lat !== undefined && lng !== null && lng !== undefined && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng)) && Math.abs(Number(lat)) <= 90 && Math.abs(Number(lng)) <= 180;
         const address = [order.address_line,order.city,order.state,order.postal_code].filter(Boolean).join(', ');
         if ((hasCoords || address) && (!detailUid || !window.SabjiwalahDeliveryMap)) {
-          const nav = link(hasCoords ? 'Navigate to Customer' : 'Navigate using address', 'https://www.google.com/maps/dir/?api=1&travelmode=driving&dir_action=navigate&destination=' + encodeURIComponent(hasCoords ? Number(lat) + ',' + Number(lng) : address));
+          const nav = link(hasCoords ? 'Navigate to Customer' : 'Navigate using address', 'https://www.google.com/maps/dir/?api=1&travelmode=two-wheeler&dir_action=navigate&destination=' + encodeURIComponent(hasCoords ? Number(lat) + ',' + Number(lng) : address));
           nav.target = '_blank'; nav.rel = 'noopener noreferrer'; nav.referrerPolicy = 'no-referrer'; contact.append(nav);
         }
         card.append(contact);
@@ -88,14 +106,22 @@
         for (const item of data.items) products.append(el('li', item.product_name + ' · ' + item.quantity + ' × ' + item.unit + ' · ' + money.format(Number(item.total_price))));
         card.append(products.children.length ? products : el('p', 'No product details recorded.'));
         const lat = order.delivery_latitude, lng = order.delivery_longitude;
-        card.append(el('h3', 'Saved delivery location'), el('p', lat !== null && lat !== undefined && lng !== null && lng !== undefined ? lat + ', ' + lng : 'Coordinates unavailable. Check the delivery address with the customer.'));
-        card.append(el('h3', 'Order timeline'), el('p', 'Placed ' + stamp(order.created_at)), el('p', 'Last updated ' + stamp(order.updated_at)));
-        if (order.completed_at) card.append(el('p', 'Completed ' + stamp(order.completed_at)));
+        const details = el('details', '', 'delivery-extra-details');
+        details.append(el('summary', 'Order activity & saved location'));
+        details.append(el('h3', 'Saved delivery location'), el('p', lat !== null && lat !== undefined && lng !== null && lng !== undefined ? lat + ', ' + lng : 'Coordinates unavailable. Check the delivery address with the customer.'));
+        details.append(el('h3', 'Order timeline'), el('p', 'Placed ' + stamp(order.created_at)), el('p', 'Last updated ' + stamp(order.updated_at)));
+        if (order.completed_at) details.append(el('p', 'Completed ' + stamp(order.completed_at)));
         const timeline = el('ul', '', 'delivery-products');
         for (const entry of data.history) timeline.append(el('li', statusName(entry.new_status) + ' · ' + stamp(entry.occurred_at)));
-        card.append(timeline);
+        details.append(timeline);
+        card.append(details);
       }
       const statusPath = 'api/v1/delivery/orders/' + encodeURIComponent(order.uid) + '/status';
+      if(['preparing','ready_for_delivery'].includes(order.order_status)&&order.pickup_location){
+        const nav=link('Navigate to pickup','https://www.google.com/maps/dir/?api=1&travelmode=two-wheeler&dir_action=navigate&destination='+encodeURIComponent(order.pickup_location.latitude+','+order.pickup_location.longitude));
+        nav.target='_blank';nav.rel='noopener noreferrer';nav.referrerPolicy='no-referrer';card.append(nav);
+      }
+      if(order.order_status==='preparing')card.append(el('p','Package is being prepared. Pickup becomes available when the shop marks it ready.','delivery-note'));
       if (order.order_status === 'ready_for_delivery') {
         const pickup = el('button', 'Record pickup', 'delivery-button delivery-primary');
         pickup.type = 'button';
@@ -110,25 +136,25 @@
         const feedback = el('p', '', 'delivery-note delivery-verification-message'); feedback.setAttribute('role','status'); feedback.setAttribute('aria-live','polite');
         pin.addEventListener('input', () => { pin.value = pin.value.replace(/[^0-9]/g,'').slice(0,6); });
         label.append(pin);
-        const cashLabel = el('label', ' I received the full COD amount of Rs ' + order.total_amount, 'delivery-cash');
-        const cash = el('input', ''); cash.type = 'checkbox'; cash.required = order.payment_method === 'cod'; cashLabel.prepend(cash);
         const submit = el('button', 'Verify and complete delivery', 'delivery-button delivery-primary'); submit.type = 'submit';
         submit.deliveryRetryUntil = cooldowns.get(order.uid) || 0;
         if (submit.deliveryRetryUntil > Date.now()) feedback.textContent = 'PIN attempts are paused until ' + stamp(new Date(submit.deliveryRetryUntil).toISOString()) + '. Refresh after that time to retry.';
         const amount = Number(order.total_amount), payable = Number.isFinite(amount) && amount >= 0;
         if (order.payment_method === 'cod') form.append(el('p', 'Cash to collect: ' + (payable ? money.format(amount) : 'Amount unavailable — refresh this order.'), 'delivery-amount-due'));
         else form.append(el('p', order.payment_status === 'paid' ? 'Payment already received. No cash collection is required.' : 'Payment is not confirmed. Delivery cannot be completed until payment is recorded.', 'delivery-note'));
-        form.append(label); if (order.payment_method === 'cod') form.append(cashLabel); form.append(feedback, submit);
+        form.append(label);
+        if(order.payment_method==='cod')form.append(el('p','Completing confirms cash received.','delivery-note'));
+        form.append(feedback, submit);
         form.addEventListener('submit', event => {
           event.preventDefault();
           if (busy || ui.isBusy() || uncertain) return;
           if ((cooldowns.get(order.uid) || 0) > Date.now()) return;
           if (!/^[0-9]{6}$/.test(pin.value)) { feedback.textContent = 'Enter exactly six numeric digits from the customer’s current PIN.'; pin.setAttribute('aria-invalid','true'); return; }
-          if (!payable || (order.payment_method === 'cod' && !cash.checked)) { feedback.textContent = 'Confirm that you received the full displayed COD amount.'; return; }
+          if (!payable) { feedback.textContent = 'Amount unavailable. Refresh this order before completing delivery.'; return; }
           if (order.payment_method !== 'cod' && order.payment_status !== 'paid') { feedback.textContent = 'Payment is not confirmed. Refresh the order after payment is recorded.'; return; }
           const entered = pin.value; pin.value = '';
           pin.setAttribute('aria-invalid','false'); feedback.textContent = 'Verifying the PIN and saving delivery…';
-          run({ pin: entered, cash_received: order.payment_method === 'cod' && cash.checked }, 'api/v1/delivery/orders/' + encodeURIComponent(order.uid) + '/complete', 'POST', 'Delivery completed.', error => {
+          run({ pin: entered, cash_received: order.payment_method === 'cod' }, 'api/v1/delivery/orders/' + encodeURIComponent(order.uid) + '/complete', 'POST', 'Delivery completed.', error => {
             feedback.textContent = ui.errorText(error);
             if (error.code === 'pin_incorrect' || error.status === 422) pin.setAttribute('aria-invalid','true');
             if (error.status === 429) {
@@ -159,7 +185,9 @@
             run({ status: 'delivery_failed', notes, expected_status: 'out_for_delivery' }, statusPath, 'PATCH', 'Failed delivery recorded.');
           }
         });
-        card.append(failure);
+        const failureDetails = el('details', '', 'delivery-failure-disclosure');
+        failureDetails.append(el('summary', 'Having trouble completing this delivery?'), failure);
+        card.append(failureDetails);
       }
       list.append(card);
     }

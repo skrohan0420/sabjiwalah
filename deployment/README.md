@@ -445,3 +445,11 @@ refresh on request or return to visibility/connectivity without continuous polli
 
 At the user’s request, PWA installation, the manifest, service worker and offline
 fallback have been removed. Delivery pages operate as ordinary web pages.
+
+### Account password cleanup
+
+Run migrations after deploying this version. The migration `2026-10-13-235959_RemoveUnusedUserPasswordHash` removes the unused `users.password_hash` column and discards its legacy values. Account login uses role-specific phone OTPs. Rolling back restores an empty nullable column, not the removed hashes. Historical migrations retain their original schema definitions so existing installations can upgrade normally. OTP code hashes and delivery PIN hashes remain required.
+
+### Pickup distance suggestions
+
+Run migrations to add the shop pickup coordinates and delivery rider presence table. Configure both pickup coordinates in Admin Settings. Available riders may explicitly share a GPS snapshot on Delivery Home; accuracy must be within 100 metres and snapshots are excluded after five minutes or after clearing/sign out. Operations recommendations include only active, available riders with no active assignment, order known fresh locations by straight-line distance before pagination, and keep unknown locations unranked. No travel ETA or automatic assignment is inferred.

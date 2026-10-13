@@ -13,8 +13,9 @@
     progress.hidden = !value;
     byId('delivery-main').setAttribute('aria-busy', String(value));
   }
-  function notify(text) {
+  function notify(text, destination = 'delivery/deliveries', notification) {
     if (!alive) return;
+    if(['assignment','ready'].includes(notification?.type))window.dispatchEvent(new CustomEvent('sabjiwalah:delivery-notification', { detail: { text, destination, type: notification.type, id: notification.id } }));
     clearTimeout(toastTimer);
     toast.textContent = text;
     toast.hidden = false;

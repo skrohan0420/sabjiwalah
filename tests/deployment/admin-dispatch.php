@@ -100,4 +100,15 @@ $db->table('delivery_assignments')->where('order_id',$orderIds[1])->delete();
 $db->query('ALTER TABLE delivery_assignments CHANGE assigned_by fixture_assigned_by INT UNSIGNED NOT NULL');
 try {dispatchCheck(dispatchAction('assign',['rider_uid'=>$twoUid,'expected_assignment_uid'=>'none'],$secondUid)[0]===503,'Assignment insert failure not reported.');dispatchCheck($db->table('delivery_assignments')->where('order_id',$orderIds[1])->countAllResults()===0,'Failed assignment partially committed.');}
 finally {$db->resetTransStatus();$db->query('ALTER TABLE delivery_assignments CHANGE fixture_assigned_by assigned_by INT UNSIGNED NOT NULL');}
-session_destroy();echo "PASS: dispatch queue/candidates/privacy, assignment/reassignment, stale/duplicate/capacity conflicts, latest rider authorization, pickup/status history, terminal rules, delayed flags, simulated interleaving and atomic rollback. Temporary SQL only.\n";
+$preparingId=$orderIds[2];$preparingUid=$orders->find($preparingId)['uid'];
+$db->table('orders')->where('id',$preparingId)->update(['order_status'=>'preparing']);fixtureIdentity($manager);
+dispatchCheck(dispatchAction('assign',['rider_uid'=>$riderUid,'expected_assignment_uid'=>'none'],$preparingUid)[0]===200,'Preparing order assignment failed.');
+dispatchCheck($orders->find($preparingId)['order_status']==='preparing','Assignment incorrectly marked package ready.');
+$dashboard=(new App\Models\DeliveryOrderModel())->dashboardSummary($one);
+dispatchCheck($dashboard['active_count']===1&&$dashboard['pending_pickups']===1&&$dashboard['active_order']['order_status']==='preparing','Preparing assignment missing from rider dashboard.');
+dispatchCheck(count(deliveryAction('index',$one,$preparingUid)[1]['data']['items'])===1,'Preparing assignment missing from rider list.');
+dispatchCheck(deliveryAction('updateStatus',$one,$preparingUid,['status'=>'out_for_delivery'])[0]===400,'Pickup allowed before package ready.');
+dispatchCheck($orders->find($preparingId)['order_status']==='preparing','Early pickup changed preparation status.');
+(new App\Services\OrderService())->changeStatus($preparingId,'ready_for_delivery',$manager,null,'preparing');
+dispatchCheck(deliveryAction('updateStatus',$one,$preparingUid,['status'=>'out_for_delivery','expected_status'=>'ready_for_delivery'])[0]===200,'Pickup failed after preparation completed.');
+session_destroy();echo "PASS: dispatch queue/candidates/privacy, assignment/reassignment, preparing assignment and pickup gating, stale/duplicate/capacity conflicts, latest rider authorization, pickup/status history, terminal rules, delayed flags, simulated interleaving and atomic rollback. Temporary SQL only.\n";

@@ -59,7 +59,7 @@ class AdminDeliveryPersonnelService
     {
         return $this->personnel->createPersonnel([
             'name' => $data['name'], 'phone' => $data['phone'], 'email' => $data['email'] ?: null,
-            'role' => 'delivery', 'status' => 'inactive', 'password_hash' => null,
+            'role' => 'delivery', 'status' => 'inactive',
         ]);
     }
 

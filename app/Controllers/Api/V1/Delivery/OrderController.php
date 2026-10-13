@@ -99,6 +99,10 @@ class OrderController extends BaseApiController
     {
         $result = $this->publicOrder($order);
         $result['assignment_uid'] = $order['assignment_uid'] ?? null;
+        if (in_array($order['order_status'], ['preparing','ready_for_delivery'], true)) {
+            $settings=(new \App\Services\OperationalSettingsService())->get();
+            $result['pickup_location']=$settings['pickup_latitude']!==null && $settings['pickup_longitude']!==null ? ['latitude'=>(float)$settings['pickup_latitude'],'longitude'=>(float)$settings['pickup_longitude']] : null;
+        }
         foreach (['created_at', 'updated_at', 'assigned_at', 'completed_at'] as $key) $result[$key] = $this->timestamp($order[$key] ?? null);
         return $result;
     }

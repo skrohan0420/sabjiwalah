@@ -10,7 +10,7 @@ $checkout = $checkout ?? [
 ];
 $items = $checkout['items'] ?? [];
 $itemCount = (int) ($checkout['count'] ?? 0);
-$loginUrl = '/login?redirect=' . rawurlencode('/checkout');
+$loginUrl = base_url('login?redirect=' . rawurlencode('/checkout'));
 $pageTitle = $pageTitle ?? 'Checkout';
 $backUrl = $backUrl ?? '/';
 $money = static fn (float $amount): string => 'Rs ' . number_format($amount, 2);
@@ -24,6 +24,7 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($pageTitle) ?> - Sabjiwalah</title>
     <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/cart.css'), 'attr') ?>">
+    <link rel="stylesheet" href="<?= esc(app_static_url('assets/css/location.css'), 'attr') ?>">
     <script src="<?= esc(app_static_url('assets/js/app-url.js'), 'attr') ?>" data-base-url="<?= esc(base_url(), 'attr') ?>"></script>
     <?= view('shared/theme') ?>
 </head>
@@ -36,12 +37,12 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
         <?= $isLoggedIn ? 'data-checkout-page' : '' ?>
     >
         <header class="checkout-topbar">
-            <a class="checkout-icon-link" href="<?= esc(app_asset_url($backUrl), 'attr') ?>" aria-label="Go back" data-history-back></a>
+            <a class="checkout-icon-link" href="<?= esc(app_asset_url($backUrl), 'attr') ?>" aria-label="Go back"></a>
             <h1><?= esc($pageTitle) ?></h1>
             <a class="checkout-text-link" href="<?= esc(base_url('products'), 'attr') ?>">Shop</a>
         </header>
 
-        <p class="checkout-card" data-checkout-policy role="status"><?= esc($checkout['checkout_notice'] ?? 'Orders are currently accepted.') ?></p>
+        <p class="checkout-card" data-checkout-policy role="status" <?= (float) $checkout['subtotal'] < (float) ($checkout['minimum_order_amount'] ?? 0) ? '' : 'hidden' ?>><?= esc($checkout['checkout_notice'] ?? '') ?></p>
         <?php if ($isLoggedIn): ?>
         <form class="checkout-card checkout-coupon" data-coupon-form>
             <label for="checkout-coupon">Coupon code</label>
@@ -139,71 +140,47 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
             </div>
         <?php else : ?>
             <section class="checkout-shell" data-checkout-authenticated="true">
-                <form class="checkout-form" data-checkout-form>
+                <form id="checkout-order-form" class="checkout-form" data-checkout-form>
                     <div class="cart-message" data-checkout-message role="status"></div>
 
-                    <label>
-                        Name
-                        <input name="customer_name" type="text" value="<?= esc($user['name'] ?? '', 'attr') ?>" required>
-                    </label>
-
-                    <label>
-                        Phone
-                        <input name="customer_phone" type="tel" value="<?= esc($user['phone'] ?? '', 'attr') ?>" data-checkout-phone required>
-                    </label>
-
-                    <section class="checkout-otp" aria-labelledby="checkout-otp-title">
+                    <section class="checkout-contact" aria-label="Order contact">
+                        <span class="checkout-contact-icon" aria-hidden="true">✓</span>
                         <div>
-                            <h2 id="checkout-otp-title">Phone verification</h2>
-                            <p>For now the test OTP is shown here so we can finish the checkout auth flow.</p>
+                            <span class="checkout-section-caption">ORDER CONTACT</span>
+                            <strong data-checkout-customer-name><?= esc($user['name'] ?? '') ?></strong>
+                            <span class="checkout-contact-phone"><?= esc($user['phone'] ?? '') ?></span>
                         </div>
-                        <button type="button" data-send-otp>Send OTP</button>
-                        <div class="dev-otp" data-dev-otp hidden></div>
-                        <div class="otp-row">
-                            <label>
-                                OTP
-                                <input name="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" data-otp-input>
-                            </label>
-                            <button type="button" data-verify-otp>Verify</button>
-                        </div>
-                        <p class="otp-status" data-otp-status>Verify your phone before placing the order.</p>
+                        <a href="<?= esc(base_url('account'), 'attr') ?>">Account</a>
+                    </section>
+                    <input name="customer_name" type="hidden" value="<?= esc($user['name'] ?? '', 'attr') ?>">
+                    <input name="customer_phone" type="hidden" value="<?= esc($user['phone'] ?? '', 'attr') ?>" data-checkout-phone>
+
+                    <input type="hidden" name="address_line">
+                    <input type="hidden" name="city">
+                    <input type="hidden" name="state">
+                    <input type="hidden" name="postal_code">
+                    <section class="checkout-address-map" aria-labelledby="checkout-map-title">
+                        <h2 id="checkout-map-title">Delivery location</h2>
+                        <iframe title="Delivery address map preview" data-checkout-map tabindex="-1" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden></iframe>
+                        <p data-checkout-map-address></p>
+                        <p data-checkout-map-status>Choose your delivery pin to fetch the address.</p>
+                        <button class="checkout-change-address" type="button" data-location-open aria-haspopup="dialog" aria-controls="location-sheet">Change address</button>
                     </section>
 
-                    <label>
-                        Address
-                        <textarea name="address_line" rows="3" required></textarea>
-                    </label>
-
-                    <div class="checkout-grid">
-                        <label>
-                            City
-                            <input name="city" type="text" required>
-                        </label>
-
-                        <label>
-                            State
-                            <input name="state" type="text">
-                        </label>
-
-                        <label>
-                            Postal Code
-                            <input name="postal_code" type="text" required>
-                        </label>
-                    </div>
-
-                    <label>
-                        Notes
-                        <textarea name="notes" rows="3"></textarea>
-                    </label>
+                    <details class="checkout-notes">
+                        <summary><span class="checkout-notes-icon" aria-hidden="true">✎</span><span class="checkout-notes-title">Delivery instructions<small>Optional · House number, landmark or drop-off note</small></span><span class="checkout-notes-chevron" aria-hidden="true"></span></summary>
+                        <label class="sr-only" for="checkout-notes">Delivery instructions</label>
+                        <textarea id="checkout-notes" name="notes" rows="2" placeholder="House or flat number, landmark, or delivery instructions"></textarea>
+                    </details>
                     <input type="hidden" name="delivery_latitude" data-delivery-latitude>
                     <input type="hidden" name="delivery_longitude" data-delivery-longitude>
-                    <p data-checkout-pin hidden></p>
 
-                    <button type="submit" data-place-order disabled>Place Order</button>
+
+
                 </form>
 
                 <aside class="cart-summary">
-                    <h2>Order Summary</h2>
+                    <h2>Order summary</h2>
                     <div data-checkout-items>
                         <?php if ($items === []) : ?>
                             <p>Your cart is empty.</p>
@@ -231,11 +208,27 @@ $compactMoney = static fn (float $amount): string => 'Rs ' . rtrim(rtrim(number_
                             <dd data-checkout-total><?= esc($money((float) $checkout['total_amount'])) ?></dd>
                         </div>
                     </dl>
-                    <p>Payment method: Cash on delivery.</p>
+                    <p>Pay on delivery</p>
                 </aside>
+                <div class="checkout-place-order">
+                    <button type="submit" form="checkout-order-form" data-place-order disabled>Place Order</button>
+                </div>
             </section>
         <?php endif; ?>
     </main>
+    <section class="checkout-confirmation" data-order-confirmation hidden role="status" aria-live="polite" aria-label="Order confirmed">
+        <div class="checkout-confirmation-card">
+            <div class="checkout-confirmation-check" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="m14 26 8 8 16-17"/></svg></div>
+            <h2>Order confirmed!</h2>
+            <p>Your fresh picks are on their way to being prepared.</p>
+            <strong data-confirmation-number></strong>
+            <a href="<?= esc(base_url('orders'), 'attr') ?>">Track your order →</a>
+        </div>
+    </section>
+    <?php if ($isLoggedIn): ?>
+        <?= view('client/products/_location_picker') ?>
+        <script src="<?= esc(app_static_url('assets/js/location.js'), 'attr') ?>"></script>
+    <?php endif ?>
 
     <script src="<?= esc(app_static_url('assets/js/navigation.js'), 'attr') ?>"></script>
     <script src="<?= esc(app_static_url('assets/js/cart.js'), 'attr') ?>"></script>

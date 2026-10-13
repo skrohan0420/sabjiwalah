@@ -18,6 +18,7 @@ class AdminOrderService
         $data = $this->orders->listing($filters, $this->dateBoundary($filters['from'] ?? null), $this->dateBoundary($filters['to'] ?? null, true));
         $latest = $this->orders->newest();
         $data['latest_order'] = $latest ? ['uid' => $latest['uid'], 'order_number' => $latest['order_number']] : null;
+        if (!empty($filters['queue'])) $data['queues'] = $this->orders->queueCounts($filters, $this->dateBoundary($filters['from'] ?? null), $this->dateBoundary($filters['to'] ?? null, true));
         return $data;
     }
 

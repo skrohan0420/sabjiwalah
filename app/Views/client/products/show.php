@@ -29,7 +29,7 @@ $icon = static fn ($name) => '<svg viewBox="0 0 24 24" aria-hidden="true">' . $i
 <body class="product-detail-page">
 <main class="product-detail-shell">
     <header class="detail-header" data-detail-header>
-        <a class="detail-icon" href="<?= esc(base_url('products'), 'attr') ?>" data-history-back aria-label="Back to products"><?= $icon('back') ?></a>
+        <a class="detail-icon" href="<?= esc(base_url('products'), 'attr') ?>" aria-label="Back to products"><?= $icon('back') ?></a>
         <span class="detail-header-name"><?= esc($product['name']) ?></span>
         <div class="detail-header-actions">
             <button class="detail-icon" type="button" data-save-product="<?= esc($product['uid'], 'attr') ?>" aria-label="Save product" aria-pressed="false"><?= $icon('heart') ?></button>
